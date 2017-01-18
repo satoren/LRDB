@@ -1,0 +1,17 @@
+// TODO.
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lua",
+            "request": "launch",
+            "name": "Lua-Debug",
+            "program": "${command.CurrentSource}",
+            "port": 21110,
+			"cwd": "${workspaceRoot}",
+            "server": {"program":"${command.DefaultLuaInterpreter}","args":["--port","21110"]},
+            "stopOnEntry": true,
+            "debugServer":4711
+        }
+    ]
+}
