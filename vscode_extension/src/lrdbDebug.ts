@@ -10,21 +10,21 @@ import * as net from 'net';
 import * as path from 'path';
 
 
-export interface ServerParameter
+export interface StartupCommand
 {
 	program: string;
 	args: string[];
+	cwd: string;
 }
 
 
 export interface LaunchRequestArguments extends DebugProtocol.LaunchRequestArguments {
-	program: string;
 
-	server: ServerParameter;
+	startupCommand: StartupCommand;
 
+	host: string;
 	port: number;
-
-	cwd: string;
+	sourceRoot: string;
 
 	stopOnEntry?: boolean;
 }
@@ -167,10 +167,10 @@ class LuaDebugSession extends DebugSession {
 	}
 
 	protected launchRequest(response: DebugProtocol.LaunchResponse, args: LaunchRequestArguments): void {
-		var server_program = args.server.program;
-		var server_args = args.server.args;
-		this._debug_server_process = spawn(server_program, server_args.concat(args.program), {
-			cwd: args.cwd,
+		var startupCommand = args.startupCommand;
+		var server_args = args.startupCommand.args;
+		this._debug_server_process = spawn(startupCommand.program, startupCommand.args, {
+			cwd: startupCommand.cwd,
 			env: process.env
 		});
 
@@ -188,11 +188,11 @@ class LuaDebugSession extends DebugSession {
 		}
 
 		this.convertClientPathToDebugger = (clientPath: string): string => {
-			return path.relative(args.cwd, clientPath);
+			return path.relative(args.sourceRoot, clientPath);
 		}
 		this.convertDebuggerPathToClient = (debuggerPath: string): string => {
 			const filename: string = debuggerPath.startsWith("@") ? debuggerPath.substr(1) : debuggerPath;
-			return path.join(args.cwd, filename);
+			return path.join(args.sourceRoot, filename);
 		}
 
 

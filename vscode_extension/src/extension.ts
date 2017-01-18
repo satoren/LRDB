@@ -15,9 +15,18 @@ const initialConfigurations = {
 			type: 'lua',
 			request: 'launch',
 			name: 'Lua-Debug',
-			program: '${command.AskForProgramName}',
-			cwd: '${workspaceRoot}',
-			port: 21110,			
+			host: 'localhost',
+			port: 21110,
+			sourceRoot: "${workspaceRoot}",
+			startupCommand: {
+				program: '${command.DefaultLuaInterpreter}',
+				args: [
+					'--port',
+					'21110',
+					'${command.CurrentSource}'
+				],
+				cwd: "${workspaceRoot}"
+			},
 			stopOnEntry: true
 		}
 	]
@@ -43,7 +52,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(disposable);
 
 	context.subscriptions.push(vscode.commands.registerCommand('extension.lrdb.getDefaultDebugServerName', config => {
-		return context.asAbsolutePath(path.join('out','bin', launchBinary()));
+		return context.asAbsolutePath(path.join('out', 'bin', launchBinary()));
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('extension.lrdb.provideInitialConfigurations', () => {
