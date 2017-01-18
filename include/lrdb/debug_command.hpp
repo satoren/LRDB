@@ -6,26 +6,26 @@
 namespace lrdb {
 
 namespace command {
-picojson::value exec_step(debugger& debugger, const picojson::value& param) {
+picojson::value exec_step(debugger& debugger, const picojson::value& ) {
   debugger.step();
   return picojson::value();
 }
-picojson::value exec_step_in(debugger& debugger, const picojson::value& param) {
+picojson::value exec_step_in(debugger& debugger, const picojson::value& ) {
   debugger.step_in();
   return picojson::value();
 }
 
 picojson::value exec_step_out(debugger& debugger,
-                              const picojson::value& param) {
+                              const picojson::value& ) {
   debugger.step_out();
   return picojson::value();
 }
 picojson::value exec_continue(debugger& debugger,
-                              const picojson::value& param) {
+                              const picojson::value& ) {
   debugger.unpause();
   return picojson::value();
 }
-picojson::value exec_pause(debugger& debugger, const picojson::value& param) {
+picojson::value exec_pause(debugger& debugger, const picojson::value& ) {
   debugger.pause();
   return picojson::value();
 }
@@ -44,7 +44,7 @@ picojson::value exec_add_breakpoint(debugger& debugger,
   return picojson::value();
 }
 picojson::value exec_get_breakpoints(debugger& debugger,
-                                     const picojson::value& param) {
+                                     const picojson::value& ) {
   const debugger::line_breakpoint_type& breakpoints =
       debugger.line_breakpoints();
 
@@ -67,7 +67,7 @@ picojson::value exec_get_breakpoints(debugger& debugger,
   return picojson::value(res);
 }
 picojson::value exec_get_stacktrace(debugger& debugger,
-                                    const picojson::value& param) {
+                                    const picojson::value& ) {
   auto callstack = debugger.get_call_stack();
   picojson::array res;
   for (auto& s : callstack) {

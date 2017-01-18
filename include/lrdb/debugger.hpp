@@ -46,7 +46,6 @@ inline picojson::value to_json(lua_State* L, int index, int max_recursive = 1) {
         picojson::array a;
         lua_pushnil(L);
         while (lua_next(L, index) != 0) {
-          int prev = lua_gettop(L);
           if (lua_type(L, -2) == LUA_TNUMBER) {
             a.push_back(to_json(L, -1, max_recursive - 1));
           }
@@ -78,8 +77,8 @@ inline picojson::value to_json(lua_State* L, int index, int max_recursive = 1) {
     case LUA_TTHREAD:
     case LUA_TFUNCTION: {
       char buffer[128] = {};
-      snprintf(buffer, sizeof(buffer) - 1, "%s(%d)", lua_typename(L, type),
-               reinterpret_cast<uintptr_t>(lua_topointer(L, index)));
+      snprintf(buffer, sizeof(buffer) - 1, "%s(%p)", lua_typename(L, type),
+               lua_topointer(L, index));
       return picojson::value(buffer);
     }
   }
@@ -115,7 +114,7 @@ inline void push_json(lua_State* L, const picojson::value& v) {
 }
 
 struct breakpoint_info {
-  breakpoint_info() : line(-1), enabled(false), break_count(0) {}
+  breakpoint_info() : line(-1), break_count(0), enabled(false) {}
   std::string file;
   std::string func;
   int line;
@@ -136,6 +135,7 @@ class debug_info {
     state_ = other.state_;
     debug_ = other.debug_;
     got_debug_ = other.got_debug_;
+    return *this;
   }
   void assign(lua_State* L, lua_Debug* debug, const char* got_type = "") {
     state_ = L;
@@ -262,6 +262,7 @@ class debug_info {
       picojson::array va;
       int varno = -1;
       while (const char* varname = lua_getlocal(state_, debug_, varno--)) {
+        (void)varname;//unused
         va.push_back(utility::to_json(state_, -1));
         lua_pop(state_, 1);
       }
@@ -319,7 +320,6 @@ class debug_info {
  private:
   void create_eval_env(bool global = true, bool upvalue = true,
                        bool local = true) {
-    int nup = number_of_upvalues();
     lua_createtable(state_, 0, 0);
 
     // copy global
@@ -354,6 +354,7 @@ class debug_info {
         varno = 0;
         lua_createtable(state_, 0, 0);
         while (const char* varname = lua_getlocal(state_, debug_, --varno)) {
+          (void)varname;//unused
           lua_seti(state_, -2, -varno);
         }
         if (varno < -1) {
@@ -390,6 +391,7 @@ class stack_info : private debug_info {
     debug_var_ = other.debug_var_;
     valid_ = other.valid_;
     debug_ = &debug_var_;
+    return *this;
   }
   bool is_available() { return valid_ && debug_info::is_available(); }
   ~stack_info() { debug_ = 0; }
@@ -516,7 +518,7 @@ class debugger {
 
  private:
   void sethook() {
-    lua_pushlightuserdata(state_, &hook_function);
+    lua_pushlightuserdata(state_, this_data_key());
     lua_pushlightuserdata(state_, this);
     lua_rawset(state_, LUA_REGISTRYINDEX);
     lua_sethook(state_, &hook_function,
@@ -525,7 +527,7 @@ class debugger {
   void unsethook() {
     if (state_) {
       lua_sethook(state_, 0, 0, 0);
-      lua_pushlightuserdata(state_, &hook_function);
+      lua_pushlightuserdata(state_, this_data_key());
       lua_pushnil(state_);
       lua_rawset(state_, LUA_REGISTRYINDEX);
       state_ = 0;
@@ -535,7 +537,6 @@ class debugger {
   debugger& operator=(const debugger&);  //=delete;
 
   breakpoint_info* search_breakpoints(debug_info& debuginfo) {
-    bool getinfo = false;
     int currentline = debuginfo.currentline();
     for (line_breakpoint_type::iterator it = line_breakpoints_.begin();
          it != line_breakpoints_.end(); ++it) {
@@ -583,6 +584,7 @@ class debugger {
         if (step_callstack_size_ > callstack.size()) {
           pause_ = true;
         }
+      case STEP_NONE:
         break;
     }
   }
@@ -608,8 +610,11 @@ class debugger {
       pause_handler_(*this);
     }
   }
+  static void* this_data_key(){
+    static int key_data=0;return &key_data;
+  }
   static void hook_function(lua_State* L, lua_Debug* ar) {
-    lua_pushlightuserdata(L, &hook_function);
+    lua_pushlightuserdata(L, this_data_key());
     lua_rawget(L, LUA_REGISTRYINDEX);
 
     debugger* self = static_cast<debugger*>(lua_touserdata(L, -1));

@@ -39,7 +39,7 @@ TEST_F(DebuggerTest, BreakPointTest1) {
     ASSERT_TRUE(breakpoint);
     ASSERT_EQ(TEST_LUA_SCRIPT, breakpoint->file);
     ASSERT_EQ(3, breakpoint->line);
-    ASSERT_EQ(1, breakpoint->break_count);
+    ASSERT_EQ(1U, breakpoint->break_count);
     ASSERT_TRUE(breakpoint->enabled);
 
     ASSERT_EQ(3, debugger.current_debug_info().currentline());
@@ -65,7 +65,7 @@ TEST_F(DebuggerTest, BreakPointTestCoroutine) {
     ASSERT_TRUE(breakpoint);
     ASSERT_EQ(TEST_LUA_SCRIPT, breakpoint->file);
     ASSERT_EQ(3, breakpoint->line);
-    ASSERT_EQ(1, breakpoint->break_count);
+    ASSERT_EQ(1U, breakpoint->break_count);
     ASSERT_TRUE(breakpoint->enabled);
 
     ASSERT_EQ(3, debugger.current_debug_info().currentline());
@@ -145,7 +145,7 @@ TEST_F(DebuggerTest, TickTest1) {
   const char* TEST_LUA_SCRIPT = "../test/lua/test1.lua";
 
   int tick_count = 0;
-  debugger.set_tick_handler([&](lrdb::debugger& debugger) { tick_count++; });
+  debugger.set_tick_handler([&](lrdb::debugger& ) { tick_count++; });
 
   luaL_dofile(L, TEST_LUA_SCRIPT);
 
@@ -161,7 +161,7 @@ TEST_F(DebuggerTest, EvalTest1) {
     std::vector<picojson::value> ret = debugger.current_debug_info().eval(
         "return arg,value,local_value,local_value3");
 
-    ASSERT_EQ(4, ret.size());
+    ASSERT_EQ(4U, ret.size());
 
     ASSERT_TRUE(ret[0].is<double>());
     ASSERT_EQ(4, ret[0].get<double>());
@@ -184,7 +184,7 @@ TEST_F(DebuggerTest, GetLocalTest1) {
 
     lrdb::debug_info::local_vars_type localvars =
         debugger.current_debug_info().get_local_vars();
-    ASSERT_EQ(2, localvars.size());
+    ASSERT_EQ(2U, localvars.size());
     ASSERT_EQ("local_value1", localvars[0].first);
     ASSERT_EQ(1, localvars[0].second.get<double>());
 
@@ -194,19 +194,19 @@ TEST_F(DebuggerTest, GetLocalTest1) {
     ASSERT_TRUE(ret);
     localvars = debugger.current_debug_info().get_local_vars();
 
-    ASSERT_EQ(2, localvars.size());
+    ASSERT_EQ(2U, localvars.size());
     ASSERT_EQ("local_value1", localvars[0].first);
     ASSERT_EQ("ab", localvars[0].second.get<std::string>());
 
     std::vector<picojson::value> eret =
         debugger.current_debug_info().eval("return local_value1");
 
-    ASSERT_EQ(1, eret.size());
+    ASSERT_EQ(1U, eret.size());
     ASSERT_TRUE(eret[0].is<std::string>());
     ASSERT_EQ("ab", eret[0].get<std::string>());
 
     eret = debugger.current_debug_info().eval("return _G");
-    ASSERT_EQ(1, eret.size());
+    ASSERT_EQ(1U, eret.size());
     ASSERT_TRUE(eret[0].is<picojson::object>());
 
   });
@@ -223,7 +223,7 @@ TEST_F(DebuggerTest, GetVaArgTest1) {
     lrdb::debug_info::local_vars_type localvars =
         debugger.current_debug_info().get_local_vars(1);
 
-    ASSERT_EQ(4, localvars.size());
+    ASSERT_EQ(4U, localvars.size());
     ASSERT_EQ("v1", localvars[0].first);
     ASSERT_EQ(2, localvars[0].second.get<double>());
 
@@ -235,13 +235,13 @@ TEST_F(DebuggerTest, GetVaArgTest1) {
     ASSERT_TRUE(localvars[3].second.is<picojson::array>());
     auto& vararg = localvars[3].second.get<picojson::array>();
 
-    ASSERT_EQ(2, vararg.size());
+    ASSERT_EQ(2U, vararg.size());
     ASSERT_EQ(1, vararg[0].get<double>());
     ASSERT_EQ(3, vararg[1].get<double>());
 
     std::vector<picojson::value> eret =
         debugger.current_debug_info().eval("return table.unpack(_ENV[\"(*vararg)\"])");
-    ASSERT_EQ(2, eret.size());
+    ASSERT_EQ(2U, eret.size());
     ASSERT_EQ(1, eret[0].get<double>());
     ASSERT_EQ(3, eret[1].get<double>());
 

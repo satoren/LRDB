@@ -36,7 +36,7 @@ class server {
       send_message(message::notify::serialize("running"));
     });
 
-    debugger_.set_tick_handler([&](debugger& debugger) {
+    debugger_.set_tick_handler([&](debugger& ) {
       io_service_.poll();
       while (wait_for_connect_ && !socket_.is_open()) {
         io_service_.run_one();
@@ -46,7 +46,7 @@ class server {
     debugger_.step_in();
 
     acceptor_.async_accept(
-        socket_, [&](const asio::error_code& ec) { connected_done(); });
+        socket_, [&](const asio::error_code& ec) {if(ec){ connected_done();} });
   }
 
   ~server() {
@@ -79,7 +79,7 @@ class server {
   }
   void start_receive_commands() {
     asio::async_read_until(socket_, read_buffer_, "\n",
-                           [&](const asio::error_code& ec, std::size_t s) {
+                           [&](const asio::error_code& ec, std::size_t) {
                              if (!ec) {
                                std::istream is(&read_buffer_);
                                std::string command;

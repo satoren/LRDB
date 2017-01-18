@@ -49,6 +49,8 @@ elseif(APPLE)
 install(TARGETS lua_with_lrdb_server
         RUNTIME DESTINATION vscode_extension/out/bin/macos)
 elseif(UNIX)
+target_link_libraries(lua_with_lrdb_server -lpthread)
+
 install(TARGETS lua_with_lrdb_server
         RUNTIME DESTINATION vscode_extension/out/bin/linux)
 else(WIN32)
@@ -71,6 +73,18 @@ target_link_libraries(lua_debugger_test ${LUA_LIBRARIES})
 
 add_executable(lrdb_server_test test/lrdb_server_test.cpp ${HEADER_FILE} ${GTEST_SOURCE})
 target_link_libraries(lrdb_server_test ${LUA_LIBRARIES})
+
+if(WIN32)
+
+elseif(APPLE)
+
+elseif(UNIX)
+target_link_libraries(lua_debugger_test -lpthread)
+target_link_libraries(lrdb_server_test -lpthread)
+else(WIN32)
+message(FATAL_ERROR "Unsupported operation system")
+endif(WIN32)
+
 
 add_test(
   NAME lua_debugger_test
