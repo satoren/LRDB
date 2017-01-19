@@ -19,6 +19,25 @@
                 "cwd": "${workspaceRoot}"
             },
             "stopOnEntry": true
+        },
+        {
+            "type": "lua",
+            "request": "launch",
+            "name": "debugserver Debug",
+            "host": "localhost",
+            "port": 21110,
+            "sourceRoot": "${workspaceRoot}",
+            "startupCommand": {
+                "program": "${command.DefaultLuaInterpreter}",
+                "args": [
+                    "--port",
+                    "21110",
+                    "${command.CurrentSource}"
+                ],
+                "cwd": "${workspaceRoot}"
+            },
+            "stopOnEntry": false
+            ,"debugServer":4711
         }
     ]
 }

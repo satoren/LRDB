@@ -6,45 +6,75 @@
 namespace lrdb {
 
 namespace command {
-picojson::value exec_step(debugger& debugger, const picojson::value& ) {
+picojson::value exec_step(debugger& debugger, const picojson::value&) {
   debugger.step();
   return picojson::value();
 }
-picojson::value exec_step_in(debugger& debugger, const picojson::value& ) {
+picojson::value exec_step_in(debugger& debugger, const picojson::value&) {
   debugger.step_in();
   return picojson::value();
 }
 
-picojson::value exec_step_out(debugger& debugger,
-                              const picojson::value& ) {
+picojson::value exec_step_out(debugger& debugger, const picojson::value&) {
   debugger.step_out();
   return picojson::value();
 }
-picojson::value exec_continue(debugger& debugger,
-                              const picojson::value& ) {
+picojson::value exec_continue(debugger& debugger, const picojson::value&) {
   debugger.unpause();
   return picojson::value();
 }
-picojson::value exec_pause(debugger& debugger, const picojson::value& ) {
+picojson::value exec_pause(debugger& debugger, const picojson::value&) {
   debugger.pause();
   return picojson::value();
 }
 picojson::value exec_add_breakpoint(debugger& debugger,
                                     const picojson::value& param) {
   bool has_source = param.get("file").is<std::string>();
+  bool has_condition = param.get("condition").is<std::string>();
+  bool has_hit_condition = param.get("hit_condition").is<std::string>();
   bool has_line = param.get("line").is<double>();
   if (has_source && has_line) {
     std::string source =
         param.get<picojson::object>().at("file").get<std::string>();
     int line = static_cast<int>(
         param.get<picojson::object>().at("line").get<double>());
-    debugger.add_breakpoint(source, line);
+
+    std::string condition;
+    std::string hit_condition;
+    if (has_condition) {
+      condition =
+          param.get<picojson::object>().at("condition").get<std::string>();
+    }
+    if (has_hit_condition) {
+      hit_condition =
+          param.get<picojson::object>().at("hit_condition").get<std::string>();
+    }
+    debugger.add_breakpoint(source, line, condition);
     return picojson::value(true);
   }
   return picojson::value();
 }
+picojson::value exec_clear_breakpoints(debugger& debugger,
+                                       const picojson::value& param) {
+  bool has_source = param.get("file").is<std::string>();
+  bool has_line = param.get("line").is<double>();
+  if (!has_source) {
+    debugger.clear_breakpoints();
+    return picojson::value(true);
+  }
+  std::string source =
+      param.get<picojson::object>().at("file").get<std::string>();
+  if (!has_line) {
+    debugger.clear_breakpoints(source);
+  } else {
+    int line = static_cast<int>(
+        param.get<picojson::object>().at("line").get<double>());
+    debugger.clear_breakpoints(source, line);
+  }
+  return picojson::value(true);
+}
 picojson::value exec_get_breakpoints(debugger& debugger,
-                                     const picojson::value& ) {
+                                     const picojson::value&) {
   const debugger::line_breakpoint_type& breakpoints =
       debugger.line_breakpoints();
 
@@ -59,15 +89,14 @@ picojson::value exec_get_breakpoints(debugger& debugger,
     if (!b.condition.empty()) {
       br["condition"] = picojson::value(b.condition);
     }
-    br["break_count"] = picojson::value(double(b.break_count));
-    br["enabled"] = picojson::value(b.enabled);
+    br["hit_count"] = picojson::value(double(b.hit_count));
     res.push_back(picojson::value(br));
   }
 
   return picojson::value(res);
 }
 picojson::value exec_get_stacktrace(debugger& debugger,
-                                    const picojson::value& ) {
+                                    const picojson::value&) {
   auto callstack = debugger.get_call_stack();
   picojson::array res;
   for (auto& s : callstack) {

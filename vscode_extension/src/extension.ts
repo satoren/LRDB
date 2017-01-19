@@ -37,10 +37,10 @@ function launchBinary(): string {
 		return "windows/lua_with_lrdb_server.exe"
 	}
 	else if (os.type() == 'Linux') {
-
+		return "linux/lua_with_lrdb_server.exe"
 	}
 	else if (os.type() == 'Darwin') {
-
+		return "macos/lua_with_lrdb_server.exe"
 	}
 	return ""
 }

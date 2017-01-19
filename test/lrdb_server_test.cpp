@@ -77,7 +77,7 @@ class DebugServerTest : public ::testing::Test {
     if (notify_handler) {
       notify_handler(v);
     }
-	std::string method = lrdb::message::get_method(v);
+    std::string method = lrdb::message::get_method(v);
     if (method == "running") {
       pause_ = false;
     } else if (method == "paused") {

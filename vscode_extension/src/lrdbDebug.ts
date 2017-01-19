@@ -10,8 +10,7 @@ import * as net from 'net';
 import * as path from 'path';
 
 
-export interface StartupCommand
-{
+export interface StartupCommand {
 	program: string;
 	args: string[];
 	cwd: string;
@@ -53,15 +52,29 @@ class LRDBClient {
 	private _request_id = 0;
 
 	public constructor(port: number, host: string) {
-		this._connection = net.connect(21110, 'localhost');
+		this._connection = net.connect(port, host);
 		this._connection.on('connect', () => {
 			console.log('Debug server connected');
 			if (this.openDelegate) {
 				this.openDelegate();
 			}
+
+			this._connection.on('close', () => {
+				if (this.closeDelegate) {
+					this.closeDelegate();
+				}
+			});
 		});
-		this._connection.on('error', function (e) {
-			console.log('Connection Failed - ' + 'localhost' + ':' + 21110);
+		var retryCount = 0;
+		this._connection.on('error', (e) => {
+			console.log('Connection Failed - ' + host + ':' + port);
+			if (retryCount < 5) {
+				retryCount++;
+				this._connection.setTimeout(1000, () => {
+					this._connection.connect(port, host);
+				});
+				return;
+			}
 			console.error(e.message);
 			if (this.errorDelegate) {
 				this.errorDelegate();
@@ -84,11 +97,6 @@ class LRDBClient {
 			}
 		}
 		this._connection.on('data', ondata);
-		this._connection.on('close', () => {
-			if (this.closeDelegate) {
-				this.closeDelegate();
-			}
-		});
 	}
 
 	public send(method: string, param?: any, callback?: (response: any) => void) {
@@ -120,10 +128,6 @@ class LuaDebugSession extends DebugSession {
 	// Lua 
 	private static THREAD_ID = 1;
 
-	// since we want to send breakpoint events, we will assign an id to every event
-	// so that the frontend can match events with breakpoints.
-	private _breakpointId = 1000;
-
 	private _debug_server_process: ChildProcess;
 
 	private _debug_client: LRDBClient;
@@ -133,6 +137,8 @@ class LuaDebugSession extends DebugSession {
 	private _breakPoints = new Map<string, DebugProtocol.Breakpoint[]>();
 
 	private _variableHandles = new Handles<VariableReference>();
+
+	private _stopOnEntry: boolean;
 
 	/**
 	 * Creates a new debug adapter that is used for one debug session.
@@ -151,14 +157,10 @@ class LuaDebugSession extends DebugSession {
 	 * to interrogate the features the debug adapter provides.
 	 */
 	protected initializeRequest(response: DebugProtocol.InitializeResponse, args: DebugProtocol.InitializeRequestArguments): void {
-
-		// since this debug adapter can accept configuration requests like 'setBreakpoint' at any time,
-		// we request them early by sending an 'initializeRequest' to the frontend.
-		// The frontend will end the configuration sequence by calling 'configurationDone' request.
-		this.sendEvent(new InitializedEvent());
-
 		// This debug adapter implements the configurationDoneRequest.
 		response.body.supportsConfigurationDoneRequest = true;
+
+		response.body.supportsConditionalBreakpoints = true;
 
 		// make VS Code to use 'evaluate' when hovering over source
 		response.body.supportsEvaluateForHovers = true;
@@ -167,16 +169,23 @@ class LuaDebugSession extends DebugSession {
 	}
 
 	protected launchRequest(response: DebugProtocol.LaunchResponse, args: LaunchRequestArguments): void {
-		var startupCommand = args.startupCommand;
-		var server_args = args.startupCommand.args;
-		this._debug_server_process = spawn(startupCommand.program, startupCommand.args, {
-			cwd: startupCommand.cwd,
-			env: process.env
-		});
+		this._stopOnEntry = args.stopOnEntry;
 
-		this._debug_client = new LRDBClient(args.port, 'localhost');
+		var startupCommand = args.startupCommand;
+		if (startupCommand) {
+			var server_args = args.startupCommand.args;
+			this._debug_server_process = spawn(startupCommand.program, startupCommand.args, {
+				cwd: startupCommand.cwd,
+				env: process.env
+			});
+		}
+
+		this._debug_client = new LRDBClient(args.port, args.host);
 		this._debug_client.eventDelegate = (event: DebugServerEvent) => { this.handleServerEvents(event) };
 		this._debug_client.closeDelegate = () => {
+			this.sendEvent(new TerminatedEvent());
+		};
+		this._debug_client.errorDelegate = () => {
 			this.sendEvent(new TerminatedEvent());
 		};
 
@@ -195,45 +204,56 @@ class LuaDebugSession extends DebugSession {
 			return path.join(args.sourceRoot, filename);
 		}
 
-
 		this._debug_client.openDelegate = () => {
-			for (var [source, breakpoints] of this._breakPoints) {
-				for (var i = 0; i < breakpoints.length; i++) {
-					this._debug_client.send("add_breakpoint", { "line": breakpoints[i].line, "file": this.convertClientPathToDebugger(source) });
-				}
-			}
-			if (args.stopOnEntry) {
-			} else {
-				this._debug_client.send("continue");
-			}
+			this.sendResponse(response);
+			this.sendEvent(new InitializedEvent());
 		};
 	}
+
+	protected configurationDoneRequest(response: DebugProtocol.ConfigurationDoneResponse, args: DebugProtocol.ConfigurationDoneArguments): void {
+
+		if (this._stopOnEntry) {
+		} else {
+			this._debug_client.send("continue");
+		}
+		this.sendResponse(response);
+	}
+
 	protected setBreakPointsRequest(response: DebugProtocol.SetBreakpointsResponse, args: DebugProtocol.SetBreakpointsArguments): void {
 
 		var path = args.source.path;
-		var clientLines = args.lines;
 
 		// read file contents into array for direct access
 		var lines = readFileSync(path).toString().split('\n');
 
 		var breakpoints = new Array<Breakpoint>();
 
+		var debuggerFilePath = this.convertClientPathToDebugger(path);
+
+		this._debug_client.send("clear_breakpoints", { "file": debuggerFilePath });
 		// verify breakpoint locations
-		for (var i = 0; i < clientLines.length; i++) {
-			var l = this.convertClientLineToDebugger(clientLines[i]);
+		for (let souceBreakpoint of args.breakpoints) {
+			var l = this.convertClientLineToDebugger(souceBreakpoint.line);
 			var verified = false;
 			if (l < lines.length) {
 				const line = lines[l].trim();
 				// if a line is empty or starts with '--' we don't allow to set a breakpoint but move the breakpoint down
-				if (line.length == 0 || line.startsWith("--"))
-				{
+				if (line.length == 0 || line.startsWith("--")) {
 					l++;
 				}
 				verified = true;    // this breakpoint has been validated
 			}
 			const bp = <DebugProtocol.Breakpoint>new Breakpoint(verified, this.convertDebuggerLineToClient(l));
-			bp.id = this._breakpointId++;
 			breakpoints.push(bp);
+
+			var sendbreakpoint = { "line": bp.line, "file": debuggerFilePath, "condition": undefined , "hit_condition": undefined };
+			if (souceBreakpoint.condition) {
+				sendbreakpoint.condition = souceBreakpoint.condition;
+			}
+			if (souceBreakpoint.hitCondition) {
+				sendbreakpoint.hit_condition = souceBreakpoint.hitCondition;
+			}
+			this._debug_client.send("add_breakpoint", sendbreakpoint);
 		}
 		this._breakPoints.set(path, breakpoints);
 
@@ -306,36 +326,55 @@ class LuaDebugSession extends DebugSession {
 					this._debug_client.send("get_local_variable", { "stack_no": id.frameId }, (res: any) => {
 						this.variablesRequestResponce(response, res.result, id);
 					});
-					return;
 				}
-				let chunk = 'return _ENV["' + id.datapath.slice(1).join('"]["') + '"]';
-				this._debug_client.send("eval", { "stack_no": id.frameId, "chunk": chunk, "global": false, "upvalue": false }, (res: any) => {
-					this.variablesRequestResponce(response, res.result[0], id);
-				});
+				else {
+					let chunk = 'return _ENV["' + id.datapath.slice(1).join('"]["') + '"]';
+					this._debug_client.send("eval", { "stack_no": id.frameId, "chunk": chunk, "global": false, "upvalue": false }, (res: any) => {
+						this.variablesRequestResponce(response, res.result[0], id);
+					});
+				}
 			}
 			else if (id.datapath[0] == "upvalue") {
 				if (id.datapath.length == 1) {
 					this._debug_client.send("get_upvalues", { "stack_no": id.frameId }, (res: any) => {
 						this.variablesRequestResponce(response, res.result, id);
 					});
-					return;
 				}
-				let chunk = 'return _ENV["' + id.datapath.slice(1).join('"]["') + '"]';
-				this._debug_client.send("eval", { "stack_no": id.frameId, "chunk": chunk, "global": false, "local": false }, (res: any) => {
-					this.variablesRequestResponce(response, res.result[0], id);
-				});
+				else {
+					let chunk = 'return _ENV["' + id.datapath.slice(1).join('"]["') + '"]';
+					this._debug_client.send("eval", { "stack_no": id.frameId, "chunk": chunk, "global": false, "local": false }, (res: any) => {
+						this.variablesRequestResponce(response, res.result[0], id);
+					});
+				}
 			}
 			else if (id.datapath[0] == "_ENV") {
-				let chunk = 'return _ENV["' + id.datapath.join('"]["') + '"]';
-				this._debug_client.send("eval", { "stack_no": id.frameId, "chunk": chunk }, (res: any) => {
-					this.variablesRequestResponce(response, res.result[0], id);
-				});
+				if (id.datapath.length == 1) {
+					let chunk = 'return _ENV;'
+					this._debug_client.send("eval", { "stack_no": id.frameId, "chunk": chunk }, (res: any) => {
+						this.variablesRequestResponce(response, res.result[0], id);
+					});
+				}
+				else {
+					let chunk = 'return _ENV["' + id.datapath.slice(1).join('"]["') + '"]';
+					this._debug_client.send("eval", { "stack_no": id.frameId, "chunk": chunk }, (res: any) => {
+						this.variablesRequestResponce(response, res.result[0], id);
+					});
+				}
 			}
 			else if (id.datapath[0] == "_G") {
-				let chunk = 'return _G["' + id.datapath.join('"]["') + '"]';
-				this._debug_client.send("eval", { "stack_no": id.frameId, "chunk": chunk }, (res: any) => {
-					this.variablesRequestResponce(response, res.result[0], id);
-				});
+				if (id.datapath.length == 1) {
+					let chunk = 'return _G';
+					this._debug_client.send("eval", { "stack_no": id.frameId, "chunk": chunk }, (res: any) => {
+						this.variablesRequestResponce(response, res.result[0], id);
+					});
+				}
+				else {
+					let chunk = 'return _G["' + id.datapath.join('"]["') + '"]';
+					this._debug_client.send("eval", { "stack_no": id.frameId, "chunk": chunk }, (res: any) => {
+						this.variablesRequestResponce(response, res.result[0], id);
+					});
+
+				}
 			}
 		}
 
@@ -392,14 +431,22 @@ class LuaDebugSession extends DebugSession {
 			let chunk = "return " + args.expression
 			this._debug_client.send("eval", { "stack_no": args.frameId, "chunk": chunk }, (res: any) => {
 				if (res.result) {
+					let ret = ""
+					for (let r of res.result) {
+						if (ret.length > 0)
+							ret += '	';
+						ret += JSON.stringify(r)
+					}
+
+
 					response.body = {
-						result: res.result[0],
+						result: ret,
 						variablesReference: 0
 					};
 				}
 				else {
 					response.body = {
-						result: "unknown data",
+						result: "",
 						variablesReference: 0
 					};
 				}

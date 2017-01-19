@@ -27,6 +27,9 @@ int main(int argc, char* argv[]) {
   debug_server.reset(L);
 
   bool ret = luaL_dofile(L, program);
+  if (ret != 0) {
+    std::cerr << lua_tostring(L, -1);  // output error
+  }
 
   debug_server.reset();
 

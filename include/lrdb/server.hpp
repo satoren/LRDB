@@ -36,7 +36,7 @@ class server {
       send_message(message::notify::serialize("running"));
     });
 
-    debugger_.set_tick_handler([&](debugger& ) {
+    debugger_.set_tick_handler([&](debugger&) {
       io_service_.poll();
       while (wait_for_connect_ && !socket_.is_open()) {
         io_service_.run_one();
@@ -45,8 +45,11 @@ class server {
 
     debugger_.step_in();
 
-    acceptor_.async_accept(
-        socket_, [&](const asio::error_code& ec) {if(ec){ connected_done();} });
+    acceptor_.async_accept(socket_, [&](const asio::error_code& ec) {
+      if (!ec) {
+        connected_done();
+      }
+    });
   }
 
   ~server() {

@@ -17,6 +17,7 @@
 	},
 	"activationEvents": [
 		"onCommand:extension.lrdb.getProgramName",
+		"onCommand:extension.lrdb.getDefaultDebugServerName",
 		"onCommand:extension.lrdb.provideInitialConfigurations"
 	],
 	"main": "./out/src/extension",
@@ -105,7 +106,7 @@
 					},
 					"attach": {
 						"required": [
-							"program"
+							"host","port"
 						],
 						"properties": {
 							"host": {
@@ -117,6 +118,11 @@
 								"type": "number",
 								"description": "port",
 								"default": 21110
+							},
+							"sourceRoot": {
+								"type": "string",
+								"description": "script source root directory.",
+								"default": "${workspaceRoot}"
 							},
 							"stopOnEntry": {
 								"type": "boolean",

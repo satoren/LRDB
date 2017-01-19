@@ -6,8 +6,6 @@ include(cmake/ReduceDependencies.cmake)
 
 add_subdirectory(third_party/lua-5.3.3)
 
-
-
 include_directories(third_party/lua-5.3.3/src)
 set(LUA_LIBRARIES liblua)
 
@@ -25,12 +23,12 @@ endif()
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 if(NOT MSVC)#-Wall nonsense on MSVC
-  add_definitions(-Wall -W -Werror)
+  add_definitions(-Wall -W)
   add_definitions(-pedantic)
   add_definitions(-Wno-variadic-macros)
   add_definitions ("-Wno-unused-local-typedefs")
   add_definitions ("-Wno-unknown-warning-option")
-  #add_definitions("-std=c++11")
+  add_definitions("-std=c++11")
 endif(NOT MSVC)
 
 

@@ -72,6 +72,28 @@ inline picojson::value to_json(lua_State* L, int index, int max_recursive = 1) {
       if (str) {
         return picojson::value(str);
       }
+      if (lua_getmetatable(L, index)) {
+        // in Lua code
+        // local meta = getmetatable(udata);
+        // if(meta.__totable)
+        //   local t = meta.__totable(udata)
+        //   if(t) return json.stringify(t) end
+        // end
+        //
+        int type = lua_getfield(L, -1, "__totable");
+        if (type == LUA_TFUNCTION) {
+          lua_pushvalue(L, index);
+          if (lua_pcall(L, 1, 1, 0) == 0)  // invoke __totable with userdata
+          {
+            picojson::value v =
+                to_json(L, -1, max_recursive);  // return value to json
+            lua_pop(L, 1);  // pop return value and metatable
+            return v;
+          }
+          lua_pop(L, 1);  // pop error message
+        }
+        lua_pop(L, 2);  // pop metatable and getfield data
+      }
     }
     case LUA_TLIGHTUSERDATA:
     case LUA_TTHREAD:
@@ -114,13 +136,14 @@ inline void push_json(lua_State* L, const picojson::value& v) {
 }
 
 struct breakpoint_info {
-  breakpoint_info() : line(-1), break_count(0), enabled(false) {}
+  breakpoint_info() : line(-1), hit_count(0) {}
   std::string file;
   std::string func;
   int line;
-  std::string condition;  // todo
-  size_t break_count;
-  bool enabled;
+  std::string condition;
+  std::string hit_condition;  // expression that controls how many hits of the
+                              // breakpoint are ignored
+  size_t hit_count;
 };
 
 class debug_info {
@@ -262,7 +285,7 @@ class debug_info {
       picojson::array va;
       int varno = -1;
       while (const char* varname = lua_getlocal(state_, debug_, varno--)) {
-        (void)varname;//unused
+        (void)varname;  // unused
         va.push_back(utility::to_json(state_, -1));
         lua_pop(state_, 1);
       }
@@ -354,7 +377,7 @@ class debug_info {
         varno = 0;
         lua_createtable(state_, 0, 0);
         while (const char* varname = lua_getlocal(state_, debug_, --varno)) {
-          (void)varname;//unused
+          (void)varname;  // unused
           lua_seti(state_, -2, -varno);
         }
         if (varno < -1) {
@@ -433,19 +456,32 @@ class debugger {
   }
   ~debugger() { reset(); }
 
-  void add_breakpoint(const std::string& file, int line, bool enabled = true) {
+  void add_breakpoint(const std::string& file, int line,
+                      const std::string& condition = "",
+                      const std::string& hit_condition = "") {
     breakpoint_info info;
     info.file = file;
     info.line = line;
-    info.enabled = enabled;
+    info.condition = condition;
+    info.hit_condition = hit_condition;
     line_breakpoints_.push_back(info);
   }
+  void clear_breakpoints(const std::string& file, int line = -1) {
+    line_breakpoints_.erase(
+        std::remove_if(line_breakpoints_.begin(), line_breakpoints_.end(),
+                       [&](const breakpoint_info& b) {
+                         return (line < 0 || b.line == line) &&
+                                (b.file == file);
+                       }),
+        line_breakpoints_.end());
+  }
+  void clear_breakpoints() { line_breakpoints_.clear(); }
 
   const line_breakpoint_type& line_breakpoints() const {
     return line_breakpoints_;
   }
 
-  void error_break(bool enable) { error_break_ = enable; }
+  //  void error_break(bool enable) { error_break_ = enable; }
   void set_tick_handler(tick_handler_type handler) { tick_handler_ = handler; }
   void set_pause_handler(pause_handler_type handler) {
     pause_handler_ = handler;
@@ -548,12 +584,34 @@ class debugger {
     }
     return 0;
   }
-
+  bool breakpoint_cond(const breakpoint_info& breakpoint,
+                       debug_info& debuginfo) {
+    if (!breakpoint.condition.empty()) {
+      picojson::array condret =
+          debuginfo.eval(("return " + breakpoint.condition).c_str());
+      return !condret.empty() && condret[0].evaluate_as_boolean();
+    }
+    return true;
+  }
+  bool breakpoint_hit_cond(const breakpoint_info& breakpoint,
+                           debug_info& debuginfo) {
+    if (!breakpoint.hit_condition.empty()) {
+      picojson::array condret =
+          debuginfo.eval(("return " + breakpoint.hit_condition).c_str());
+      if (!condret.empty() && condret[0].is<double>()) {
+        return breakpoint.hit_count >= condret[0].get<double>();
+      }
+    }
+    return true;
+  }
   void hookline() {
     current_breakpoint_ = search_breakpoints(current_debug_info_);
-    if (current_breakpoint_ && current_breakpoint_->enabled) {
-      current_breakpoint_->break_count++;
-      pause_ = true;
+    if (current_breakpoint_ &&
+        breakpoint_cond(*current_breakpoint_, current_debug_info_)) {
+      current_breakpoint_->hit_count++;
+      if (breakpoint_hit_cond(*current_breakpoint_, current_debug_info_)) {
+        pause_ = true;
+      }
     }
   }
   void hookcall() {}
@@ -610,8 +668,9 @@ class debugger {
       pause_handler_(*this);
     }
   }
-  static void* this_data_key(){
-    static int key_data=0;return &key_data;
+  static void* this_data_key() {
+    static int key_data = 0;
+    return &key_data;
   }
   static void hook_function(lua_State* L, lua_Debug* ar) {
     lua_pushlightuserdata(L, this_data_key());
@@ -631,7 +690,7 @@ class debugger {
 
   lua_State* state_;
   bool pause_;
-  bool error_break_;
+  //  bool error_break_;
   step_type step_type_;
   size_t step_callstack_size_;
   debug_info current_debug_info_;
