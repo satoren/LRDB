@@ -5,7 +5,7 @@
 namespace lrdb {
 
 namespace message {
-const std::string& get_method(const picojson::value& msg) {
+inline const std::string& get_method(const picojson::value& msg) {
   static std::string null;
   if (!msg.is<picojson::object>() || !msg.contains("method")) {
     return null;
@@ -16,14 +16,14 @@ const std::string& get_method(const picojson::value& msg) {
   }
   return m.get<std::string>();
 }
-const picojson::value& get_param(const picojson::value& msg) {
+inline const picojson::value& get_param(const picojson::value& msg) {
   static picojson::value null;
   if (!msg.is<picojson::object>() || !msg.contains("param")) {
     return null;
   }
   return msg.get<picojson::object>().at("param");
 }
-const picojson::value& get_id(const picojson::value& msg) {
+inline const picojson::value& get_id(const picojson::value& msg) {
   static picojson::value null;
   if (!msg.is<picojson::object>() || !msg.contains("id")) {
     return null;

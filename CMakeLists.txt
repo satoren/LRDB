@@ -69,7 +69,7 @@ set(GTEST_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/src/gtest-al
 add_executable(lua_debugger_test test/lua_debugger_test.cpp ${HEADER_FILE} ${GTEST_SOURCE})
 target_link_libraries(lua_debugger_test ${LUA_LIBRARIES})
 
-add_executable(lrdb_server_test test/lrdb_server_test.cpp ${HEADER_FILE} ${GTEST_SOURCE})
+add_executable(lrdb_server_test test/lrdb_server_test.cpp test/lrdb_server_test1.cpp ${HEADER_FILE} ${GTEST_SOURCE})
 target_link_libraries(lrdb_server_test ${LUA_LIBRARIES})
 
 if(WIN32)

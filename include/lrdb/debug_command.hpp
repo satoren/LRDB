@@ -6,29 +6,32 @@
 namespace lrdb {
 
 namespace command {
-picojson::value exec_step(debugger& debugger, const picojson::value&) {
+inline picojson::value exec_step(debugger& debugger, const picojson::value&) {
   debugger.step();
   return picojson::value();
 }
-picojson::value exec_step_in(debugger& debugger, const picojson::value&) {
+inline picojson::value exec_step_in(debugger& debugger,
+                                    const picojson::value&) {
   debugger.step_in();
   return picojson::value();
 }
 
-picojson::value exec_step_out(debugger& debugger, const picojson::value&) {
+inline picojson::value exec_step_out(debugger& debugger,
+                                     const picojson::value&) {
   debugger.step_out();
   return picojson::value();
 }
-picojson::value exec_continue(debugger& debugger, const picojson::value&) {
+inline picojson::value exec_continue(debugger& debugger,
+                                     const picojson::value&) {
   debugger.unpause();
   return picojson::value();
 }
-picojson::value exec_pause(debugger& debugger, const picojson::value&) {
+inline picojson::value exec_pause(debugger& debugger, const picojson::value&) {
   debugger.pause();
   return picojson::value();
 }
-picojson::value exec_add_breakpoint(debugger& debugger,
-                                    const picojson::value& param) {
+inline picojson::value exec_add_breakpoint(debugger& debugger,
+                                           const picojson::value& param) {
   bool has_source = param.get("file").is<std::string>();
   bool has_condition = param.get("condition").is<std::string>();
   bool has_hit_condition = param.get("hit_condition").is<std::string>();
@@ -54,8 +57,8 @@ picojson::value exec_add_breakpoint(debugger& debugger,
   }
   return picojson::value();
 }
-picojson::value exec_clear_breakpoints(debugger& debugger,
-                                       const picojson::value& param) {
+inline picojson::value exec_clear_breakpoints(debugger& debugger,
+                                              const picojson::value& param) {
   bool has_source = param.get("file").is<std::string>();
   bool has_line = param.get("line").is<double>();
   if (!has_source) {
@@ -73,8 +76,8 @@ picojson::value exec_clear_breakpoints(debugger& debugger,
   }
   return picojson::value(true);
 }
-picojson::value exec_get_breakpoints(debugger& debugger,
-                                     const picojson::value&) {
+inline picojson::value exec_get_breakpoints(debugger& debugger,
+                                            const picojson::value&) {
   const debugger::line_breakpoint_type& breakpoints =
       debugger.line_breakpoints();
 
@@ -95,8 +98,8 @@ picojson::value exec_get_breakpoints(debugger& debugger,
 
   return picojson::value(res);
 }
-picojson::value exec_get_stacktrace(debugger& debugger,
-                                    const picojson::value&) {
+inline picojson::value exec_get_stacktrace(debugger& debugger,
+                                           const picojson::value&) {
   auto callstack = debugger.get_call_stack();
   picojson::array res;
   for (auto& s : callstack) {
@@ -125,8 +128,8 @@ picojson::value exec_get_stacktrace(debugger& debugger,
 
   return picojson::value(res);
 }
-picojson::value exec_get_local_variable(debugger& debugger,
-                                        const picojson::value& param) {
+inline picojson::value exec_get_local_variable(debugger& debugger,
+                                               const picojson::value& param) {
   if (!param.is<picojson::object>()) {
     return picojson::value();
   }
@@ -146,8 +149,8 @@ picojson::value exec_get_local_variable(debugger& debugger,
   }
   return picojson::value();
 }
-picojson::value exec_get_upvalues(debugger& debugger,
-                                  const picojson::value& param) {
+inline picojson::value exec_get_upvalues(debugger& debugger,
+                                         const picojson::value& param) {
   if (!param.is<picojson::object>()) {
     return picojson::value();
   }
@@ -167,7 +170,8 @@ picojson::value exec_get_upvalues(debugger& debugger,
   }
   return picojson::value();
 }
-picojson::value exec_eval(debugger& debugger, const picojson::value& param) {
+inline picojson::value exec_eval(debugger& debugger,
+                                 const picojson::value& param) {
   bool has_chunk = param.get("chunk").is<std::string>();
   bool has_stackno = param.get("stack_no").is<double>();
 

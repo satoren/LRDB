@@ -136,6 +136,8 @@ class LuaDebugSession extends DebugSession {
 	// maps from sourceFile to array of Breakpoints
 	private _breakPoints = new Map<string, DebugProtocol.Breakpoint[]>();
 
+	private _breakPointID = 1000;
+
 	private _variableHandles = new Handles<VariableReference>();
 
 	private _stopOnEntry: boolean;
@@ -235,25 +237,30 @@ class LuaDebugSession extends DebugSession {
 		for (let souceBreakpoint of args.breakpoints) {
 			var l = this.convertClientLineToDebugger(souceBreakpoint.line);
 			var verified = false;
-			if (l < lines.length) {
-				const line = lines[l].trim();
+			while (l < lines.length) {
+				const line = lines[l-1].trim();
 				// if a line is empty or starts with '--' we don't allow to set a breakpoint but move the breakpoint down
 				if (line.length == 0 || line.startsWith("--")) {
 					l++;
 				}
-				verified = true;    // this breakpoint has been validated
+				else {
+					verified = true;    // this breakpoint has been validated
+					break;
+				}
 			}
 			const bp = <DebugProtocol.Breakpoint>new Breakpoint(verified, this.convertDebuggerLineToClient(l));
+			bp.id = this._breakPointID++;
 			breakpoints.push(bp);
-
-			var sendbreakpoint = { "line": bp.line, "file": debuggerFilePath, "condition": undefined , "hit_condition": undefined };
-			if (souceBreakpoint.condition) {
-				sendbreakpoint.condition = souceBreakpoint.condition;
+			if (verified) {
+				var sendbreakpoint = { "line": l, "file": debuggerFilePath, "condition": undefined, "hit_condition": undefined };
+				if (souceBreakpoint.condition) {
+					sendbreakpoint.condition = souceBreakpoint.condition;
+				}
+				if (souceBreakpoint.hitCondition) {
+					sendbreakpoint.hit_condition = souceBreakpoint.hitCondition;
+				}
+				this._debug_client.send("add_breakpoint", sendbreakpoint);
 			}
-			if (souceBreakpoint.hitCondition) {
-				sendbreakpoint.hit_condition = souceBreakpoint.hitCondition;
-			}
-			this._debug_client.send("add_breakpoint", sendbreakpoint);
 		}
 		this._breakPoints.set(path, breakpoints);
 

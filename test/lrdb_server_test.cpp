@@ -4,6 +4,7 @@
 #include "lrdb/client.hpp"
 #include "lrdb/message.hpp"
 #include "lrdb/server.hpp"
+#include "lrdb/server.hpp"
 
 #include "gtest/gtest.h"
 
@@ -168,6 +169,34 @@ TEST_F(DebugServerTest, ConnectTest2) {
 
   client.join();
 }
+
+TEST_F(DebugServerTest, ConnectTest4) {
+  const char* TEST_LUA_SCRIPT = "../test/lua/test1.lua";
+
+  std::thread client([&] {
+
+    picojson::object break_point;
+    break_point["file"] = picojson::value(TEST_LUA_SCRIPT);
+    break_point["line"] = picojson::value(5.);
+
+    int seqid = 0;
+    picojson::value res =
+        sync_request(seqid++, "add_breakpoint", picojson::value(break_point));
+    res = sync_request(seqid++, "get_breakpoints");
+
+    res = sync_request(seqid++, "get_stacktrace");
+
+    sync_request(seqid++, "continue");
+    wait_for_paused();
+    sync_request(seqid++, "continue");
+  });
+
+  luaL_dofile(L, TEST_LUA_SCRIPT);
+  server.exit();
+
+  client.join();
+}
+
 int main(int argc, char* argv[]) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

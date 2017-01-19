@@ -128,6 +128,7 @@ class server {
       DEBUG_COMMAND_TABLE(pause)
       DEBUG_COMMAND_TABLE(add_breakpoint)
       DEBUG_COMMAND_TABLE(get_breakpoints)
+      DEBUG_COMMAND_TABLE(clear_breakpoints)
       DEBUG_COMMAND_TABLE(get_stacktrace)
       DEBUG_COMMAND_TABLE(get_local_variable)
       DEBUG_COMMAND_TABLE(get_upvalues)
