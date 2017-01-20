@@ -3,7 +3,7 @@
 #include <memory>
 #include <vector>
 
-#ifdef USE_BOOST_ASIO
+#ifdef LRDB_USE_BOOST_ASIO
 #include <boost/asio.hpp>
 #else
 #define ASIO_STANDALONE
@@ -15,8 +15,10 @@
 #include "message.hpp"
 
 namespace lrdb {
-#ifdef USE_BOOST_ASIO
-using namespace boost::asio;
+#ifdef LRDB_USE_BOOST_ASIO
+namespace asio {
+using namespace boost;
+}
 #endif
 
 #define LRDB_SERVER_VERSION "0.0.1"

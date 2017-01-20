@@ -4,13 +4,12 @@
 #include "lrdb/client.hpp"
 #include "lrdb/message.hpp"
 #include "lrdb/server.hpp"
-#include "lrdb/server.hpp"
 
 #include "gtest/gtest.h"
 
 namespace {
 
-#ifdef USE_BOOST_ASIO
+#ifdef LRDB_USE_BOOST_ASIO
 using namespace boost::asio;
 #endif
 class DebugServerTest : public ::testing::Test {
