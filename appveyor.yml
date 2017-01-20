@@ -15,7 +15,7 @@ build_script:
     }
     cd build
 
-    cmake ../ -G $env:CMAKE_GEN_TYPE -DLOCAL_LUA_DIRECTORY="lua-5.3.3"
+    cmake ../ -G $env:CMAKE_GEN_TYPE -DLOCAL_LUA_DIRECTORY="third_party/lua-5.3.3"
 
     cmake --build . --config $env:CONFIGURATION
 test_script:
