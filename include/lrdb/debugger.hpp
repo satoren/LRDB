@@ -105,8 +105,7 @@ inline picojson::value to_json(lua_State* L, int index, int max_recursive = 1) {
     case LUA_TTHREAD:
     case LUA_TFUNCTION: {
       char buffer[128] = {};
-      snprintf(buffer, sizeof(buffer) - 1, "%s: %p", lua_typename(L, type),
-               lua_topointer(L, index));
+      sprintf(buffer, "%s(%p)", lua_typename(L, type), lua_topointer(L, index));
       return picojson::value(buffer);
     }
   }

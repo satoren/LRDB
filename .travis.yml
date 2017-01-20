@@ -1,0 +1,40 @@
+sudo: false
+language: cpp
+
+compiler:
+  - clang
+  - gcc
+before_install:
+  - pip install --user 'requests[security]'
+  - pip install --user cpp-coveralls
+install:
+- if [ "$CXX" = "g++" ]; then export COVERAGE=$COV; fi
+- if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - liblua5.2-dev
+    - libluajit-5.1-dev
+    - gcc-4.8
+    - g++-4.8
+    - clang
+env:
+  - BUILD_TYPE=Debug LUALIB=lua5.2 CXX_FLAGS=-std=c++11 COV=On
+  - BUILD_TYPE=Release LUALIB=lua5.2 CXX_FLAGS=-std=c++11
+  - BUILD_TYPE=Debug LUALIB=luajit CXX_FLAGS=-std=c++11 COV=On
+  - BUILD_TYPE=Release LUALIB=luajit CXX_FLAGS=-std=c++11
+script:
+  - cmake . -DCOVERAGE=${COVERAGE} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DLUA_SEARCH_LIB_NAME=${LUALIB} -DCMAKE_CXX_FLAGS=${CXX_FLAGS} && make && CTEST_OUTPUT_ON_FAILURE=1 make test
+
+after_success: |
+
+  if [ "$CXX" = "g++-4.8" ]; then
+    export GCOV="gcov-4.8"
+  elif [ "$CXX" = "g++" ]; then
+    export GCOV="gcov"
+  fi
+  if [ -n "$GCOV" ] && [ -n "$COVERAGE" ]; then
+    coveralls --gcov ${GCOV} --gcov-options '\-lp'
+  fi
