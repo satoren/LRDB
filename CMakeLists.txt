@@ -4,10 +4,10 @@ project(LRDB)
 
 include(cmake/ReduceDependencies.cmake)
 
-add_subdirectory(third_party/lua-5.3.3)
+include(cmake/FindLua.cmake)
 
-include_directories(third_party/lua-5.3.3/src)
-set(LUA_LIBRARIES liblua)
+include_directories(SYSTEM ${LUA_INCLUDE_DIRS})
+link_directories(${LUA_LIBRARY_DIRS})
 
 file(GLOB HEADER_FILE RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}  include/*.hpp)
 
