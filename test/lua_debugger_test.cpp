@@ -6,6 +6,9 @@
 
 #include "gtest/gtest.h"
 
+
+using picojson::object;
+using picojson::array;
 namespace {
 
 class DebuggerTest : public ::testing::Test {
@@ -34,7 +37,7 @@ void luaDofile(lua_State* L, const char* file) {
   if (err) {
     errorstring = lua_tostring(L, -1);
   }
-  ASSERT_EQ(0, errorstring);
+  ASSERT_STREQ(0, errorstring);
 }
 }
 TEST_F(DebuggerTest, BreakPointTest1) {
@@ -181,6 +184,36 @@ TEST_F(DebuggerTest, EvalTest1) {
   });
 
   luaDofile(L, TEST_LUA_SCRIPT);
+}
+
+
+TEST_F(DebuggerTest, EvalTest2) {
+	const char* TEST_LUA_SCRIPT = "../test/lua/eval_test2.lua";
+
+	debugger.add_breakpoint(TEST_LUA_SCRIPT, 2);
+
+	debugger.set_pause_handler([&](lrdb::debugger& debugger) {
+		std::vector<picojson::value> ret = debugger.current_debug_info().eval(
+			"return _G",true,false,false,1);
+
+		ASSERT_EQ(1U, ret.size());
+		ASSERT_TRUE(ret[0].is<object>());
+		ASSERT_LT(0U,ret[0].get<object>().size());
+
+		std::vector<picojson::value> ret2 = debugger.current_debug_info().eval(
+			"return _ENV._G", false, true, false, 1);
+		ASSERT_EQ(ret, ret2);
+		ASSERT_TRUE(ret[0].is<object>());
+		ASSERT_LT(0U, ret[0].get<object>().size());
+		
+		ret = debugger.current_debug_info().eval(
+			"return _ENV['envvar']", false, false, true, 1);
+		ASSERT_EQ(1U, ret.size());
+		ASSERT_TRUE(ret[0].is<double>());
+		ASSERT_EQ(5456, ret[0].get<double>());
+	});
+
+	luaDofile(L, TEST_LUA_SCRIPT);
 }
 
 TEST_F(DebuggerTest, GetLocalTest1) {

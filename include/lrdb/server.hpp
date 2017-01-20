@@ -134,8 +134,8 @@ class server {
       DEBUG_COMMAND_TABLE(get_stacktrace)
       DEBUG_COMMAND_TABLE(get_local_variable)
       DEBUG_COMMAND_TABLE(get_upvalues)
-	  DEBUG_COMMAND_TABLE(eval)
-	  DEBUG_COMMAND_TABLE(get_global)
+      DEBUG_COMMAND_TABLE(eval)
+      DEBUG_COMMAND_TABLE(get_global)
       if (true) {
         throw std::runtime_error(method + " is not supported");
       }

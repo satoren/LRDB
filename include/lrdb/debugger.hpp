@@ -39,7 +39,13 @@ inline picojson::value to_json(lua_State* L, int index, int max_recursive = 1) {
       return picojson::value(lua_tostring(L, index));
     case LUA_TTABLE: {
       if (max_recursive <= 0) {
-        return picojson::value(picojson::object());
+        char buffer[128] = {};
+        lua_pushvalue(L, index);  // backup
+        snprintf(buffer, sizeof(buffer) - 1, "%p", lua_topointer(L, -1));
+        lua_pop(L, 1);  // pop value
+        picojson::object obj;
+        obj[lua_typename(L, type)] = picojson::value(buffer);
+        return picojson::value(obj);
       }
       int array_size = lua_rawlen(L, index);
       if (array_size > 0) {
@@ -368,7 +374,7 @@ class debug_info {
     }
     // use upvalue
     if (upvalue) {
-		int n = number_of_upvalues();
+      int n = number_of_upvalues();
       lua_getinfo(state_, "f", debug_);  // push current running function
       int upvno = 1;
       while (const char* varname = lua_getupvalue(state_, -1, upvno++)) {
@@ -574,11 +580,12 @@ class debugger {
   }
 
   picojson::value get_global_table(int object_depth = 0) {
-	  lua_pushglobaltable(state_);
-	  picojson::value v = utility::to_json(state_, -1, 1 + object_depth);
-	  lua_pop(state_,1);//pop global table
-	  return v;
+    lua_pushglobaltable(state_);
+    picojson::value v = utility::to_json(state_, -1, 1 + object_depth);
+    lua_pop(state_, 1);  // pop global table
+    return v;
   }
+
  private:
   void sethook() {
     lua_pushlightuserdata(state_, this_data_key());

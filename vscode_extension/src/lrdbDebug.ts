@@ -238,7 +238,7 @@ class LuaDebugSession extends DebugSession {
 			var l = this.convertClientLineToDebugger(souceBreakpoint.line);
 			var verified = false;
 			while (l < lines.length) {
-				const line = lines[l-1].trim();
+				const line = lines[l - 1].trim();
 				// if a line is empty or starts with '--' we don't allow to set a breakpoint but move the breakpoint down
 				if (line.length == 0 || line.startsWith("--")) {
 					l++;
@@ -313,14 +313,17 @@ class LuaDebugSession extends DebugSession {
 
 		const scopes = new Array<Scope>();
 		scopes.push(new Scope("Local", this._variableHandles.create(new VariableReference(args.frameId, ["local"])), false));
-		scopes.push(new Scope("UpValue", this._variableHandles.create(new VariableReference(args.frameId, ["upvalue"])), false));
-		scopes.push(new Scope("Env", this._variableHandles.create(new VariableReference(args.frameId, ["_ENV"])), true));
-		scopes.push(new Scope("Global", this._variableHandles.create(new VariableReference(args.frameId, ["_G"])), true));
+		scopes.push(new Scope("Upvalues", this._variableHandles.create(new VariableReference(args.frameId, ["upvalue"])), false));
+		scopes.push(new Scope("Global", this._variableHandles.create(new VariableReference(args.frameId, ["Global"])), true));
 
 		response.body = {
 			scopes: scopes
 		};
 		this.sendResponse(response);
+	}
+
+	private createVariableObjectPath(datapath: string[]): string {
+		return "_ENV" + '["' + datapath.join('"]["') + '"]'
 	}
 
 	protected variablesRequest(response: DebugProtocol.VariablesResponse, args: DebugProtocol.VariablesArguments): void {
@@ -335,8 +338,8 @@ class LuaDebugSession extends DebugSession {
 					});
 				}
 				else {
-					let chunk = 'return _ENV["' + id.datapath.slice(1).join('"]["') + '"]';
-					this._debug_client.send("eval", { "stack_no": id.frameId, "chunk": chunk, "global": false, "upvalue": false }, (res: any) => {
+					let chunk = "return " + this.createVariableObjectPath(id.datapath.slice(1));
+					this._debug_client.send("eval", { "stack_no": id.frameId, "chunk": chunk, "global": false, "local": true, "upvalue": false }, (res: any) => {
 						this.variablesRequestResponce(response, res.result[0], id);
 					});
 				}
@@ -348,40 +351,23 @@ class LuaDebugSession extends DebugSession {
 					});
 				}
 				else {
-					let chunk = 'return _ENV["' + id.datapath.slice(1).join('"]["') + '"]';
-					this._debug_client.send("eval", { "stack_no": id.frameId, "chunk": chunk, "global": false, "local": false }, (res: any) => {
+					let chunk = "return " + this.createVariableObjectPath(id.datapath.slice(1));
+					this._debug_client.send("eval", { "stack_no": id.frameId, "chunk": chunk, "global": false, "local": false, "upvalue": true }, (res: any) => {
 						this.variablesRequestResponce(response, res.result[0], id);
 					});
 				}
 			}
-			else if (id.datapath[0] == "_ENV") {
+			else if (id.datapath[0] == "Global") {
+				let chunk = '';
 				if (id.datapath.length == 1) {
-					let chunk = 'return _ENV;'
-					this._debug_client.send("eval", { "stack_no": id.frameId, "chunk": chunk }, (res: any) => {
-						this.variablesRequestResponce(response, res.result[0], id);
-					});
+					chunk = 'return _G';
 				}
 				else {
-					let chunk = 'return _ENV["' + id.datapath.slice(1).join('"]["') + '"]';
-					this._debug_client.send("eval", { "stack_no": id.frameId, "chunk": chunk }, (res: any) => {
-						this.variablesRequestResponce(response, res.result[0], id);
-					});
+					chunk = "return " + this.createVariableObjectPath(id.datapath.slice(1));
 				}
-			}
-			else if (id.datapath[0] == "_G") {
-				if (id.datapath.length == 1) {
-					let chunk = 'return _G';
-					this._debug_client.send("eval", { "stack_no": id.frameId, "chunk": chunk }, (res: any) => {
-						this.variablesRequestResponce(response, res.result[0], id);
-					});
-				}
-				else {
-					let chunk = 'return _G["' + id.datapath.join('"]["') + '"]';
-					this._debug_client.send("eval", { "stack_no": id.frameId, "chunk": chunk }, (res: any) => {
-						this.variablesRequestResponce(response, res.result[0], id);
-					});
-
-				}
+				this._debug_client.send("eval", { "stack_no": id.frameId, "chunk": chunk, "global": true, "local": false, "upvalue": false }, (res: any) => {
+					this.variablesRequestResponce(response, res.result[0], id);
+				});
 			}
 		}
 
