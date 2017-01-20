@@ -99,7 +99,7 @@ inline picojson::value to_json(lua_State* L, int index, int max_recursive = 1) {
     case LUA_TTHREAD:
     case LUA_TFUNCTION: {
       char buffer[128] = {};
-      snprintf(buffer, sizeof(buffer) - 1, "%s(%p)", lua_typename(L, type),
+      snprintf(buffer, sizeof(buffer) - 1, "%s: %p", lua_typename(L, type),
                lua_topointer(L, index));
       return picojson::value(buffer);
     }
@@ -250,12 +250,26 @@ class debug_info {
     }
     return debug_->short_src;
   }
+  /*
+  std::vector<bool> valid_lines_on_function() {
+    std::vector<bool> ret;
+    lua_getinfo(state_, "fL", debug_);
+    lua_pushnil(state_);
+    while (lua_next(state_, -2) != 0) {
+      int t = lua_type(state_, -1);
+      ret.push_back(lua_toboolean(state_, -1));
+      lua_pop(state_, 1);  // pop value
+    }
+    lua_pop(state_, 2);
+    return ret;
+  }*/
 
   std::vector<picojson::value> eval(const char* script, bool global = true,
                                     bool upvalue = true, bool local = true,
                                     int object_depth = 1) {
     int stack_start = lua_gettop(state_);
     luaL_loadstring(state_, script);
+
     create_eval_env(global, upvalue, local);
 #if LUA_VERSION_NUM >= 502
     lua_setupvalue(state_, -2, 1);
@@ -344,33 +358,39 @@ class debug_info {
   void create_eval_env(bool global = true, bool upvalue = true,
                        bool local = true) {
     lua_createtable(state_, 0, 0);
-
-    // copy global
+    int envtable = lua_gettop(state_);
+    lua_createtable(state_, 0, 0);  // create metatable for env
+    int metatable = lua_gettop(state_);
+    // use global
     if (global) {
-      int envtable = lua_gettop(state_);
       lua_pushglobaltable(state_);
-      int globaltable = lua_gettop(state_);
-      lua_pushnil(state_);
-      while (lua_next(state_, globaltable) != 0) {
-        lua_pushvalue(state_, -2);  // push key
-        lua_rotate(state_, -2, 1);
-        lua_rawset(state_, envtable);
-      }
-      lua_pop(state_, 1);  // pop global table
+      lua_setfield(state_, metatable, "__index");
     }
+    // use upvalue
     if (upvalue) {
+		int n = number_of_upvalues();
       lua_getinfo(state_, "f", debug_);  // push current running function
       int upvno = 1;
       while (const char* varname = lua_getupvalue(state_, -1, upvno++)) {
-        lua_setfield(state_, -3, varname);
+        if (strcmp(varname, "_ENV") == 0)  // override _ENV
+        {
+          lua_pushvalue(state_, -1);
+          lua_setfield(state_, metatable, "__index");
+        }
+        lua_setfield(state_, envtable, varname);
       }
       lua_pop(state_, 1);  // pop current running function
     }
-
+    // use local vars
     if (local) {
       int varno = 0;
       while (const char* varname = lua_getlocal(state_, debug_, ++varno)) {
-        lua_setfield(state_, -2, varname);
+        if (strcmp(varname, "_ENV") == 0)  // override _ENV
+        {
+          lua_pushvalue(state_, -1);
+          lua_setfield(state_, metatable, "__index");
+        }
+        lua_setfield(state_, envtable, varname);
       }
       // va arg
       if (is_variadic_arg()) {
@@ -381,12 +401,13 @@ class debug_info {
           lua_seti(state_, -2, -varno);
         }
         if (varno < -1) {
-          lua_setfield(state_, -2, "(*vararg)");
+          lua_setfield(state_, envtable, "(*vararg)");
         } else {
           lua_pop(state_, 1);
         }
       }
     }
+    lua_setmetatable(state_, envtable);
     return;
   }
 
@@ -552,6 +573,12 @@ class debugger {
     return ret;
   }
 
+  picojson::value get_global_table(int object_depth = 0) {
+	  lua_pushglobaltable(state_);
+	  picojson::value v = utility::to_json(state_, -1, 1 + object_depth);
+	  lua_pop(state_,1);//pop global table
+	  return v;
+  }
  private:
   void sethook() {
     lua_pushlightuserdata(state_, this_data_key());
@@ -577,7 +604,15 @@ class debugger {
     for (line_breakpoint_type::iterator it = line_breakpoints_.begin();
          it != line_breakpoints_.end(); ++it) {
       if (currentline == it->line) {
-        if (it->file == (debuginfo.source() + 1)) {
+        const char* source = debuginfo.source();
+        if (!source) {
+          continue;
+        }
+        // remove front @
+        if (source[0] == '@') {
+          source++;
+        }
+        if (it->file == source) {
           return &(*it);
         }
       }

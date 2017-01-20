@@ -195,5 +195,9 @@ inline picojson::value exec_eval(debugger& debugger,
   }
   return picojson::value();
 }
+inline picojson::value exec_get_global(debugger& debugger,
+	const picojson::value& param) {
+	return debugger.get_global_table();
+}
 }
 }
