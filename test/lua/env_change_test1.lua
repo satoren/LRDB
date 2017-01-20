@@ -1,12 +1,10 @@
+local _ENV={envvar=5456}
 local value = 1
-
-function testfn()
+local function testfn()
 local local_value1 = 1
 local local_value2 = "abc"
 local local_value3 = 4234.33
 local local_value4 ={envvar}
 end
 
-for i = 1, 10 do
-  testfn()
-end
+testfn()

@@ -2,9 +2,13 @@
 #include <iostream>
 
 #include "lrdb/debugger.hpp"
+#include "kaguya.hpp"
 
 #include "gtest/gtest.h"
 
+
+using picojson::object;
+using picojson::array;
 namespace {
 
 class DebuggerTest : public ::testing::Test {
@@ -33,7 +37,7 @@ void luaDofile(lua_State* L, const char* file) {
   if (err) {
     errorstring = lua_tostring(L, -1);
   }
-  ASSERT_EQ(0, errorstring);
+  ASSERT_STREQ(0, errorstring);
 }
 }
 TEST_F(DebuggerTest, BreakPointTest1) {
@@ -66,8 +70,9 @@ TEST_F(DebuggerTest, BreakPointTestCoroutine) {
 
   debugger.add_breakpoint(TEST_LUA_SCRIPT, 3);
 
-  bool breaked = false;
+  std::vector<int> break_line_numbers;
   debugger.set_pause_handler([&](lrdb::debugger& debugger) {
+	  break_line_numbers.push_back(debugger.current_debug_info().currentline());
     auto* breakpoint = debugger.current_breakpoint();
     ASSERT_TRUE(breakpoint);
     ASSERT_EQ(TEST_LUA_SCRIPT, breakpoint->file);
@@ -80,13 +85,11 @@ TEST_F(DebuggerTest, BreakPointTestCoroutine) {
 
     auto callstack = debugger.get_call_stack();
     ASSERT_TRUE(callstack.size() > 0);
-
-    breaked = true;
   });
 
   luaDofile(L, TEST_LUA_SCRIPT);
-
-  ASSERT_TRUE(breaked);
+  std::vector<int> require_line_number = { 3 };
+  ASSERT_EQ(require_line_number, break_line_numbers);
 }
 TEST_F(DebuggerTest, StepInTestCoroutine) {
   const char* TEST_LUA_SCRIPT = "../test/lua/break_coroutine_test1.lua";
@@ -181,6 +184,36 @@ TEST_F(DebuggerTest, EvalTest1) {
   });
 
   luaDofile(L, TEST_LUA_SCRIPT);
+}
+
+
+TEST_F(DebuggerTest, EvalTest2) {
+	const char* TEST_LUA_SCRIPT = "../test/lua/eval_test2.lua";
+
+	debugger.add_breakpoint(TEST_LUA_SCRIPT, 2);
+
+	debugger.set_pause_handler([&](lrdb::debugger& debugger) {
+		std::vector<picojson::value> ret = debugger.current_debug_info().eval(
+			"return _G",true,false,false,1);
+
+		ASSERT_EQ(1U, ret.size());
+		ASSERT_TRUE(ret[0].is<object>());
+		ASSERT_LT(0U,ret[0].get<object>().size());
+
+		std::vector<picojson::value> ret2 = debugger.current_debug_info().eval(
+			"return _ENV._G", false, true, false, 1);
+		ASSERT_EQ(ret, ret2);
+		ASSERT_TRUE(ret[0].is<object>());
+		ASSERT_LT(0U, ret[0].get<object>().size());
+		
+		ret = debugger.current_debug_info().eval(
+			"return _ENV['envvar']", false, false, true, 1);
+		ASSERT_EQ(1U, ret.size());
+		ASSERT_TRUE(ret[0].is<double>());
+		ASSERT_EQ(5456, ret[0].get<double>());
+	});
+
+	luaDofile(L, TEST_LUA_SCRIPT);
 }
 
 TEST_F(DebuggerTest, GetLocalTest1) {
@@ -395,6 +428,45 @@ TEST_F(DebuggerTest, RemoveBreakPointTest3) {
   ASSERT_EQ(require_line_number, break_line_numbers);
 }
 
+
+
+TEST_F(DebuggerTest, GetEnvDataTest1) {
+	const char* TEST_LUA_SCRIPT = "../test/lua/loop_test.lua";
+
+	debugger.set_pause_handler([&](lrdb::debugger& debugger) {
+		auto env = debugger.current_debug_info().eval("return envvar");
+		ASSERT_EQ(1, env.size());
+		ASSERT_TRUE( env[0].is<double>());
+		ASSERT_EQ(2, env[0].get<double>());
+		debugger.unpause();
+	});
+
+	debugger.step_in();
+	debugger.add_breakpoint(TEST_LUA_SCRIPT, 6);
+
+	kaguya::State state(L);
+
+	kaguya::LuaTable envtable = state.newTable();
+	envtable["envvar"] = 2;
+	bool ret = state.dofile(TEST_LUA_SCRIPT, envtable);
+	ASSERT_TRUE(ret);
+}
+
+
+TEST_F(DebuggerTest, GetGlobalTest) {
+	const char* TEST_LUA_SCRIPT = "../test/lua/test1.lua";
+
+	debugger.add_breakpoint(TEST_LUA_SCRIPT, 3);
+
+	debugger.set_pause_handler([&](lrdb::debugger& debugger) {
+		auto global = debugger.get_global_table();
+		ASSERT_TRUE(global.is<picojson::object>());
+		ASSERT_TRUE(global.get<picojson::object>().size());
+	});
+
+	luaDofile(L, TEST_LUA_SCRIPT);
+
+}
 int main(int argc, char* argv[]) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

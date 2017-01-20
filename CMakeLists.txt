@@ -9,7 +9,7 @@ add_subdirectory(third_party/lua-5.3.3)
 include_directories(third_party/lua-5.3.3/src)
 set(LUA_LIBRARIES liblua)
 
-file(GLOB HEADER_FILE RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}  include/*.hpp)
+file(GLOB HEADER_FILE RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}  include/lrdb/*.hpp)
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/third_party/asio/asio/include")
 
