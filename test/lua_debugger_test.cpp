@@ -262,31 +262,24 @@ TEST_F(DebuggerTest, GetVaArgTest1) {
     lrdb::debug_info::local_vars_type localvars =
         debugger.current_debug_info().get_local_vars(1);
 
-	ASSERT_LE(4U, localvars.size());
-	std::map<std::string, picojson::value> varmap;
-	for (auto& v : localvars)
-	{
-		varmap[v.first] = v.second;
-	}
-	ASSERT_LE(1, varmap.count("v1"));
-	ASSERT_LE(1, varmap.count("local_value1"));
-	ASSERT_LE(1, varmap.count("local_value2"));
-	ASSERT_LE(1, varmap.count("(*vararg)"));
-
-    ASSERT_EQ(2, varmap["v1"].get<double>());
-	ASSERT_EQ(1, varmap["local_value1"].get<double>());
-	ASSERT_EQ("abc", varmap["local_value2"].get<std::string>());
+    ASSERT_LE(4U, localvars.size());
+    std::map<std::string, picojson::value> varmap;
+    for (auto& v : localvars) {
+      varmap[v.first] = v.second;
+    }
+    ASSERT_LE(1, varmap.count("v1"));
+    ASSERT_LE(1, varmap.count("local_value1"));
+    ASSERT_LE(1, varmap.count("local_value2"));
 #if LUA_VERSION_NUM >= 502
-	ASSERT_TRUE( varmap["(*vararg)"].is<array>());
+    ASSERT_LE(1, varmap.count("(*vararg)"));
 #endif
 
-    auto& vararg = varmap["(*vararg)"].get<array>();
-
-    ASSERT_EQ(2U, vararg.size());
-    ASSERT_EQ(1, vararg[0].get<double>());
-    ASSERT_EQ(3, vararg[1].get<double>());
-
+    ASSERT_EQ(2, varmap["v1"].get<double>());
+    ASSERT_EQ(1, varmap["local_value1"].get<double>());
+    ASSERT_EQ("abc", varmap["local_value2"].get<std::string>());
 #if LUA_VERSION_NUM >= 502
+    ASSERT_TRUE(varmap["(*vararg)"].is<array>());
+
     std::vector<picojson::value> eret = debugger.current_debug_info().eval(
         "return table.unpack(_ENV[\"(*vararg)\"])");
     ASSERT_EQ(2U, eret.size());
