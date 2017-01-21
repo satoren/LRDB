@@ -14,7 +14,7 @@ using namespace boost::asio;
 #endif
 class DebugServerTest : public ::testing::Test {
  protected:
-  DebugServerTest() : server(21115), client_stream(), pause_(0) {}
+  DebugServerTest() : server(21115), client_stream("localhost", "21115"), pause_(0) {}
 
   virtual ~DebugServerTest() {}
 
@@ -22,7 +22,6 @@ class DebugServerTest : public ::testing::Test {
     L = luaL_newstate();
     luaL_openlibs(L);
     server.reset(L);
-    client_stream = asio::ip::tcp::iostream("localhost", "21115");
     rid_ = 0;
   }
 
@@ -30,8 +29,6 @@ class DebugServerTest : public ::testing::Test {
     server.reset();
     lua_close(L);
     L = 0;
-    client_stream.clear();
-    client_stream.close();
   }
   lua_State* L;
   lrdb::server server;
