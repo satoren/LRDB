@@ -13,7 +13,20 @@ extern "C" {
 
 namespace lrdb {
 
+#if LUA_VERSION_NUM < 502
+inline int lua_absindex(lua_State* L, int idx) {
+  return (idx > 0 || (idx <= LUA_REGISTRYINDEX)) ? idx
+                                                 : lua_gettop(L) + 1 + idx;
+}
+inline size_t lua_rawlen(lua_State* L, int index) {
+  return lua_objlen(L, index);
+}
+inline void lua_pushglobaltable(lua_State* L) {
+  lua_pushvalue(L, LUA_GLOBALSINDEX);
+}
+#endif
 namespace utility {
+
 inline picojson::value to_json(lua_State* L, int index, int max_recursive = 1) {
   index = lua_absindex(L, index);
   int type = lua_type(L, index);
@@ -41,7 +54,14 @@ inline picojson::value to_json(lua_State* L, int index, int max_recursive = 1) {
       if (max_recursive <= 0) {
         char buffer[128] = {};
         lua_pushvalue(L, index);  // backup
-        snprintf(buffer, sizeof(buffer) - 1, "%p", lua_topointer(L, -1));
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4996)
+#endif
+        sprintf(buffer, "%p", lua_topointer(L, -1));
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
         lua_pop(L, 1);  // pop value
         picojson::object obj;
         obj[lua_typename(L, type)] = picojson::value(buffer);
@@ -86,7 +106,8 @@ inline picojson::value to_json(lua_State* L, int index, int max_recursive = 1) {
         //   if(t) return json.stringify(t) end
         // end
         //
-        int type = lua_getfield(L, -1, "__totable");
+        lua_getfield(L, -1, "__totable");
+        int type = lua_type(L, -1);
         if (type == LUA_TFUNCTION) {
           lua_pushvalue(L, index);
           if (lua_pcall(L, 1, 1, 0) == 0)  // invoke __totable with userdata
@@ -105,7 +126,14 @@ inline picojson::value to_json(lua_State* L, int index, int max_recursive = 1) {
     case LUA_TTHREAD:
     case LUA_TFUNCTION: {
       char buffer[128] = {};
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4996)
+#endif
       sprintf(buffer, "%s(%p)", lua_typename(L, type), lua_topointer(L, index));
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
       return picojson::value(buffer);
     }
   }
@@ -134,7 +162,7 @@ inline void push_json(lua_State* L, const picojson::value& v) {
     lua_createtable(L, array.size(), 0);
     for (size_t index = 0; index < array.size(); ++index) {
       push_json(L, array[index]);
-      lua_seti(L, -2, index + 1);
+      lua_rawseti(L, -2, index + 1);
     }
   }
 }
@@ -231,6 +259,7 @@ class debug_info {
     }
     return debug_->nups;
   }
+#if LUA_VERSION_NUM >= 502
   int number_of_parameters() {
     if (!get_info("u")) {
       return -1;
@@ -249,6 +278,7 @@ class debug_info {
     }
     return debug_->istailcall != 0;
   }
+#endif
   const char* short_src() {
     if (!get_info("S")) {
       return "";
@@ -300,6 +330,7 @@ class debug_info {
       }
       lua_pop(state_, 1);
     }
+#if LUA_VERSION_NUM >= 502
     if (is_variadic_arg()) {
       picojson::array va;
       int varno = -1;
@@ -311,6 +342,7 @@ class debug_info {
       localvars.push_back(std::pair<std::string, picojson::value>(
           "(*vararg)", picojson::value(va)));
     }
+#endif
     return localvars;
   }
   bool set_local_var(const char* name, const picojson::value& v) {
@@ -371,10 +403,16 @@ class debug_info {
       lua_pushglobaltable(state_);
       lua_setfield(state_, metatable, "__index");
     }
+
     // use upvalue
     if (upvalue) {
       int n = number_of_upvalues();
       lua_getinfo(state_, "f", debug_);  // push current running function
+
+#if LUA_VERSION_NUM < 502
+      lua_getfenv(state_, -1);
+      lua_setfield(state_, metatable, "__index");
+#endif
       int upvno = 1;
       while (const char* varname = lua_getupvalue(state_, -1, upvno++)) {
         if (strcmp(varname, "_ENV") == 0)  // override _ENV
@@ -397,13 +435,14 @@ class debug_info {
         }
         lua_setfield(state_, envtable, varname);
       }
+#if LUA_VERSION_NUM >= 502
       // va arg
       if (is_variadic_arg()) {
         varno = 0;
         lua_createtable(state_, 0, 0);
         while (const char* varname = lua_getlocal(state_, debug_, --varno)) {
           (void)varname;  // unused
-          lua_seti(state_, -2, -varno);
+          lua_rawseti(state_, -2, -varno);
         }
         if (varno < -1) {
           lua_setfield(state_, envtable, "(*vararg)");
@@ -411,8 +450,13 @@ class debug_info {
           lua_pop(state_, 1);
         }
       }
+#endif
     }
     lua_setmetatable(state_, envtable);
+#if LUA_VERSION_NUM < 502
+    lua_pushvalue(state_, envtable);
+    lua_setfield(state_, envtable, "_ENV");
+#endif
     return;
   }
 
@@ -455,9 +499,11 @@ class stack_info : private debug_info {
   using debug_info::linedefined;
   using debug_info::lastlinedefined;
   using debug_info::number_of_upvalues;
+#if LUA_VERSION_NUM >= 502
   using debug_info::number_of_parameters;
   using debug_info::is_variadic_arg;
   using debug_info::is_tailcall;
+#endif
   using debug_info::short_src;
   using debug_info::eval;
   using debug_info::get_local_vars;

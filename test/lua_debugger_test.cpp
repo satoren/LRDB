@@ -1,11 +1,10 @@
 
 #include <iostream>
 
-#include "lrdb/debugger.hpp"
 #include "kaguya.hpp"
+#include "lrdb/debugger.hpp"
 
 #include "gtest/gtest.h"
-
 
 using picojson::object;
 using picojson::array;
@@ -72,7 +71,7 @@ TEST_F(DebuggerTest, BreakPointTestCoroutine) {
 
   std::vector<int> break_line_numbers;
   debugger.set_pause_handler([&](lrdb::debugger& debugger) {
-	  break_line_numbers.push_back(debugger.current_debug_info().currentline());
+    break_line_numbers.push_back(debugger.current_debug_info().currentline());
     auto* breakpoint = debugger.current_breakpoint();
     ASSERT_TRUE(breakpoint);
     ASSERT_EQ(TEST_LUA_SCRIPT, breakpoint->file);
@@ -88,7 +87,7 @@ TEST_F(DebuggerTest, BreakPointTestCoroutine) {
   });
 
   luaDofile(L, TEST_LUA_SCRIPT);
-  std::vector<int> require_line_number = { 3 };
+  std::vector<int> require_line_number = {3};
   ASSERT_EQ(require_line_number, break_line_numbers);
 }
 TEST_F(DebuggerTest, StepInTestCoroutine) {
@@ -186,34 +185,33 @@ TEST_F(DebuggerTest, EvalTest1) {
   luaDofile(L, TEST_LUA_SCRIPT);
 }
 
-
 TEST_F(DebuggerTest, EvalTest2) {
-	const char* TEST_LUA_SCRIPT = "../test/lua/eval_test2.lua";
+  const char* TEST_LUA_SCRIPT = "../test/lua/eval_test2.lua";
 
-	debugger.add_breakpoint(TEST_LUA_SCRIPT, 2);
+  debugger.add_breakpoint(TEST_LUA_SCRIPT, 2);
 
-	debugger.set_pause_handler([&](lrdb::debugger& debugger) {
-		std::vector<picojson::value> ret = debugger.current_debug_info().eval(
-			"return _G",true,false,false,1);
+  debugger.set_pause_handler([&](lrdb::debugger& debugger) {
+    std::vector<picojson::value> ret =
+        debugger.current_debug_info().eval("return _G", true, false, false, 1);
 
-		ASSERT_EQ(1U, ret.size());
-		ASSERT_TRUE(ret[0].is<object>());
-		ASSERT_LT(0U,ret[0].get<object>().size());
+    ASSERT_EQ(1U, ret.size());
+    ASSERT_TRUE(ret[0].is<object>());
+    ASSERT_LT(0U, ret[0].get<object>().size());
 
-		std::vector<picojson::value> ret2 = debugger.current_debug_info().eval(
-			"return _ENV._G", false, true, false, 1);
-		ASSERT_EQ(ret, ret2);
-		ASSERT_TRUE(ret[0].is<object>());
-		ASSERT_LT(0U, ret[0].get<object>().size());
-		
-		ret = debugger.current_debug_info().eval(
-			"return _ENV['envvar']", false, false, true, 1);
-		ASSERT_EQ(1U, ret.size());
-		ASSERT_TRUE(ret[0].is<double>());
-		ASSERT_EQ(5456, ret[0].get<double>());
-	});
+    std::vector<picojson::value> ret2 = debugger.current_debug_info().eval(
+        "return _ENV._G", false, true, false, 1);
+    ASSERT_EQ(ret, ret2);
+    ASSERT_TRUE(ret[0].is<object>());
+    ASSERT_LT(0U, ret[0].get<object>().size());
 
-	luaDofile(L, TEST_LUA_SCRIPT);
+    ret = debugger.current_debug_info().eval("return _ENV['envvar']", false,
+                                             false, true, 1);
+    ASSERT_EQ(1U, ret.size());
+    ASSERT_TRUE(ret[0].is<double>());
+    ASSERT_EQ(5456, ret[0].get<double>());
+  });
+
+  luaDofile(L, TEST_LUA_SCRIPT);
 }
 
 TEST_F(DebuggerTest, GetLocalTest1) {
@@ -225,7 +223,7 @@ TEST_F(DebuggerTest, GetLocalTest1) {
 
     lrdb::debug_info::local_vars_type localvars =
         debugger.current_debug_info().get_local_vars();
-    ASSERT_EQ(2U, localvars.size());
+    ASSERT_LE(2U, localvars.size());
     ASSERT_EQ("local_value1", localvars[0].first);
     ASSERT_EQ(1, localvars[0].second.get<double>());
 
@@ -235,7 +233,7 @@ TEST_F(DebuggerTest, GetLocalTest1) {
     ASSERT_TRUE(ret);
     localvars = debugger.current_debug_info().get_local_vars();
 
-    ASSERT_EQ(2U, localvars.size());
+    ASSERT_LE(2U, localvars.size());
     ASSERT_EQ("local_value1", localvars[0].first);
     ASSERT_EQ("ab", localvars[0].second.get<std::string>());
 
@@ -264,30 +262,39 @@ TEST_F(DebuggerTest, GetVaArgTest1) {
     lrdb::debug_info::local_vars_type localvars =
         debugger.current_debug_info().get_local_vars(1);
 
-    ASSERT_EQ(4U, localvars.size());
-    ASSERT_EQ("v1", localvars[0].first);
-    ASSERT_EQ(2, localvars[0].second.get<double>());
+	ASSERT_LE(4U, localvars.size());
+	std::map<std::string, picojson::value> varmap;
+	for (auto& v : localvars)
+	{
+		varmap[v.first] = v.second;
+	}
+	ASSERT_LE(1, varmap.count("v1"));
+	ASSERT_LE(1, varmap.count("local_value1"));
+	ASSERT_LE(1, varmap.count("local_value2"));
+	ASSERT_LE(1, varmap.count("(*vararg)"));
 
-    ASSERT_EQ("local_value1", localvars[1].first);
-    ASSERT_EQ(1, localvars[1].second.get<double>());
-    ASSERT_EQ("local_value2", localvars[2].first);
-    ASSERT_EQ("abc", localvars[2].second.get<std::string>());
-    ASSERT_EQ("(*vararg)", localvars[3].first);
-    ASSERT_TRUE(localvars[3].second.is<picojson::array>());
-    auto& vararg = localvars[3].second.get<picojson::array>();
+    ASSERT_EQ(2, varmap["v1"].get<double>());
+	ASSERT_EQ(1, varmap["local_value1"].get<double>());
+	ASSERT_EQ("abc", varmap["local_value2"].get<std::string>());
+#if LUA_VERSION_NUM >= 502
+	ASSERT_TRUE( varmap["(*vararg)"].is<array>());
+#endif
+
+    auto& vararg = varmap["(*vararg)"].get<array>();
 
     ASSERT_EQ(2U, vararg.size());
     ASSERT_EQ(1, vararg[0].get<double>());
     ASSERT_EQ(3, vararg[1].get<double>());
 
+#if LUA_VERSION_NUM >= 502
     std::vector<picojson::value> eret = debugger.current_debug_info().eval(
         "return table.unpack(_ENV[\"(*vararg)\"])");
     ASSERT_EQ(2U, eret.size());
     ASSERT_EQ(1, eret[0].get<double>());
     ASSERT_EQ(3, eret[1].get<double>());
-
     bool vaarg = debugger.current_debug_info().is_variadic_arg();
     ASSERT_TRUE(vaarg);
+#endif
   });
 
   luaDofile(L, TEST_LUA_SCRIPT);
@@ -428,44 +435,40 @@ TEST_F(DebuggerTest, RemoveBreakPointTest3) {
   ASSERT_EQ(require_line_number, break_line_numbers);
 }
 
-
-
 TEST_F(DebuggerTest, GetEnvDataTest1) {
-	const char* TEST_LUA_SCRIPT = "../test/lua/loop_test.lua";
+  const char* TEST_LUA_SCRIPT = "../test/lua/loop_test.lua";
 
-	debugger.set_pause_handler([&](lrdb::debugger& debugger) {
-		auto env = debugger.current_debug_info().eval("return envvar");
-		ASSERT_EQ(1, env.size());
-		ASSERT_TRUE( env[0].is<double>());
-		ASSERT_EQ(2, env[0].get<double>());
-		debugger.unpause();
-	});
+  debugger.set_pause_handler([&](lrdb::debugger& debugger) {
+    auto env = debugger.current_debug_info().eval("return envvar");
+    ASSERT_EQ(1, env.size());
+    ASSERT_TRUE(env[0].is<double>());
+    ASSERT_EQ(2, env[0].get<double>());
+    debugger.unpause();
+  });
 
-	debugger.step_in();
-	debugger.add_breakpoint(TEST_LUA_SCRIPT, 6);
+  debugger.step_in();
+  debugger.add_breakpoint(TEST_LUA_SCRIPT, 6);
 
-	kaguya::State state(L);
+  kaguya::State state(L);
 
-	kaguya::LuaTable envtable = state.newTable();
-	envtable["envvar"] = 2;
-	bool ret = state.dofile(TEST_LUA_SCRIPT, envtable);
-	ASSERT_TRUE(ret);
+  kaguya::LuaTable envtable = state.newTable();
+  envtable["envvar"] = 2;
+  bool ret = state.dofile(TEST_LUA_SCRIPT, envtable);
+  ASSERT_TRUE(ret);
 }
 
-
 TEST_F(DebuggerTest, GetGlobalTest) {
-	const char* TEST_LUA_SCRIPT = "../test/lua/test1.lua";
+  const char* TEST_LUA_SCRIPT = "../test/lua/test1.lua";
 
-	debugger.add_breakpoint(TEST_LUA_SCRIPT, 3);
+  debugger.add_breakpoint(TEST_LUA_SCRIPT, 3);
 
-	debugger.set_pause_handler([&](lrdb::debugger& debugger) {
-		auto global = debugger.get_global_table();
-		ASSERT_TRUE(global.is<picojson::object>());
-		ASSERT_TRUE(global.get<picojson::object>().size());
-	});
+  debugger.set_pause_handler([&](lrdb::debugger& debugger) {
+    auto global = debugger.get_global_table();
+    ASSERT_TRUE(global.is<picojson::object>());
+    ASSERT_TRUE(global.get<picojson::object>().size());
+  });
 
-	luaDofile(L, TEST_LUA_SCRIPT);
-
+  luaDofile(L, TEST_LUA_SCRIPT);
 }
 int main(int argc, char* argv[]) {
   ::testing::InitGoogleTest(&argc, argv);
