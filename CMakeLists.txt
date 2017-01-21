@@ -11,7 +11,12 @@ link_directories(${LUA_LIBRARY_DIRS})
 
 file(GLOB HEADER_FILE RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}  include/lrdb/*.hpp)
 
+if(LRDB_USE_BOOST_ASIO)
+  add_definitions(-DLRDB_USE_BOOST_ASIO)
+else(LRDB_USE_BOOST_ASIO)
+add_definitions(-DASIO_HAS_MOVE=0)# workaround compile error for gcc 4.8
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/third_party/asio/asio/include")
+endif(LRDB_USE_BOOST_ASIO)
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/third_party/picojson")
 
