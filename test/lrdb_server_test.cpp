@@ -126,13 +126,18 @@ TEST_F(DebugServerTest, ConnectTest1) {
 
     picojson::value res =
         sync_request("add_breakpoint", picojson::value(break_point));
+    ASSERT_TRUE(res.evaluate_as_boolean());
     res = sync_request("get_breakpoints");
+    ASSERT_TRUE(res.evaluate_as_boolean());
 
     res = sync_request("get_stacktrace");
+    ASSERT_TRUE(res.evaluate_as_boolean());
 
-    sync_request("continue");
+    res = sync_request("continue");
+    ASSERT_TRUE(res.evaluate_as_boolean());
     wait_for_paused();
-    sync_request("continue");
+    res = sync_request("continue");
+    ASSERT_TRUE(res.evaluate_as_boolean());
   });
 
   luaDofile(L, TEST_LUA_SCRIPT);
@@ -151,23 +156,30 @@ TEST_F(DebugServerTest, ConnectTest2) {
 
     picojson::value res =
         sync_request("add_breakpoint", picojson::value(break_point));
+    ASSERT_TRUE(res.evaluate_as_boolean());
     res = sync_request("get_breakpoints");
+    ASSERT_TRUE(res.evaluate_as_boolean());
     // std::cout << res.serialize() << std::endl;
 
-    sync_request("continue");
+    res = sync_request("continue");
+    ASSERT_TRUE(res.evaluate_as_boolean());
     wait_for_paused();
 
     res = sync_request("get_local_variable");
+    ASSERT_TRUE(res.evaluate_as_boolean());
     //		std::cout << res.serialize() << std::endl;
     res = sync_request("get_upvalues");
+    ASSERT_TRUE(res.evaluate_as_boolean());
     //		std::cout << res.serialize() << std::endl;
     picojson::object stack_var_req_param_obj;
     stack_var_req_param_obj["stack_no"] = picojson::value(0.);
     picojson::value stack_var_req_param =
         picojson::value(stack_var_req_param_obj);
     res = sync_request("get_local_variable", stack_var_req_param);
+    ASSERT_TRUE(res.evaluate_as_boolean());
     //		std::cout << res.serialize() << std::endl;
     res = sync_request("get_upvalues", stack_var_req_param);
+    ASSERT_TRUE(res.evaluate_as_boolean());
     //		std::cout << res.serialize() << std::endl;
 
     sync_request("continue");
@@ -190,13 +202,18 @@ TEST_F(DebugServerTest, ConnectTest4) {
 
     picojson::value res =
         sync_request("add_breakpoint", picojson::value(break_point));
+    ASSERT_TRUE(res.evaluate_as_boolean());
     res = sync_request("get_breakpoints");
+    ASSERT_TRUE(res.evaluate_as_boolean());
 
     res = sync_request("get_stacktrace");
+    ASSERT_TRUE(res.evaluate_as_boolean());
 
-    sync_request("continue");
+    res = sync_request("continue");
+    ASSERT_TRUE(res.evaluate_as_boolean());
     wait_for_paused();
-    sync_request("continue");
+    res = sync_request("continue");
+    ASSERT_TRUE(res.evaluate_as_boolean());
   });
 
   luaDofile(L, TEST_LUA_SCRIPT);
@@ -216,26 +233,34 @@ TEST_F(DebugServerTest, ConnectTest5) {
 
     picojson::value res =
         sync_request("add_breakpoint", picojson::value(break_point));
+    ASSERT_TRUE(res.evaluate_as_boolean());
     res = sync_request("get_breakpoints");
+    ASSERT_TRUE(res.evaluate_as_boolean());
     // std::cout << res.serialize() << std::endl;
 
-    sync_request("continue");
+    res = sync_request("continue");
+    ASSERT_TRUE(res.evaluate_as_boolean());
     wait_for_paused();
 
     res = sync_request("get_local_variable");
+    ASSERT_TRUE(res.evaluate_as_boolean());
     //		std::cout << res.serialize() << std::endl;
     res = sync_request("get_upvalues");
+    ASSERT_TRUE(res.evaluate_as_boolean());
     //		std::cout << res.serialize() << std::endl;
     picojson::object stack_var_req_param_obj;
     stack_var_req_param_obj["stack_no"] = picojson::value(0.);
     picojson::value stack_var_req_param =
         picojson::value(stack_var_req_param_obj);
     res = sync_request("get_local_variable", stack_var_req_param);
+    ASSERT_TRUE(res.evaluate_as_boolean());
     //		std::cout << res.serialize() << std::endl;
     res = sync_request("get_upvalues", stack_var_req_param);
-    std::cout << res.serialize() << std::endl;
+    ASSERT_TRUE(res.evaluate_as_boolean());
+    // std::cout << res.serialize() << std::endl;
 
-    sync_request("continue");
+    res = sync_request("continue");
+    ASSERT_TRUE(res.evaluate_as_boolean());
   });
 
   luaDofile(L, TEST_LUA_SCRIPT);

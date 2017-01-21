@@ -4,6 +4,16 @@ project(LRDB)
 
 include(cmake/ReduceDependencies.cmake)
 
+
+
+if(EMSCRIPTEN)
+  set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS}  --memory-init-file 0 -s TOTAL_MEMORY=8777216 -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --memory-init-file 0 -s TOTAL_MEMORY=8777216 -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1 -s EXPORTED_FUNCTIONS=\"['_main', '_lrdb_server_socket_on_connect', '_lrdb_server_socket_on_close', '_lrdb_server_socket_on_error', '_lrdb_server_socket_on_data']\"")
+endif(EMSCRIPTEN)
+
+if(NOT LOCAL_LUA_DIRECTORY AND NOT LUA_SEARCH_LIB_NAME)
+   set(LOCAL_LUA_DIRECTORY "third_party/lua-5.3.3")
+endif()
 include(cmake/FindLua.cmake)
 
 include_directories(SYSTEM ${LUA_INCLUDE_DIRS})
@@ -44,12 +54,16 @@ add_executable(lua_with_lrdb_server src/lua_with_lrdb_server.cpp ${HEADER_FILE})
 target_link_libraries(lua_with_lrdb_server ${LUA_LIBRARIES})
 
 set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR})
+
 if(WIN32)
 install(TARGETS lua_with_lrdb_server
         RUNTIME DESTINATION vscode_extension/out/bin/windows)
 elseif(APPLE)
 install(TARGETS lua_with_lrdb_server
-        RUNTIME DESTINATION vscode_extension/out/bin/macos)
+        RUNTIME DESTINATION vscode_extension/out/bin/macos) 
+elseif(EMSCRIPTEN)
+install(TARGETS lua_with_lrdb_server
+        RUNTIME DESTINATION vscode_extension/out/bin/node)
 elseif(UNIX)
 target_link_libraries(lua_with_lrdb_server -lpthread)
 
@@ -73,8 +87,15 @@ set(GTEST_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/src/gtest-al
 add_executable(lua_debugger_test test/lua_debugger_test.cpp ${HEADER_FILE} ${GTEST_SOURCE})
 target_link_libraries(lua_debugger_test ${LUA_LIBRARIES})
 
+if(NOT EMSCRIPTEN)
 add_executable(lrdb_server_test test/lrdb_server_test.cpp test/lrdb_server_test1.cpp ${HEADER_FILE} ${GTEST_SOURCE})
 target_link_libraries(lrdb_server_test ${LUA_LIBRARIES})
+target_link_libraries(lrdb_server_test -lpthread)
+add_test(
+  NAME lrdb_server_test
+  COMMAND $<TARGET_FILE:lrdb_server_test>
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/test)
+endif(NOT EMSCRIPTEN)
 
 if(WIN32)
 
@@ -82,7 +103,6 @@ elseif(APPLE)
 
 elseif(UNIX)
 target_link_libraries(lua_debugger_test -lpthread)
-target_link_libraries(lrdb_server_test -lpthread)
 else(WIN32)
 message(FATAL_ERROR "Unsupported operation system")
 endif(WIN32)
@@ -91,9 +111,4 @@ endif(WIN32)
 add_test(
   NAME lua_debugger_test
   COMMAND $<TARGET_FILE:lua_debugger_test>
-  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/test)
-
-add_test(
-  NAME lrdb_server_test
-  COMMAND $<TARGET_FILE:lrdb_server_test>
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/test)

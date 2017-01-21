@@ -1,5 +1,9 @@
 #include "lrdb/server.hpp"
 
+#ifdef EMSCRIPTEN
+#include <emscripten.h>
+#endif
+
 int main(int argc, char* argv[]) {
   int port = 21110;  // default port
   const char* program = 0;
@@ -19,6 +23,10 @@ int main(int argc, char* argv[]) {
     }
   }
 
+#ifdef EMSCRIPTEN
+  EM_ASM(FS.mkdir('root'); FS.mount(NODEFS, {root : '/'}, 'root');
+         FS.chdir('root/' + process.cwd()););
+#endif
   lrdb::server debug_server(port);
 
   lua_State* L = luaL_newstate();
