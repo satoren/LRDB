@@ -18,3 +18,9 @@ if(UNIX AND NOT EMSCRIPTEN)
 add_definitions("-DLUA_USE_POSIX -DLUA_USE_DLOPEN")
 target_link_libraries(liblua m dl)
 endif(UNIX AND NOT EMSCRIPTEN)
+
+#add_executable(lua src/lua.c)
+#target_link_libraries(lua liblua)
+
+#add_executable(luac src/luac.c)
+#target_link_libraries(luac liblua)
