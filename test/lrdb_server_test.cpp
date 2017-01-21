@@ -14,7 +14,8 @@ using namespace boost::asio;
 #endif
 class DebugServerTest : public ::testing::Test {
  protected:
-  DebugServerTest() : server(21115), client_stream("localhost", "21115"), pause_(0) {}
+  DebugServerTest()
+      : server(21115), client_stream("localhost", "21115"), pause_(0) {}
 
   virtual ~DebugServerTest() {}
 
