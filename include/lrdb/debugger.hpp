@@ -406,7 +406,6 @@ class debug_info {
 
     // use upvalue
     if (upvalue) {
-      int n = number_of_upvalues();
       lua_getinfo(state_, "f", debug_);  // push current running function
 
 #if LUA_VERSION_NUM < 502
