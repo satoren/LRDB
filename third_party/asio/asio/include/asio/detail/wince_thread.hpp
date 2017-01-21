@@ -2,7 +2,7 @@
 // detail/wince_thread.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2015 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -19,7 +19,7 @@
 
 #if defined(ASIO_WINDOWS) && defined(UNDER_CE)
 
-#include "asio/detail/memory.hpp"
+#include <memory>
 #include "asio/detail/noncopyable.hpp"
 #include "asio/detail/socket_types.hpp"
 #include "asio/detail/throw_error.hpp"
@@ -64,14 +64,6 @@ public:
   void join()
   {
     ::WaitForSingleObject(thread_, INFINITE);
-  }
-
-  // Get number of CPUs.
-  static std::size_t hardware_concurrency()
-  {
-    SYSTEM_INFO system_info;
-    ::GetSystemInfo(&system_info);
-    return system_info.dwNumberOfProcessors;
   }
 
 private:

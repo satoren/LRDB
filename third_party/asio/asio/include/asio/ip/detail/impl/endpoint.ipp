@@ -2,7 +2,7 @@
 // ip/detail/impl/endpoint.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2015 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -80,7 +80,8 @@ endpoint::endpoint(const asio::ip::address& addr,
       asio::detail::socket_ops::host_to_network_short(port_num);
     data_.v4.sin_addr.s_addr =
       asio::detail::socket_ops::host_to_network_long(
-        addr.to_v4().to_uint());
+          static_cast<asio::detail::u_long_type>(
+            addr.to_v4().to_ulong()));
   }
   else
   {
@@ -176,14 +177,18 @@ bool operator<(const endpoint& e1, const endpoint& e2)
 }
 
 #if !defined(ASIO_NO_IOSTREAM)
-std::string endpoint::to_string() const
+std::string endpoint::to_string(asio::error_code& ec) const
 {
+  std::string a = address().to_string(ec);
+  if (ec)
+    return std::string();
+
   std::ostringstream tmp_os;
   tmp_os.imbue(std::locale::classic());
   if (is_v4())
-    tmp_os << address();
+    tmp_os << a;
   else
-    tmp_os << '[' << address() << ']';
+    tmp_os << '[' << a << ']';
   tmp_os << ':' << port();
 
   return tmp_os.str();
