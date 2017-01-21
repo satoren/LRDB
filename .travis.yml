@@ -36,5 +36,5 @@ after_success: |
     export GCOV="gcov"
   fi
   if [ -n "$GCOV" ] && [ -n "$COVERAGE" ]; then
-    coveralls --gcov ${GCOV} --exclude test --exclude third_party --gcov-options '\-lp'
+    coveralls --gcov ${GCOV} --exclude CMakeFiles --exclude test --exclude third_party --gcov-options '\-lp'
   fi
