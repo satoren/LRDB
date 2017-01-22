@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
   if (!program) {
     return 1;
   }
-
+  std::cout << LUA_COPYRIGHT << std::endl;
 #ifdef EMSCRIPTEN
   EM_ASM(FS.mkdir('root'); FS.mount(NODEFS, {root : '/'}, 'root');
          FS.chdir('root/' + process.cwd()););
