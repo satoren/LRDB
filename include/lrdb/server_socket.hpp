@@ -35,6 +35,7 @@ class server_socket {
         if (on_error) {
           on_error(ec.message());
         }
+		close();
       }
     });
   }
@@ -73,7 +74,7 @@ class server_socket {
       if (on_error) {
         on_error(ec.message());
       }
-      socket_.close();
+	  close();
       return true;
     }
     return false;
@@ -101,6 +102,7 @@ class server_socket {
                                if (on_error) {
                                  on_error(ec.message());
                                }
+							   close();
                              }
                            });
   }
