@@ -1,1 +1,0 @@
-/mnt/c/Users/sator/Documents/GitHub/LRDB/vscode_extension/out/bin/node/lua_with_lrdb_server.js
