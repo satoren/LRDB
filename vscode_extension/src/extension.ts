@@ -14,46 +14,29 @@ const initialConfigurations = {
 		{
 			type: 'lua',
 			request: 'launch',
-			name: 'Lua-Debug',
+			name: 'Lua Launch',
+			program: '${command.CurrentSource}',
+			cwd: "${workspaceRoot}",
+			stopOnEntry: true
+		},
+		{
+			type: 'lua',
+			request: 'launch',
+			name: 'Lua Attach',
 			host: 'localhost',
 			port: 21110,
 			sourceRoot: "${workspaceRoot}",
-			startupCommand: {
-				program: '${command.DefaultLuaInterpreter}',
-				args: [
-					'--port',
-					'21110',
-					'${command.CurrentSource}'
-				],
-				cwd: "${workspaceRoot}"
-			},
 			stopOnEntry: true
 		}
 	]
 }
 
-function launchBinary(): string {
-	if (os.type() == 'Windows_NT') {
-		return "windows/lua_with_lrdb_server.exe"
-	}
-	else if (os.type() == 'Linux') {
-		return "linux/lua_with_lrdb_server"
-	}
-	else if (os.type() == 'Darwin') {
-		return "macos/lua_with_lrdb_server"
-	}
-	return ""
-}
-
 export function activate(context: vscode.ExtensionContext) {
 	let disposable = vscode.commands.registerCommand('extension.lrdb.getProgramName', config => {
-		return vscode.workspace.asRelativePath(vscode.window.activeTextEditor.document.fileName);
+		return vscode.window.activeTextEditor.document.fileName;
 	});
 	context.subscriptions.push(disposable);
 
-	context.subscriptions.push(vscode.commands.registerCommand('extension.lrdb.getDefaultDebugServerName', config => {
-		return context.asAbsolutePath(path.join('out', 'bin', launchBinary()));
-	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('extension.lrdb.provideInitialConfigurations', () => {
 		return [

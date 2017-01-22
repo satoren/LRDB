@@ -5,28 +5,34 @@ import {
 } from 'vscode-debugadapter';
 import { DebugProtocol } from 'vscode-debugprotocol';
 import { readFileSync } from 'fs';
-import { spawn, ChildProcess } from 'child_process';
+import { spawn, ChildProcess, fork } from 'child_process';
 import * as net from 'net';
 import * as path from 'path';
 
-
-export interface StartupCommand {
-	program: string;
-	args: string[];
-	cwd: string;
-}
+import * as os from 'os';
 
 
 export interface LaunchRequestArguments extends DebugProtocol.LaunchRequestArguments {
 
-	startupCommand: StartupCommand;
+	program: string;
+	args: string[];
+	cwd: string;
 
+	sourceRoot?: string;
+	stopOnEntry?: boolean;
+}
+
+
+export interface AttachRequestArguments extends DebugProtocol.AttachRequestArguments {
 	host: string;
 	port: number;
 	sourceRoot: string;
 
 	stopOnEntry?: boolean;
 }
+
+
+
 
 export interface DebugServerEvent {
 	method: string;
@@ -54,7 +60,6 @@ class LRDBClient {
 	public constructor(port: number, host: string) {
 		this._connection = net.connect(port, host);
 		this._connection.on('connect', () => {
-			console.log('Debug server connected');
 			if (this.openDelegate) {
 				this.openDelegate();
 			}
@@ -170,17 +175,84 @@ class LuaDebugSession extends DebugSession {
 		this.sendResponse(response);
 	}
 
+	private launchBinary(): string {
+		if (os.type() == 'Windows_NT') {
+			return path.resolve(path.join('./out', 'bin', "windows/lua_with_lrdb_server.exe"));
+		}
+		else if (os.type() == 'Linux') {
+			return path.resolve(path.join('./out', 'bin', "linux/lua_with_lrdb_server"));
+		}
+		else if (os.type() == 'Darwin') {
+			return path.resolve(path.join('./out', 'bin', "macos/lua_with_lrdb_server"));
+		}
+		return ""
+	}
+
+	private setupSourceEnv(sourceRoot: string) {
+		this.convertClientLineToDebugger = (line: number): number => {
+			return line;
+		}
+		this.convertDebuggerLineToClient = (line: number): number => {
+			return line;
+		}
+
+		this.convertClientPathToDebugger = (clientPath: string): string => {
+			return path.relative(sourceRoot, clientPath);
+		}
+		this.convertDebuggerPathToClient = (debuggerPath: string): string => {
+			const filename: string = debuggerPath.startsWith("@") ? debuggerPath.substr(1) : debuggerPath;
+			if (path.isAbsolute(filename)) {
+				return filename;
+			}
+			else {
+				return path.join(sourceRoot, filename);
+			}
+		}
+	}
+
+
 	protected launchRequest(response: DebugProtocol.LaunchResponse, args: LaunchRequestArguments): void {
 		this._stopOnEntry = args.stopOnEntry;
+		const cwd = args.cwd ? args.cwd : process.cwd();
+		const sourceRoot = args.sourceRoot ? args.sourceRoot : cwd;
+		this.setupSourceEnv(sourceRoot);
 
-		var startupCommand = args.startupCommand;
-		if (startupCommand) {
-			var server_args = args.startupCommand.args;
-			this._debug_server_process = spawn(startupCommand.program, startupCommand.args, {
-				cwd: startupCommand.cwd,
+
+		this._debug_server_process = spawn(this.launchBinary(), ['--port',
+			'21110', this.convertClientPathToDebugger(args.program)], {
+				cwd: cwd,
 				env: process.env
-			});
-		}
+			}
+		);
+		this._debug_server_process.stdout.on('data', (data: string) => { this.sendEvent(new OutputEvent(data)); });
+		this._debug_server_process.on('error', (msg: string) => {
+			this.sendEvent(new OutputEvent(msg, 'error'));
+			this.sendEvent(new TerminatedEvent());
+		});
+		this._debug_server_process.on('close', (code: number, signal: string) => {
+			this.sendEvent(new OutputEvent(`exit status: ${code}\n`));
+			this.sendEvent(new TerminatedEvent());
+		});
+
+		this._debug_client = new LRDBClient(21110, 'localhost');
+		this._debug_client.eventDelegate = (event: DebugServerEvent) => { this.handleServerEvents(event) };
+		this._debug_client.closeDelegate = () => {
+			this.sendEvent(new TerminatedEvent());
+		};
+		this._debug_client.errorDelegate = () => {
+			this.sendEvent(new TerminatedEvent());
+		};
+
+		this._debug_client.openDelegate = () => {
+			this.sendResponse(response);
+			this.sendEvent(new InitializedEvent());
+		};
+
+	}
+
+	protected attachRequest(response: DebugProtocol.AttachResponse, args: AttachRequestArguments): void {
+		this._stopOnEntry = args.stopOnEntry;
+		this.setupSourceEnv(args.sourceRoot);
 
 		this._debug_client = new LRDBClient(args.port, args.host);
 		this._debug_client.eventDelegate = (event: DebugServerEvent) => { this.handleServerEvents(event) };
@@ -191,30 +263,18 @@ class LuaDebugSession extends DebugSession {
 			this.sendEvent(new TerminatedEvent());
 		};
 
-		this.convertClientLineToDebugger = (line: number): number => {
-			return line;
-		}
-		this.convertDebuggerLineToClient = (line: number): number => {
-			return line;
-		}
-
-		this.convertClientPathToDebugger = (clientPath: string): string => {
-			return path.relative(args.sourceRoot, clientPath);
-		}
-		this.convertDebuggerPathToClient = (debuggerPath: string): string => {
-			const filename: string = debuggerPath.startsWith("@") ? debuggerPath.substr(1) : debuggerPath;
-			return path.join(args.sourceRoot, filename);
-		}
-
 		this._debug_client.openDelegate = () => {
 			this.sendResponse(response);
 			this.sendEvent(new InitializedEvent());
 		};
+
 	}
+
 
 	protected configurationDoneRequest(response: DebugProtocol.ConfigurationDoneResponse, args: DebugProtocol.ConfigurationDoneArguments): void {
 
 		if (this._stopOnEntry) {
+			this.sendEvent(new StoppedEvent("entry", LuaDebugSession.THREAD_ID));
 		} else {
 			this._debug_client.send("continue");
 		}
@@ -397,7 +457,6 @@ class LuaDebugSession extends DebugSession {
 	}
 
 	protected continueRequest(response: DebugProtocol.ContinueResponse, args: DebugProtocol.ContinueArguments): void {
-
 		this._debug_client.send("continue");
 	}
 
@@ -414,9 +473,10 @@ class LuaDebugSession extends DebugSession {
 	}
 
 	protected disconnectRequest(response: DebugProtocol.DisconnectResponse, args: DebugProtocol.DisconnectArguments): void {
-		this._debug_server_process.kill();
+		if (this._debug_server_process) {
+			this._debug_server_process.kill();
+		}
 		this.sendResponse(response);
-		this.shutdown();
 	}
 
 	protected evaluateRequest(response: DebugProtocol.EvaluateResponse, args: DebugProtocol.EvaluateArguments): void {
