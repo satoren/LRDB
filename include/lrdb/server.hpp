@@ -22,6 +22,10 @@ class server {
       : wait_for_connect_(true), server_socket_(port) {
     debugger_.set_pause_handler([&](debugger& debugger) {
       send_pause_status();
+	  if (wait_for_connect_) {
+		  debugger.pause();
+		  server_socket_.wait_for_connection();
+	  }
       while (debugger.paused() && server_socket_.is_open()) {
         server_socket_.run_one();
       }
@@ -30,9 +34,6 @@ class server {
 
     debugger_.set_tick_handler([&](debugger&) {
       server_socket_.poll();
-      if (wait_for_connect_) {
-        server_socket_.wait_for_connection();
-      }
     });
 
     debugger_.step_in();
@@ -40,7 +41,9 @@ class server {
     server_socket_.on_data = [=](const std::string& data) {
       execute_message(data);
     };
-    server_socket_.on_close = [=]() {};
+    server_socket_.on_close = [=]() {
+		debugger_.unpause();
+	};
   }
 
   ~server() { exit(); }

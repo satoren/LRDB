@@ -2,12 +2,11 @@
 	"name": "lrdb",
 	"displayName": "LRDB",
 	"description": "Lua Remote DeBugger",
-	"version": "0.0.1",
-	"publisher": "lrdb",
+	"version": "0.1.0",
+	"publisher": "satoren",
 	"engines": {
-		"vscode": "^1.5.0"
+		"vscode": "^1.8.0"
 	},
-	"private": true,
 	"categories": [
 		"Debuggers"
 	],
@@ -20,6 +19,13 @@
 		"onCommand:extension.lrdb.getDefaultDebugServerName",
 		"onCommand:extension.lrdb.provideInitialConfigurations"
 	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/satoren/LRDB.git"
+	},
+	"bugs": {
+		"url": "https://github.com/satoren/LRDB/issues"
+	},
 	"main": "./out/src/extension",
 	"contributes": {
 		"breakpoints": [
@@ -65,37 +71,20 @@
 							"program"
 						],
 						"properties": {
-							"host": {
+							"program": {
 								"type": "string",
-								"description": "Connect host name.",
+								"description": "Lua program name.",
 								"default": "localhost"
 							},
-							"port": {
-								"type": "number",
-								"description": "connection port.",
-								"default": 21110
+							"cwd": {
+								"type": "string",
+								"description": "working directory.",
+								"default": "${workspaceRoot}"
 							},
 							"sourceRoot": {
 								"type": "string",
 								"description": "script source root directory.",
 								"default": "${workspaceRoot}"
-							},
-							"startupCommand": {
-								"type": "object",
-								"description": "Debugging server.",
-								"default": {
-									"program": "${command.DefaultLuaInterpreter}",
-									"args": [
-										"--port",
-										"21110",
-										"${command.CurrentSource}"
-									],
-									"cwd": {
-										"type": "string",
-										"description": "Absolute path to working directory.",
-										"default": "${workspaceRoot}"
-									}
-								}
 							},
 							"stopOnEntry": {
 								"type": "boolean",
@@ -150,5 +139,5 @@
 		"mocha": "^2.3.3",
 		"@types/node": "^6.0.40",
 		"@types/mocha": "^2.2.32"
-	}
+	},"icon": "icon.png"
 }

@@ -5,28 +5,34 @@ import {
 } from 'vscode-debugadapter';
 import { DebugProtocol } from 'vscode-debugprotocol';
 import { readFileSync } from 'fs';
-import { spawn, ChildProcess } from 'child_process';
+import { spawn, ChildProcess, fork } from 'child_process';
 import * as net from 'net';
 import * as path from 'path';
 
-
-export interface StartupCommand {
-	program: string;
-	args: string[];
-	cwd: string;
-}
+import * as os from 'os';
 
 
 export interface LaunchRequestArguments extends DebugProtocol.LaunchRequestArguments {
 
-	startupCommand: StartupCommand;
+	program: string;
+	args: string[];
+	cwd: string;
 
+	sourceRoot?: string;
+	stopOnEntry?: boolean;
+}
+
+
+export interface AttachRequestArguments extends DebugProtocol.AttachRequestArguments {
 	host: string;
 	port: number;
 	sourceRoot: string;
 
 	stopOnEntry?: boolean;
 }
+
+
+
 
 export interface DebugServerEvent {
 	method: string;
@@ -50,31 +56,45 @@ class LRDBClient {
 
 	private _callback_map = {};
 	private _request_id = 0;
+	private _end = false;
+
+	private on_close() {
+		for (var key in this._callback_map) {
+			this._callback_map[key]({ result: null, id: key });
+			delete this._callback_map[key];
+		}
+
+		if (this.closeDelegate) {
+			this.closeDelegate();
+		}
+	}
+	private on_connect() {
+		this._connection.on('close', () => {
+			this.on_close();
+		});
+		if (this.openDelegate) {
+			this.openDelegate();
+		}
+	}
 
 	public constructor(port: number, host: string) {
 		this._connection = net.connect(port, host);
 		this._connection.on('connect', () => {
-			console.log('Debug server connected');
-			if (this.openDelegate) {
-				this.openDelegate();
-			}
-
-			this._connection.on('close', () => {
-				if (this.closeDelegate) {
-					this.closeDelegate();
-				}
-			});
+			this.on_connect();
 		});
+
 		var retryCount = 0;
-		this._connection.on('error', (e) => {
-			console.log('Connection Failed - ' + host + ':' + port);
-			if (retryCount < 5) {
+		this._connection.on('error', (e: any) => {
+			if (e.code == 'ECONNREFUSED' && retryCount < 5) {
 				retryCount++;
 				this._connection.setTimeout(1000, () => {
-					this._connection.connect(port, host);
+					if (!this._end) {
+						this._connection.connect(port, host);
+					}
 				});
 				return;
 			}
+
 			console.error(e.message);
 			if (this.errorDelegate) {
 				this.errorDelegate();
@@ -101,20 +121,31 @@ class LRDBClient {
 
 	public send(method: string, param?: any, callback?: (response: any) => void) {
 		let id = this._request_id++;
-		if (callback) {
-			this._callback_map[id] = callback
-		}
+
 		var data = JSON.stringify({ "method": method, "param": param, "id": id }) + "\n";
-		this._connection.write(data);
+		var ret = this._connection.write(data);
+
+		if (callback) {
+			if (!ret) {
+				this._callback_map[id] = callback
+			}
+			else {
+				callback({ result: null, id: id });
+			}
+		}
 	}
 	public receive(event: DebugServerEvent) {
 		if (this._callback_map[event.id]) {
 			this._callback_map[event.id](event);
-			this._callback_map[event.id] = undefined;
+			delete this._callback_map[event.id];
 		}
 		if (this.eventDelegate) {
 			this.eventDelegate(event);
 		}
+	}
+	public end() {
+		this._end = true;
+		this._connection.end();
 	}
 
 	eventDelegate: (event: DebugServerEvent) => void;
@@ -159,6 +190,14 @@ class LuaDebugSession extends DebugSession {
 	 * to interrogate the features the debug adapter provides.
 	 */
 	protected initializeRequest(response: DebugProtocol.InitializeResponse, args: DebugProtocol.InitializeRequestArguments): void {
+		if (this._debug_server_process) {
+			this._debug_server_process.kill();
+			delete this._debug_server_process;
+		}
+		if (this._debug_client) {
+			this._debug_client.end();
+			delete this._debug_client;
+		}
 		// This debug adapter implements the configurationDoneRequest.
 		response.body.supportsConfigurationDoneRequest = true;
 
@@ -170,17 +209,87 @@ class LuaDebugSession extends DebugSession {
 		this.sendResponse(response);
 	}
 
+	private launchBinary(): string {
+		if (os.type() == 'Windows_NT') {
+			return path.resolve(path.join(__dirname, '../bin', "windows/lua_with_lrdb_server.exe"));
+		}
+		else if (os.type() == 'Linux') {
+			return path.resolve(path.join(__dirname, '../bin', "linux/lua_with_lrdb_server"));
+		}
+		else if (os.type() == 'Darwin') {
+			return path.resolve(path.join(__dirname, '../bin', "macos/lua_with_lrdb_server"));
+		}
+		return ""
+	}
+
+	private setupSourceEnv(sourceRoot: string) {
+		this.convertClientLineToDebugger = (line: number): number => {
+			return line;
+		}
+		this.convertDebuggerLineToClient = (line: number): number => {
+			return line;
+		}
+
+		this.convertClientPathToDebugger = (clientPath: string): string => {
+			return path.relative(sourceRoot, clientPath);
+		}
+		this.convertDebuggerPathToClient = (debuggerPath: string): string => {
+			const filename: string = debuggerPath.startsWith("@") ? debuggerPath.substr(1) : debuggerPath;
+			if (path.isAbsolute(filename)) {
+				return filename;
+			}
+			else {
+				return path.join(sourceRoot, filename);
+			}
+		}
+	}
+
+
 	protected launchRequest(response: DebugProtocol.LaunchResponse, args: LaunchRequestArguments): void {
 		this._stopOnEntry = args.stopOnEntry;
+		const cwd = args.cwd ? args.cwd : process.cwd();
+		const sourceRoot = args.sourceRoot ? args.sourceRoot : cwd;
+		this.setupSourceEnv(sourceRoot);
+		const program = this.convertClientPathToDebugger(args.program);
 
-		var startupCommand = args.startupCommand;
-		if (startupCommand) {
-			var server_args = args.startupCommand.args;
-			this._debug_server_process = spawn(startupCommand.program, startupCommand.args, {
-				cwd: startupCommand.cwd,
-				env: process.env
-			});
-		}
+		this._debug_server_process = spawn(this.launchBinary(), ['--port',
+			'21110', program], {
+				cwd: cwd
+			}
+		);
+		this._debug_server_process.stdout.on('data', (data: any) => {
+			this.sendEvent(new OutputEvent(data.toString(), 'stdout'));
+		});
+		this._debug_server_process.stderr.on('data', (data: any) => {
+			this.sendEvent(new OutputEvent(data.toString(), 'stderr'));
+		});
+		this._debug_server_process.on('error', (msg: string) => {
+			this.sendEvent(new OutputEvent(msg, 'error'));
+		});
+		this._debug_server_process.on('close', (code: number, signal: string) => {
+			this.sendEvent(new OutputEvent(`exit status: ${code}\n`));
+			this.sendEvent(new TerminatedEvent());
+		});
+
+		this._debug_client = new LRDBClient(21110, 'localhost');
+		this._debug_client.eventDelegate = (event: DebugServerEvent) => { this.handleServerEvents(event) };
+		this._debug_client.closeDelegate = () => {
+			this.sendEvent(new TerminatedEvent());
+		};
+		this._debug_client.errorDelegate = () => {
+			this.sendEvent(new TerminatedEvent());
+		};
+
+		this._debug_client.openDelegate = () => {
+			this.sendResponse(response);
+			this.sendEvent(new InitializedEvent());
+		};
+
+	}
+
+	protected attachRequest(response: DebugProtocol.AttachResponse, args: AttachRequestArguments): void {
+		this._stopOnEntry = args.stopOnEntry;
+		this.setupSourceEnv(args.sourceRoot);
 
 		this._debug_client = new LRDBClient(args.port, args.host);
 		this._debug_client.eventDelegate = (event: DebugServerEvent) => { this.handleServerEvents(event) };
@@ -191,30 +300,18 @@ class LuaDebugSession extends DebugSession {
 			this.sendEvent(new TerminatedEvent());
 		};
 
-		this.convertClientLineToDebugger = (line: number): number => {
-			return line;
-		}
-		this.convertDebuggerLineToClient = (line: number): number => {
-			return line;
-		}
-
-		this.convertClientPathToDebugger = (clientPath: string): string => {
-			return path.relative(args.sourceRoot, clientPath);
-		}
-		this.convertDebuggerPathToClient = (debuggerPath: string): string => {
-			const filename: string = debuggerPath.startsWith("@") ? debuggerPath.substr(1) : debuggerPath;
-			return path.join(args.sourceRoot, filename);
-		}
-
 		this._debug_client.openDelegate = () => {
 			this.sendResponse(response);
 			this.sendEvent(new InitializedEvent());
 		};
+
 	}
+
 
 	protected configurationDoneRequest(response: DebugProtocol.ConfigurationDoneResponse, args: DebugProtocol.ConfigurationDoneArguments): void {
 
 		if (this._stopOnEntry) {
+			this.sendEvent(new StoppedEvent("entry", LuaDebugSession.THREAD_ID));
 		} else {
 			this._debug_client.send("continue");
 		}
@@ -288,21 +385,27 @@ class LuaDebugSession extends DebugSession {
 	protected stackTraceRequest(response: DebugProtocol.StackTraceResponse, args: DebugProtocol.StackTraceArguments): void {
 
 		this._debug_client.send("get_stacktrace", null, (res: any) => {
-
-			const startFrame = typeof args.startFrame === 'number' ? args.startFrame : 0;
-			const maxLevels = typeof args.levels === 'number' ? args.levels : res.result.length - startFrame;
-			const endFrame = Math.min(startFrame + maxLevels, res.result.length);
-			const frames = new Array<StackFrame>();
-			for (let i = startFrame; i < endFrame; i++) {
-				const frame = res.result[i];	// use a word of the line as the stackframe name
-				frames.push(new StackFrame(i, frame.func, new Source(path.basename(frame.file),
-					this.convertDebuggerPathToClient(frame.file)),
-					this.convertDebuggerLineToClient(frame.line), 0));
+			if (res.result) {
+				const startFrame = typeof args.startFrame === 'number' ? args.startFrame : 0;
+				const maxLevels = typeof args.levels === 'number' ? args.levels : res.result.length - startFrame;
+				const endFrame = Math.min(startFrame + maxLevels, res.result.length);
+				const frames = new Array<StackFrame>();
+				for (let i = startFrame; i < endFrame; i++) {
+					const frame = res.result[i];	// use a word of the line as the stackframe name
+					frames.push(new StackFrame(i, frame.func, new Source(path.basename(frame.file),
+						this.convertDebuggerPathToClient(frame.file)),
+						this.convertDebuggerLineToClient(frame.line), 0));
+				}
+				response.body = {
+					stackFrames: frames,
+					totalFrames: res.result.length
+				};
 			}
-			response.body = {
-				stackFrames: frames,
-				totalFrames: res.result.length
-			};
+			else
+			{
+				response.success = false;
+				response.message = "unknown error";
+			}
 			this.sendResponse(response);
 		});
 
@@ -397,7 +500,6 @@ class LuaDebugSession extends DebugSession {
 	}
 
 	protected continueRequest(response: DebugProtocol.ContinueResponse, args: DebugProtocol.ContinueArguments): void {
-
 		this._debug_client.send("continue");
 	}
 
@@ -414,9 +516,15 @@ class LuaDebugSession extends DebugSession {
 	}
 
 	protected disconnectRequest(response: DebugProtocol.DisconnectResponse, args: DebugProtocol.DisconnectArguments): void {
-		this._debug_server_process.kill();
+		if (this._debug_server_process) {
+			this._debug_server_process.kill();
+			delete this._debug_server_process;
+		}
+		if (this._debug_client) {
+			this._debug_client.end();
+			delete this._debug_client;
+		}
 		this.sendResponse(response);
-		this.shutdown();
 	}
 
 	protected evaluateRequest(response: DebugProtocol.EvaluateResponse, args: DebugProtocol.EvaluateArguments): void {
@@ -442,6 +550,7 @@ class LuaDebugSession extends DebugSession {
 						result: "",
 						variablesReference: 0
 					};
+					response.success = false;
 				}
 				this.sendResponse(response);
 			});
