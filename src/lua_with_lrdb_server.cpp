@@ -22,6 +22,9 @@ int main(int argc, char* argv[]) {
       program = argv[i];
     }
   }
+  if (!program) {
+    return 1;
+  }
 
 #ifdef EMSCRIPTEN
   EM_ASM(FS.mkdir('root'); FS.mount(NODEFS, {root : '/'}, 'root');
