@@ -90,7 +90,7 @@ class command_stream_stdstream {
       mutex_.unlock();
       std::getline(istream_, msg);
       if (msg.find(LRDB_IOSTREAM_PREFIX) == 0) {
-        push_message(msg.substr(strlen(LRDB_IOSTREAM_PREFIX)));
+        push_message(msg.substr(sizeof(LRDB_IOSTREAM_PREFIX)));
       }
       mutex_.lock();
     }
