@@ -2,51 +2,33 @@
 
 #include <memory>
 #include <vector>
+#include <utility>
 
 #include "debug_command.hpp"
 #include "debugger.hpp"
 #include "message.hpp"
 
 #ifdef EMSCRIPTEN
-#include "server_socket_emscripten.hpp"
+#include "command_stream_socket_emscripten.hpp"
 #else
-#include "server_socket.hpp"
+#include "command_stream_socket.hpp"
 #endif
+
 namespace lrdb {
 
 #define LRDB_SERVER_VERSION "0.0.1"
 
-class server {
+template <typename StreamType>
+class basic_server {
  public:
-  server(uint16_t port = 21110)
-      : wait_for_connect_(true), server_socket_(port) {
-    debugger_.set_pause_handler([&](debugger& debugger) {
-      send_pause_status();
-	  if (wait_for_connect_) {
-		  debugger.pause();
-		  server_socket_.wait_for_connection();
-	  }
-      while (debugger.paused() && server_socket_.is_open()) {
-        server_socket_.run_one();
-      }
-      send_message(message::notify::serialize("running"));
-    });
 
-    debugger_.set_tick_handler([&](debugger&) {
-      server_socket_.poll();
-    });
-
-    debugger_.step_in();
-    server_socket_.on_connection = [=]() { connected_done(); };
-    server_socket_.on_data = [=](const std::string& data) {
-      execute_message(data);
-    };
-    server_socket_.on_close = [=]() {
-		debugger_.unpause();
-	};
+ template<typename... StreamArgs>
+  basic_server(StreamArgs&&... arg)
+      : wait_for_connect_(true), command_stream_(std::forward<StreamArgs>(arg)...) {
+    init();
   }
 
-  ~server() { exit(); }
+  ~basic_server() { exit(); }
 
   void reset(lua_State* L = 0) {
     debugger_.reset(L);
@@ -57,10 +39,32 @@ class server {
 
   void exit() {
     send_message(message::notify::serialize("exit"));
-    server_socket_.close();
+    command_stream_.close();
   }
 
  private:
+  void init() {
+    debugger_.set_pause_handler([&](debugger& debugger) {
+      send_pause_status();
+      if (wait_for_connect_) {
+        debugger.pause();
+        command_stream_.wait_for_connection();
+      }
+      while (debugger.paused() && command_stream_.is_open()) {
+        command_stream_.run_one();
+      }
+      send_message(message::notify::serialize("running"));
+    });
+
+    debugger_.set_tick_handler([&](debugger&) { command_stream_.poll(); });
+
+    debugger_.step_in();
+    command_stream_.on_connection = [=]() { connected_done(); };
+    command_stream_.on_data = [=](const std::string& data) {
+      execute_message(data);
+    };
+    command_stream_.on_close = [=]() { debugger_.unpause(); };
+  }
   void send_pause_status() {
     picojson::object pauseparam;
     pauseparam["reason"] = picojson::value(debugger_.pause_reason());
@@ -70,7 +74,7 @@ class server {
   void connected_done() { wait_for_connect_ = false; }
 
   void send_message(const std::string& message) {
-    server_socket_.send_message(message + "\r\n");
+    command_stream_.send_message(message);
   }
   void execute_message(const std::string& message) {
     picojson::value req;
@@ -119,6 +123,7 @@ class server {
 
   bool wait_for_connect_;
   debugger debugger_;
-  server_socket server_socket_;
+  StreamType command_stream_;
 };
+typedef basic_server<command_stream_socket> server;
 }
