@@ -3,31 +3,30 @@
 #endif
 #include <iostream>
 
-#include "lrdb/server.hpp"
 #include "lrdb/command_stream_stdstream.hpp"
+#include "lrdb/server.hpp"
 
+template <typename DebugServer>
+int exec(const char* program, DebugServer& debug_server) {
+  lua_State* L = luaL_newstate();
+  luaL_openlibs(L);
 
-template<typename DebugServer>int exec(const char* program,DebugServer& debug_server)
-{
-	lua_State* L = luaL_newstate();
-	luaL_openlibs(L);
+  debug_server.reset(L);
 
-	debug_server.reset(L);
+  bool ret = luaL_dofile(L, program);
+  if (ret != 0) {
+    std::cerr << lua_tostring(L, -1);  // output error
+  }
 
-	bool ret = luaL_dofile(L, program);
-	if (ret != 0) {
-		std::cerr << lua_tostring(L, -1);  // output error
-	}
+  debug_server.reset();
 
-	debug_server.reset();
-
-	lua_close(L);
-	L = 0;
-	return ret ? 1 : 0;
+  lua_close(L);
+  L = 0;
+  return ret ? 1 : 0;
 }
 
 int main(int argc, char* argv[]) {
-  int port = 0; 
+  int port = 0;
   const char* program = 0;
 
   // parse args
@@ -36,6 +35,7 @@ int main(int argc, char* argv[]) {
       if (i + 1 < argc) {
         if (strcmp(argv[i], "-p") || strcmp(argv[i], "--port")) {
           port = atoi(argv[i + 1]);
+          ++i;
         }
       } else {
         return 1;  // invalid argument
@@ -52,14 +52,13 @@ int main(int argc, char* argv[]) {
   EM_ASM(FS.mkdir('root'); FS.mount(NODEFS, {root : '/'}, 'root');
          FS.chdir('root/' + process.cwd()););
 #endif
-  if (port == 0)//if no port use std::cin and std::cout
+  if (port == 0)  // if no port use std::cin and std::cout
   {
-	  lrdb::basic_server<lrdb::command_stream_stdstream> debug_server(std::cin, std::cout);
-	  return exec(program,debug_server);
-  }
-  else
-  {
-	  lrdb::server debug_server(port);
-	  return exec(program,debug_server);
+    lrdb::basic_server<lrdb::command_stream_stdstream> debug_server(std::cin,
+                                                                    std::cout);
+    return exec(program, debug_server);
+  } else {
+    lrdb::server debug_server(port);
+    return exec(program, debug_server);
   }
 }
