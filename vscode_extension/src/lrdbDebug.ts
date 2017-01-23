@@ -5,7 +5,7 @@ import {
 } from 'vscode-debugadapter';
 import { DebugProtocol } from 'vscode-debugprotocol';
 import { readFileSync } from 'fs';
-import { spawn, ChildProcess, fork } from 'child_process';
+import { spawn, ChildProcess } from 'child_process';
 import * as net from 'net';
 import * as path from 'path';
 
