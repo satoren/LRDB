@@ -11,9 +11,9 @@ extern "C" void lrdb_server_socket_on_data(void* ptr, const char* data);
 
 namespace lrdb {
 // one to one server socket
-class server_socket {
+class command_stream_socket {
  public:
-  server_socket(uint16_t port = 21110) {
+  command_stream_socket(uint16_t port = 21110) {
     EM_ASM_(
         {
           var net = require('net');
@@ -73,7 +73,7 @@ class server_socket {
         },
         this, port);
   }
-  ~server_socket() { close(); }
+  ~command_stream_socket() { close(); }
   void close() {
     EM_ASM_(
         {
@@ -110,7 +110,8 @@ class server_socket {
     }
   }
 
-  bool send_message(const std::string& message) {
+  bool send_message(const std::string& m) {
+    const std::string message = m + "\r\n";
     return EM_ASM_INT(
         {
           var server = Module.lrdb_server_table[$0];

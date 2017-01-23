@@ -4,8 +4,6 @@
 
 This extension is debug Lua programs with Visual Studio Code.
 
-Open Lua file and press F5.
-
 ## Features
 
 Debug your Lua program.
@@ -13,17 +11,16 @@ Debug your Lua program.
 * Breakpoints
 * Step over, step in, step out
 * Display Local,Upvalue,Global values
-* Watches
+* Watches,Eval on Debug Console
 * Remote debugging over TCP network
 
 
-If you want embedded debug server to your host program, Please see [this](https://github.com/satoren/LRDB)
+If you want embedded debug server to your host program, Please see [this page](https://github.com/satoren/LRDB)
 
 ## Extension Settings
 
 ## Known Issues
 
-Variable set not working.
 
 ## Release Notes
 

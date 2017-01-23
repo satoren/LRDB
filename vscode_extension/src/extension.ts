@@ -21,7 +21,7 @@ const initialConfigurations = {
 		},
 		{
 			type: 'lua',
-			request: 'launch',
+			request: 'attach',
 			name: 'Lua Attach',
 			host: 'localhost',
 			port: 21110,

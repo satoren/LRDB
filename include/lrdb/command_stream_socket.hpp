@@ -22,9 +22,9 @@ using namespace boost;
 #endif
 
 // one to one server socket
-class server_socket {
+class command_stream_socket {
  public:
-  server_socket(uint16_t port = 21110)
+  command_stream_socket(uint16_t port = 21110)
       : endpoint_(asio::ip::tcp::v4(), port),
         acceptor_(io_service_, endpoint_),
         socket_(io_service_) {
@@ -35,12 +35,12 @@ class server_socket {
         if (on_error) {
           on_error(ec.message());
         }
-		close();
+        close();
       }
     });
   }
 
-  ~server_socket() {
+  ~command_stream_socket() {
     close();
     acceptor_.close();
   }
@@ -69,12 +69,13 @@ class server_socket {
   // sync
   bool send_message(const std::string& message) {
     asio::error_code ec;
-    asio::write(socket_, asio::buffer(message), ec);
+    std::string data = message + "\r\n";
+    asio::write(socket_, asio::buffer(data), ec);
     if (ec) {
       if (on_error) {
         on_error(ec.message());
       }
-	  close();
+      close();
       return true;
     }
     return false;
@@ -102,7 +103,7 @@ class server_socket {
                                if (on_error) {
                                  on_error(ec.message());
                                }
-							   close();
+                               close();
                              }
                            });
   }
