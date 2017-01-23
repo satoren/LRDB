@@ -49,8 +49,18 @@ int main(int argc, char* argv[]) {
   }
   std::cout << LUA_COPYRIGHT << std::endl;
 #ifdef EMSCRIPTEN
-  EM_ASM(FS.mkdir('root'); FS.mount(NODEFS, {root : '/'}, 'root');
-         FS.chdir('root/' + process.cwd()););
+  EM_ASM_(
+      {
+        var path = require('path');
+        var program_path = Pointer_stringify($0);
+        var program_full_path = path.resolve(program_path);
+        var token = path.parse(program_full_path);
+        var cwd = path.relative(token.root, process.cwd());
+        FS.mkdir('root');
+        FS.mount(NODEFS, {root : token.root}, 'root');
+        FS.chdir('root/' + cwd);
+      },
+      program);
 #endif
   if (port == 0)  // if no port use std::cin and std::cout
   {

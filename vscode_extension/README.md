@@ -24,6 +24,8 @@ If you want embedded debug server to your host program, Please see [this page](h
 
 ## Release Notes
 
+### 0.1.1
+Bug fixed
 
 ### 0.1.0
 

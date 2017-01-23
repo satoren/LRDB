@@ -152,18 +152,22 @@ class command_stream_socket {
 }
 
 extern "C" void lrdb_server_socket_on_connect(void* ptr) {
-  lrdb::server_socket* this_ = reinterpret_cast<lrdb::server_socket*>(ptr);
+  lrdb::command_stream_socket* this_ =
+      reinterpret_cast<lrdb::command_stream_socket*>(ptr);
   this_->on_con_();
 }
 extern "C" void lrdb_server_socket_on_close(void* ptr) {
-  lrdb::server_socket* this_ = reinterpret_cast<lrdb::server_socket*>(ptr);
+  lrdb::command_stream_socket* this_ =
+      reinterpret_cast<lrdb::command_stream_socket*>(ptr);
   this_->on_clo_();
 }
 extern "C" void lrdb_server_socket_on_error(void* ptr, const char* msg) {
-  lrdb::server_socket* this_ = reinterpret_cast<lrdb::server_socket*>(ptr);
+  lrdb::command_stream_socket* this_ =
+      reinterpret_cast<lrdb::command_stream_socket*>(ptr);
   this_->on_err_(msg);
 }
 extern "C" void lrdb_server_socket_on_data(void* ptr, const char* data) {
-  lrdb::server_socket* this_ = reinterpret_cast<lrdb::server_socket*>(ptr);
+  lrdb::command_stream_socket* this_ =
+      reinterpret_cast<lrdb::command_stream_socket*>(ptr);
   this_->on_dat_(data);
 }

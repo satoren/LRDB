@@ -359,8 +359,8 @@ class LuaDebugSession extends DebugSession {
 				cwd: cwd
 			}
 		);
-		this._debug_server_process.stdin.on('data', (data: any) => {
-			this.sendEvent(new OutputEvent(data.toString(), 'stdin'));
+		this._debug_server_process.stdout.on('data', (data: any) => {
+			this.sendEvent(new OutputEvent(data.toString(), 'stdout'));
 		});
 		this._debug_server_process.stderr.on('data', (data: any) => {
 			this.sendEvent(new OutputEvent(data.toString(), 'stderr'));
@@ -436,7 +436,7 @@ class LuaDebugSession extends DebugSession {
 		for (let souceBreakpoint of args.breakpoints) {
 			var l = this.convertClientLineToDebugger(souceBreakpoint.line);
 			var verified = false;
-			while (l < lines.length) {
+			while (l <= lines.length) {
 				const line = lines[l - 1].trim();
 				// if a line is empty or starts with '--' we don't allow to set a breakpoint but move the breakpoint down
 				if (line.length == 0 || line.startsWith("--")) {
