@@ -16,7 +16,6 @@
 	},
 	"activationEvents": [
 		"onCommand:extension.lrdb.getProgramName",
-		"onCommand:extension.lrdb.getDefaultDebugServerName",
 		"onCommand:extension.lrdb.provideInitialConfigurations"
 	],
 	"repository": {
@@ -139,5 +138,7 @@
 		"mocha": "^2.3.3",
 		"@types/node": "^6.0.40",
 		"@types/mocha": "^2.2.32"
-	},"icon": "icon.png"
+	},
+	"icon": "icon.png",
+	"license": "LICENSE_1_0.txt"
 }
