@@ -10,6 +10,7 @@ import * as net from 'net';
 import * as path from 'path';
 
 import * as os from 'os';
+import * as stream from 'stream';
 
 
 export interface LaunchRequestArguments extends DebugProtocol.LaunchRequestArguments {
@@ -18,6 +19,8 @@ export interface LaunchRequestArguments extends DebugProtocol.LaunchRequestArgum
 	args: string[];
 	cwd: string;
 
+
+	port: number;
 	sourceRoot?: string;
 	stopOnEntry?: boolean;
 }
@@ -51,36 +54,47 @@ class VariableReference {
 
 }
 
-class LRDBClient {
+
+interface LRDBClient {
+	send(method: string, param?: any, callback?: (response: any) => void);
+	end();
+	on_event: (event: DebugServerEvent) => void;
+	on_close: () => void;
+	on_open: () => void;
+	on_error: () => void;
+	on_data: (data: string) => void;
+}
+
+class LRDBTCPClient {
 	private _connection: net.Socket;
 
 	private _callback_map = {};
 	private _request_id = 0;
 	private _end = false;
 
-	private on_close() {
+	private on_close_() {
 		for (var key in this._callback_map) {
 			this._callback_map[key]({ result: null, id: key });
 			delete this._callback_map[key];
 		}
 
-		if (this.closeDelegate) {
-			this.closeDelegate();
+		if (this.on_close) {
+			this.on_close();
 		}
 	}
-	private on_connect() {
+	private on_connect_() {
 		this._connection.on('close', () => {
-			this.on_close();
+			this.on_close_();
 		});
-		if (this.openDelegate) {
-			this.openDelegate();
+		if (this.on_open) {
+			this.on_open();
 		}
 	}
 
 	public constructor(port: number, host: string) {
 		this._connection = net.connect(port, host);
 		this._connection.on('connect', () => {
-			this.on_connect();
+			this.on_connect_();
 		});
 
 		var retryCount = 0;
@@ -96,8 +110,8 @@ class LRDBClient {
 			}
 
 			console.error(e.message);
-			if (this.errorDelegate) {
-				this.errorDelegate();
+			if (this.on_error) {
+				this.on_error();
 			}
 		});
 
@@ -126,7 +140,7 @@ class LRDBClient {
 		var ret = this._connection.write(data);
 
 		if (callback) {
-			if (!ret) {
+			if (ret) {
 				this._callback_map[id] = callback
 			}
 			else {
@@ -139,8 +153,10 @@ class LRDBClient {
 			this._callback_map[event.id](event);
 			delete this._callback_map[event.id];
 		}
-		if (this.eventDelegate) {
-			this.eventDelegate(event);
+		else {
+			if (this.on_event) {
+				this.on_event(event);
+			}
 		}
 	}
 	public end() {
@@ -148,11 +164,94 @@ class LRDBClient {
 		this._connection.end();
 	}
 
-	eventDelegate: (event: DebugServerEvent) => void;
-	closeDelegate: () => void;
-	openDelegate: () => void;
-	errorDelegate: () => void;
+	on_event: (event: DebugServerEvent) => void;
+	on_data: (data: string) => void;
+	on_close: () => void;
+	on_open: () => void;
+	on_error: () => void;
 }
+
+
+class LRDBStdInOutClient {
+	private static LRDB_IOSTREAM_PREFIX = "lrdb_stream_message:";
+
+	private _callback_map = {};
+	private _request_id = 0;
+
+	public constructor(private input: stream.Readable, private output: stream.Writable) {
+
+		var chunk = "";
+		var ondata = (data) => {
+			chunk += data.toString();
+			var d_index = chunk.indexOf('\n');
+			while (d_index > -1) {
+				try {
+					var string = chunk.substring(0, d_index);
+					if (string.startsWith(LRDBStdInOutClient.LRDB_IOSTREAM_PREFIX)) {
+						var json = JSON.parse(string.substr(LRDBStdInOutClient.LRDB_IOSTREAM_PREFIX.length));
+						this.receive(json);
+					}
+					else {
+						if (this.on_data) {
+							this.on_data(string)
+						}
+					}
+				}
+				finally { }
+				chunk = chunk.substring(d_index + 1);
+				d_index = chunk.indexOf('\n');
+			}
+		}
+		input.on('data', ondata);
+
+		setTimeout(() => {
+			if (this.on_open) {
+				this.on_open();
+			}
+		}, 0);
+	}
+
+
+	public send(method: string, param?: any, callback?: (response: any) => void) {
+		let id = this._request_id++;
+
+		var data = LRDBStdInOutClient.LRDB_IOSTREAM_PREFIX + JSON.stringify({ "method": method, "param": param, "id": id }) + "\n";
+		var ret = this.output.write(data);
+
+		if (callback) {
+			if (ret) {
+				this._callback_map[id] = callback
+			}
+			else {
+				callback({ result: null, id: id });
+			}
+		}
+	}
+	public receive(event: DebugServerEvent) {
+		if (this._callback_map[event.id]) {
+			this._callback_map[event.id](event);
+			delete this._callback_map[event.id];
+		}
+		else {
+			if (this.on_event) {
+				this.on_event(event);
+			}
+		}
+	}
+	public end() {
+		for (var key in this._callback_map) {
+			this._callback_map[key]({ result: null, id: key });
+			delete this._callback_map[key];
+		}
+		this.output.write("\r\n");
+	}
+	on_event: (event: DebugServerEvent) => void;
+	on_data: (data: string) => void;
+	on_close: () => void;
+	on_open: () => void;
+	on_error: () => void;
+}
+
 
 class LuaDebugSession extends DebugSession {
 
@@ -252,13 +351,16 @@ class LuaDebugSession extends DebugSession {
 		this.setupSourceEnv(sourceRoot);
 		const program = this.convertClientPathToDebugger(args.program);
 
+
+		const port = args.port ? args.port : 21110;
+
 		this._debug_server_process = spawn(this.launchBinary(), ['--port',
-			'21110', program], {
+			port.toString(), program], {
 				cwd: cwd
 			}
 		);
-		this._debug_server_process.stdout.on('data', (data: any) => {
-			this.sendEvent(new OutputEvent(data.toString(), 'stdout'));
+		this._debug_server_process.stdin.on('data', (data: any) => {
+			this.sendEvent(new OutputEvent(data.toString(), 'stdin'));
 		});
 		this._debug_server_process.stderr.on('data', (data: any) => {
 			this.sendEvent(new OutputEvent(data.toString(), 'stderr'));
@@ -271,36 +373,36 @@ class LuaDebugSession extends DebugSession {
 			this.sendEvent(new TerminatedEvent());
 		});
 
-		this._debug_client = new LRDBClient(21110, 'localhost');
-		this._debug_client.eventDelegate = (event: DebugServerEvent) => { this.handleServerEvents(event) };
-		this._debug_client.closeDelegate = () => {
+
+		this._debug_client = new LRDBTCPClient(port, 'localhost');
+		this._debug_client.on_event = (event: DebugServerEvent) => { this.handleServerEvents(event) };
+		this._debug_client.on_close = () => {
 			this.sendEvent(new TerminatedEvent());
 		};
-		this._debug_client.errorDelegate = () => {
+		this._debug_client.on_error = () => {
 			this.sendEvent(new TerminatedEvent());
 		};
 
-		this._debug_client.openDelegate = () => {
+		this._debug_client.on_open = () => {
 			this.sendResponse(response);
 			this.sendEvent(new InitializedEvent());
 		};
-
 	}
 
 	protected attachRequest(response: DebugProtocol.AttachResponse, args: AttachRequestArguments): void {
 		this._stopOnEntry = args.stopOnEntry;
 		this.setupSourceEnv(args.sourceRoot);
 
-		this._debug_client = new LRDBClient(args.port, args.host);
-		this._debug_client.eventDelegate = (event: DebugServerEvent) => { this.handleServerEvents(event) };
-		this._debug_client.closeDelegate = () => {
+		this._debug_client = new LRDBTCPClient(args.port, args.host);
+		this._debug_client.on_event = (event: DebugServerEvent) => { this.handleServerEvents(event) };
+		this._debug_client.on_close = () => {
 			this.sendEvent(new TerminatedEvent());
 		};
-		this._debug_client.errorDelegate = () => {
+		this._debug_client.on_error = () => {
 			this.sendEvent(new TerminatedEvent());
 		};
 
-		this._debug_client.openDelegate = () => {
+		this._debug_client.on_open = () => {
 			this.sendResponse(response);
 			this.sendEvent(new InitializedEvent());
 		};
@@ -401,8 +503,7 @@ class LuaDebugSession extends DebugSession {
 					totalFrames: res.result.length
 				};
 			}
-			else
-			{
+			else {
 				response.success = false;
 				response.message = "unknown error";
 			}
@@ -472,6 +573,13 @@ class LuaDebugSession extends DebugSession {
 					this.variablesRequestResponce(response, res.result[0], id);
 				});
 			}
+			else {
+				let chunk = "return " + this.createVariableObjectPath(id.datapath);
+				this._debug_client.send("eval", { "stack_no": id.frameId, "chunk": chunk }, (res: any) => {
+					this.variablesRequestResponce(response, res.result[0], id);
+				});
+
+			}
 		}
 
 	}
@@ -528,39 +636,48 @@ class LuaDebugSession extends DebugSession {
 	}
 
 	protected evaluateRequest(response: DebugProtocol.EvaluateResponse, args: DebugProtocol.EvaluateArguments): void {
-		if (args.context == "watch" || args.context == "hover") {
-			let chunk = "return " + args.expression
-			this._debug_client.send("eval", { "stack_no": args.frameId, "chunk": chunk }, (res: any) => {
-				if (res.result) {
-					let ret = ""
-					for (let r of res.result) {
-						if (ret.length > 0)
-							ret += '	';
-						ret += JSON.stringify(r)
+		//		if (args.context == "watch" || args.context == "hover" || args.context == "repl") {
+		let chunk = "return " + args.expression
+		this._debug_client.send("eval", { "stack_no": args.frameId, "chunk": chunk }, (res: any) => {
+			if (res.result) {
+				let ret = ""
+				for (let r of res.result) {
+					if (ret.length > 0)
+						ret += '	';
+					ret += JSON.stringify(r)
+				}
+				let varRef = 0;
+				if (res.result.length == 1) {
+					let refobj = res.result[0];
+					const typename = typeof refobj;
+					if (typename == "object") {
+						varRef = this._variableHandles.create(new VariableReference(args.frameId, [args.expression]));
 					}
-
-
-					response.body = {
-						result: ret,
-						variablesReference: 0
-					};
 				}
-				else {
-					response.body = {
-						result: "",
-						variablesReference: 0
-					};
-					response.success = false;
-				}
+				response.body = {
+					result: ret,
+					variablesReference: varRef
+				};
+
+			}
+			else {
+				response.body = {
+					result: "",
+					variablesReference: 0
+				};
+				response.success = false;
+			}
+			this.sendResponse(response);
+		});
+		/*	}
+			else {
+	
+				response.body = {
+					result: `evaluate(context: '${args.context}', '${args.expression}')`,
+					variablesReference: 0
+				};
 				this.sendResponse(response);
-			});
-			return
-		}
-		response.body = {
-			result: `evaluate(context: '${args.context}', '${args.expression}')`,
-			variablesReference: 0
-		};
-		this.sendResponse(response);
+			}*/
 	}
 
 	private handleServerEvents(event: DebugServerEvent) {
