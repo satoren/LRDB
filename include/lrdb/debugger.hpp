@@ -130,7 +130,7 @@ inline picojson::value to_json(lua_State* L, int index, int max_recursive = 1) {
 #pragma warning(push)
 #pragma warning(disable : 4996)
 #endif
-      sprintf(buffer, "%s(%p)", lua_typename(L, type), lua_topointer(L, index));
+      sprintf(buffer, "%s: %p", lua_typename(L, type), lua_topointer(L, index));
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif

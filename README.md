@@ -7,6 +7,7 @@ Lua Remote Debugger
 Currentry client is VSCode extension only.
 command line interface debugger is not implemented.
 
+
 ## Features
 
 * Breakpoints
@@ -17,6 +18,9 @@ command line interface debugger is not implemented.
 
 ## Embedded to your host program
 
+### Requirements
+  * Lua 5.1 to 5.3 (recommended: 5.3)
+  * C++11 compiler
 ```C++
   int listen_port = 21110;//listen tcp port for debugger interface
 
