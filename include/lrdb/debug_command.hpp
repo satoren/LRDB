@@ -52,7 +52,7 @@ inline picojson::value exec_add_breakpoint(debugger& debugger,
       hit_condition =
           param.get<picojson::object>().at("hit_condition").get<std::string>();
     }
-    debugger.add_breakpoint(source, line, condition);
+    debugger.add_breakpoint(source, line, condition, hit_condition);
     return picojson::value(true);
   }
   return picojson::value();

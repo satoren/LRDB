@@ -301,6 +301,8 @@ class LuaDebugSession extends DebugSession {
 		response.body.supportsConfigurationDoneRequest = true;
 
 		response.body.supportsConditionalBreakpoints = true;
+		
+		response.body.supportsHitConditionalBreakpoints = true;
 
 		// make VS Code to use 'evaluate' when hovering over source
 		response.body.supportsEvaluateForHovers = true;
