@@ -71,41 +71,24 @@ suite("Lua Debug Adapter", () => {
 		test('should run program to the end', () => {
 			const PROGRAM = path.join(DATA_ROOT, 'loop_test.lua');
 
-			return dc.initializeRequest().then(response => {
-				dc.launch({ program: PROGRAM }).then(esponse => {
-					dc.configurationDoneRequest();
-					dc.waitForEvent('terminated');
-				});
-			});
+			return Promise.all([
+				dc.launch({ program: PROGRAM }),
+				dc.configurationSequence(),
+				dc.waitForEvent('terminated')
+			]);
 		});
 
 		test('should stop on entry', () => {
 
 			const PROGRAM = path.join(DATA_ROOT, 'loop_test.lua');
 			const ENTRY_LINE = 1;
-
-			return dc.initializeRequest().then(response => {
-				dc.launch({ program: PROGRAM }).then(response => {
-					dc.configurationDoneRequest();
-					dc.assertStoppedLocation('entry', { line: ENTRY_LINE });
-				});
-			});
+			return Promise.all([
+				dc.launch({ program: PROGRAM, stopOnEntry: true }),
+				dc.configurationSequence(),
+				dc.waitForEvent('stopped'),
+				dc.assertStoppedLocation('entry', { line: ENTRY_LINE } )
+			]);
 		});
 	});
-
-	suite('setBreakpoints', () => {
-
-		test('should stop on a breakpoint', () => {
-			const PROGRAM = path.join(DATA_ROOT, 'loop_test.lua');
-			const BREAKPOINT_LINE = 6;
-
-			return dc.initializeRequest().then(response => {
-				dc.launch({ program: PROGRAM }).then(response => {
-					dc.hitBreakpoint({ program: PROGRAM }, { path: PROGRAM, line: BREAKPOINT_LINE });
-					dc.configurationDoneRequest();
-				});
-			});
-		});
-
-	});
+	
 });
