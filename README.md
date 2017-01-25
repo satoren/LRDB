@@ -21,6 +21,12 @@ command line interface debugger is not implemented.
 ### Requirements
   * Lua 5.1 to 5.3 (recommended: 5.3)
   * C++11 compiler
+  
+### include path
+  - LRDB/include
+  - LRDB/third_party/asio/asio/include
+  - LRDB/third_party/picojson
+### code
 ```C++
   int listen_port = 21110;//listen tcp port for debugger interface
 
