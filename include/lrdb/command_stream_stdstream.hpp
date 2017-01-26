@@ -4,7 +4,7 @@
 #include <string>
 #include <thread>
 
-//experimental implementation
+// experimental implementation
 
 #define LRDB_IOSTREAM_PREFIX "lrdb_stream_message:"
 namespace lrdb {

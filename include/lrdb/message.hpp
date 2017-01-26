@@ -3,98 +3,99 @@
 #include "picojson.h"
 
 namespace lrdb {
+namespace json {
+using namespace ::picojson;
+};
 
 namespace message {
-inline const std::string& get_method(const picojson::value& msg) {
+inline const std::string& get_method(const json::value& msg) {
   static std::string null;
-  if (!msg.is<picojson::object>() || !msg.contains("method")) {
+  if (!msg.is<json::object>() || !msg.contains("method")) {
     return null;
   }
-  const picojson::value& m = msg.get<picojson::object>().at("method");
+  const json::value& m = msg.get<json::object>().at("method");
   if (!m.is<std::string>()) {
     return null;
   }
   return m.get<std::string>();
 }
-inline const picojson::value& get_param(const picojson::value& msg) {
-  static picojson::value null;
-  if (!msg.is<picojson::object>() || !msg.contains("param")) {
+inline const json::value& get_param(const json::value& msg) {
+  static json::value null;
+  if (!msg.is<json::object>() || !msg.contains("param")) {
     return null;
   }
-  return msg.get<picojson::object>().at("param");
+  return msg.get<json::object>().at("param");
 }
-inline const picojson::value& get_id(const picojson::value& msg) {
-  static picojson::value null;
-  if (!msg.is<picojson::object>() || !msg.contains("id")) {
+inline const json::value& get_id(const json::value& msg) {
+  static json::value null;
+  if (!msg.is<json::object>() || !msg.contains("id")) {
     return null;
   }
-  return msg.get<picojson::object>().at("id");
+  return msg.get<json::object>().at("id");
 }
 namespace request {
-inline std::string serialize(const picojson::value& id,
-                             const std::string& medhod,
-                             const picojson::value& param = picojson::value()) {
-  picojson::object obj;
-  obj["method"] = picojson::value(medhod);
-  if (!param.is<picojson::null>()) {
+inline std::string serialize(const json::value& id, const std::string& medhod,
+                             const json::value& param = json::value()) {
+  json::object obj;
+  obj["method"] = json::value(medhod);
+  if (!param.is<json::null>()) {
     obj["param"] = param;
   }
   obj["id"] = id;
-  return picojson::value(obj).serialize();
+  return json::value(obj).serialize();
 }
-inline std::string serialize(const picojson::value& id,
-                             const std::string& medhod,
+inline std::string serialize(const json::value& id, const std::string& medhod,
                              const std::string& param) {
-  return serialize(id, medhod, picojson::value(param));
+  return serialize(id, medhod, json::value(param));
 }
 inline std::string serialize(double id, const std::string& medhod,
                              const std::string& param) {
-  return serialize(picojson::value(id), medhod, picojson::value(param));
+  return serialize(json::value(id), medhod, json::value(param));
 }
 inline std::string serialize(double id, const std::string& medhod,
-                             const picojson::value& param = picojson::value()) {
-  return serialize(picojson::value(id), medhod, picojson::value(param));
+                             const json::value& param = json::value()) {
+  return serialize(json::value(id), medhod, json::value(param));
 }
 inline std::string serialize(const std::string& id, const std::string& medhod,
                              const std::string& param) {
-  return serialize(picojson::value(id), medhod, picojson::value(param));
+  return serialize(json::value(id), medhod, json::value(param));
 }
 inline std::string serialize(const std::string& id, const std::string& medhod,
-                             const picojson::value& param = picojson::value()) {
-  return serialize(picojson::value(id), medhod, picojson::value(param));
+                             const json::value& param = json::value()) {
+  return serialize(json::value(id), medhod, json::value(param));
 }
 }
 namespace notify {
 inline std::string serialize(const std::string& medhod,
-                             const picojson::value& param = picojson::value()) {
-  picojson::object obj;
-  obj["method"] = picojson::value(medhod);
-  if (!param.is<picojson::null>()) {
+                             const json::value& param = json::value()) {
+  json::object obj;
+  obj["method"] = json::value(medhod);
+  if (!param.is<json::null>()) {
     obj["param"] = param;
   }
-  return picojson::value(obj).serialize();
+  return json::value(obj).serialize();
 }
 inline std::string serialize(const std::string& medhod,
                              const std::string& param) {
-  return serialize(medhod, picojson::value(param));
+  return serialize(medhod, json::value(param));
 }
 }
 namespace responce {
-inline std::string serialize(const picojson::value& id,
-                             const picojson::value& result = picojson::value(),
+inline std::string serialize(const json::value& id,
+                             const json::value& result = json::value(),
                              bool error = false) {
-  picojson::object obj;
+  json::object obj;
   if (error) {
     obj["error"] = result;
   } else {
     obj["result"] = result;
   }
   obj["id"] = id;
-  return picojson::value(obj).serialize();
+  return json::value(obj).serialize();
 }
-inline std::string serialize(const picojson::value& id,
-                             const std::string& result, bool error = false) {
-  return serialize(id, picojson::value(result), error);
+inline std::string serialize(const json::value& id, const std::string& result,
+                             bool error = false) {
+  return serialize(id, json::value(result), error);
 }
 }
 }

@@ -1,8 +1,8 @@
 #pragma once
 
 #include <memory>
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include "debug_command.hpp"
 #include "debugger.hpp"
@@ -21,10 +21,10 @@ namespace lrdb {
 template <typename StreamType>
 class basic_server {
  public:
-
- template<typename... StreamArgs>
+  template <typename... StreamArgs>
   basic_server(StreamArgs&&... arg)
-      : wait_for_connect_(true), command_stream_(std::forward<StreamArgs>(arg)...) {
+      : wait_for_connect_(true),
+        command_stream_(std::forward<StreamArgs>(arg)...) {
     init();
   }
 
@@ -66,10 +66,9 @@ class basic_server {
     command_stream_.on_close = [=]() { debugger_.unpause(); };
   }
   void send_pause_status() {
-    picojson::object pauseparam;
-    pauseparam["reason"] = picojson::value(debugger_.pause_reason());
-    send_message(
-        message::notify::serialize("paused", picojson::value(pauseparam)));
+    json::object pauseparam;
+    pauseparam["reason"] = json::value(debugger_.pause_reason());
+    send_message(message::notify::serialize("paused", json::value(pauseparam)));
   }
   void connected_done() { wait_for_connect_ = false; }
 
@@ -77,19 +76,19 @@ class basic_server {
     command_stream_.send_message(message);
   }
   void execute_message(const std::string& message) {
-    picojson::value req;
-    std::string err = picojson::parse(req, message);
+    json::value req;
+    std::string err = json::parse(req, message);
     if (err.empty()) {
       execute_request(req);
     }
   }
 
-  void execute_request(picojson::value& req) {
+  void execute_request(json::value& req) {
     const std::string& method = message::get_method(req);
-    const picojson::value& param = message::get_param(req);
-    const picojson::value& reqid = message::get_id(req);
+    const json::value& param = message::get_param(req);
+    const json::value& reqid = message::get_id(req);
 
-    picojson::value result;
+    json::value result;
 
 #define DEBUG_COMMAND_TABLE(NAME)                    \
   if (method == #NAME) {                             \
@@ -116,7 +115,7 @@ class basic_server {
 
 #undef DEBUG_COMMAND_TABLE
 
-    if (!reqid.is<picojson::null>()) {
+    if (!reqid.is<json::null>()) {
       send_message(message::responce::serialize(reqid, result));
     }
   }
