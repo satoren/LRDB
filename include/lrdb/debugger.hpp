@@ -534,7 +534,14 @@ class debugger {
     info.file = file;
     info.line = line;
     info.condition = condition;
-    info.hit_condition = hit_condition;
+    if (!hit_condition.empty()) {
+      if (is_first_cond_operators(hit_condition)) {
+        info.hit_condition = hit_condition;
+      } else {
+        info.hit_condition = ">=" + hit_condition;
+      }
+    }
+
     line_breakpoints_.push_back(info);
   }
   void clear_breakpoints(const std::string& file, int line = -1) {
@@ -679,14 +686,25 @@ class debugger {
     }
     return true;
   }
+  static bool is_first_cond_operators(const std::string& cond) {
+    const char* ops[] = {"<", "==", ">", "%"};  //,"<=" ,">="
+    for (size_t i = 0; i < sizeof(ops) / sizeof(ops[0]); ++i) {
+      if (cond.compare(0, strlen(ops[i]), ops[i]) == 0) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   bool breakpoint_hit_cond(const breakpoint_info& breakpoint,
                            debug_info& debuginfo) {
     if (!breakpoint.hit_condition.empty()) {
       picojson::array condret =
-          debuginfo.eval(("return " + breakpoint.hit_condition).c_str());
-      if (!condret.empty() && condret[0].is<double>()) {
-        return breakpoint.hit_count >= condret[0].get<double>();
-      }
+          debuginfo.eval(("return " + std::to_string(breakpoint.hit_count) +
+                          breakpoint.hit_condition)
+                             .c_str());
+
+      return condret.empty() || condret[0].evaluate_as_boolean();
     }
     return true;
   }
@@ -716,7 +734,7 @@ class debugger {
     std::vector<stack_info> callstack = get_call_stack();
     switch (step_type_) {
       case STEP_OVER:
-        if (step_callstack_size_ == callstack.size()) {
+        if (step_callstack_size_ >= callstack.size()) {
           pause_ = true;
         }
         break;
