@@ -16,7 +16,7 @@ const initialConfigurations = {
 			type: 'lua',
 			request: 'launch',
 			name: 'Lua Launch',
-			program: '${command.CurrentSource}',
+			program: '${file}',
 			cwd: "${workspaceRoot}",
 			stopOnEntry: true
 		},

@@ -2,7 +2,7 @@
 	"name": "lrdb",
 	"displayName": "LRDB",
 	"description": "Lua Remote DeBugger",
-	"version": "0.1.2",
+	"version": "0.1.4",
 	"publisher": "satoren",
 	"engines": {
 		"vscode": "^1.8.0"
@@ -139,6 +139,6 @@
 		"@types/node": "^6.0.40",
 		"@types/mocha": "^2.2.32"
 	},
-	"icon": "icon.png",
+	"icon": "images/icon.png",
 	"license": "LICENSE_1_0.txt"
 }

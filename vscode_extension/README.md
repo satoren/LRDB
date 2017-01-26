@@ -4,7 +4,7 @@
 
 This extension is debug Lua programs with Visual Studio Code.
 
-![preview](lrdb.gif)
+![Lua Debug](https://raw.githubusercontent.com/satoren/LRDB/master/vscode_extension/images/lrdb.gif)
 
 ## Features
 
@@ -31,15 +31,13 @@ launch.json example:
             "type": "lua",
             "request": "launch",
             "name": "Lua Launch",
-            "program": "${command.CurrentSource}",
+            "program": "${file}",
             "cwd": "${workspaceRoot}",
             "stopOnEntry": true
         }
     ]
 }
 ```
-${command.CurrentSource} is opened at VSCode file.
-
 
 
 ## Known Issues
@@ -47,10 +45,12 @@ ${command.CurrentSource} is opened at VSCode file.
 
 ## Release Notes
 
-### 0.1.2
-Bug fixed
+### 0.1.4
+- Remove ${command.CurrentSource}. It is same to ${file}
+- Support operators in hit count condition breakpoint ``<``, ``<=``, ``==``, ``>``, ``>=``, ``%``
 
-### 0.1.1
+
+### 0.1.3
 Bug fixed
 
 ### 0.1.0
