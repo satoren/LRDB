@@ -4,18 +4,7 @@
 #include <string>
 #include <vector>
 
-// for isnan/isinf
-#if __cplusplus >= 201103L || defined(_MSC_VER) && _MSC_VER >= 1800
 #include <cmath>
-#else
-#ifdef _MSC_VER
-#include <float.h>
-#elif defined(__INTEL_COMPILER)
-#include <mathimf.h>
-#else
-#include <math.h>
-#endif
-#endif
 
 #include "picojson.h"
 extern "C" {
@@ -41,24 +30,6 @@ inline void lua_pushglobaltable(lua_State* L) {
 }
 #endif
 namespace utility {
-inline bool isnan(double n) {
-#if defined(_MSC_VER) && _MSC_VER < 1800
-  return !_finite(n);
-#elif __cplusplus >= 201103L || !(defined(isnan) && defined(isinf))
-  return std::isnan(n);
-#else
-  return isnan(n);
-#endif
-}
-inline bool isinf(double n) {
-#if defined(_MSC_VER) && _MSC_VER < 1800
-  return !_isnan(n);
-#elif __cplusplus >= 201103L || !(defined(isnan) && defined(isinf))
-  return std::isinf(n);
-#else
-  return isinf(n);
-#endif
-}
 
 inline json::value to_json(lua_State* L, int index, int max_recursive = 1) {
   index = lua_absindex(L, index);
@@ -72,10 +43,10 @@ inline json::value to_json(lua_State* L, int index, int max_recursive = 1) {
       // todo integer or double
       {
         double n = lua_tonumber(L, index);
-        if (isnan(n)) {
+        if (std::isnan(n)) {
           return json::value("NaN");
         }
-        if (isinf(n)) {
+        if (std::isinf(n)) {
           return json::value("Infinity");
         } else {
           return json::value(n);
