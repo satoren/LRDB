@@ -3,6 +3,13 @@
 #include <memory>
 #include <vector>
 
+#include <iostream>
+#if __cplusplus >= 201103L || defined(_MSC_VER) && _MSC_VER >= 1800
+#else
+#define ASIO_HAS_BOOST_DATE_TIME
+#define LRDB_USE_BOOST_ASIO
+#endif
+
 #ifdef LRDB_USE_BOOST_ASIO
 #include <boost/asio.hpp>
 #else
@@ -17,8 +24,10 @@
 namespace lrdb {
 #ifdef LRDB_USE_BOOST_ASIO
 namespace asio {
-using namespace boost;
+using boost::system::error_code;
+using namespace boost::asio;
 }
+#else
 #endif
 
 // one to one server socket
