@@ -3,7 +3,9 @@
 #endif
 #include <iostream>
 
+#ifdef LRDB_ENABLE_STDINOUT_STREAM
 #include "lrdb/command_stream_stdstream.hpp"
+#endif
 #include "lrdb/server.hpp"
 
 template <typename DebugServer>
@@ -62,11 +64,16 @@ int main(int argc, char* argv[]) {
       },
       program);
 #endif
+
   if (port == 0)  // if no port use std::cin and std::cout
   {
+#ifdef LRDB_ENABLE_STDINOUT_STREAM
     lrdb::basic_server<lrdb::command_stream_stdstream> debug_server(std::cin,
                                                                     std::cout);
     return exec(program, debug_server);
+#else
+    return -1;
+#endif
   } else {
     lrdb::server debug_server(port);
     return exec(program, debug_server);
