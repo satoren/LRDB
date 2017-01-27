@@ -1,16 +1,18 @@
 # Lua Remote DeBugger
 
 ## Introduction
-Lua Remote Debugger 
+
+LRDB is Debugger for Lua programing language.
 
 
-Currentry client is VSCode extension only.
-command line interface debugger is not implemented.
+Currentry debug client is [Visual Studio Code extension](https://marketplace.visualstudio.com/items?itemName=satoren.lrdb) only.
+
+Command line interface debugger is not implemented.
 
 
 ## Features
 
-* Breakpoints
+* Breakpoints with conditional and hit counts.
 * Step over, step in, step out
 * Display Local,Upvalue,Global values
 * Watches,Eval on Debug Console
@@ -24,11 +26,14 @@ command line interface debugger is not implemented.
   
 ### include path
   - LRDB/include
-  - LRDB/third_party/asio/asio/include
+  - LRDB/third_party/asio/asio/include or boost.asio with -DLRDB_USE_BOOST_ASIO
   - LRDB/third_party/picojson
 
 ### code
 ```C++
+#include "lrdb/server.hpp"
+...
+
   int listen_port = 21110;//listen tcp port for debugger interface
 
   lua_State* L = luaL_newstate();//create lua state
@@ -43,11 +48,11 @@ command line interface debugger is not implemented.
 ```
 
 
-## Visual Studio Code Extension
+## Visual Studio Code Extension setting
 search ``lrdb`` and install at Visual Studio Code
 
 launch.json example:
-```
+```json
 {
     "version": "0.1.0",
     "configurations": [
@@ -65,8 +70,9 @@ launch.json example:
 ```
 
 If you want Lua and C++ debug in VSCode 
-Exaple
-```
+
+launch.json example:
+```json
 {
     "version": "0.1.0",
     "configurations": [
@@ -82,7 +88,7 @@ Exaple
             "name": "C++ Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "Your C++ with Lua host program",
+            "program": "Your Lua host program",
             "args": []
             "cwd": "${workspaceRoot}"
             .....

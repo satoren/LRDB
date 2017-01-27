@@ -18,9 +18,28 @@ namespace lrdb {
 
 #define LRDB_SERVER_VERSION "0.0.1"
 
+/// @brief Debug Server Class
+/// template type is messaging communication customization point
+/// require members
+///  void close();			/// connection close
+///  bool is_open() const; /// connection is opened
+///  void poll();          /// polling event data. Require non blocking
+///  void run_one();		/// run event data. Blocking until run one
+///  message.
+///  void wait_for_connection(); //Blocking until connection.
+///  bool send_message(const std::string& message); /// send message to
+///  communication opponent
+///  //callback functions. Must that call inside poll or run_one
+///  std::function<void(const std::string& data)> on_data;///callback for
+///  receiving data.
+///  std::function<void()> on_connection;
+///  std::function<void()> on_close;
+///  std::function<void(const std::string&)> on_error;
 template <typename StreamType>
 class basic_server {
  public:
+  /// @brief constructor
+  /// @param arg Forward to StreamType constructor
   template <typename... StreamArgs>
   basic_server(StreamArgs&&... arg)
       : wait_for_connect_(true),
@@ -30,6 +49,8 @@ class basic_server {
 
   ~basic_server() { exit(); }
 
+  /// @brief attach (or detach) for debug target
+  /// @param lua_State*  debug target
   void reset(lua_State* L = 0) {
     debugger_.reset(L);
     if (!L) {
@@ -37,6 +58,7 @@ class basic_server {
     }
   }
 
+  /// @brief Exit debug server
   void exit() {
     send_message(message::notify::serialize("exit"));
     command_stream_.close();
