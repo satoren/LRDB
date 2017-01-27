@@ -301,7 +301,7 @@ class LuaDebugSession extends DebugSession {
 		response.body.supportsConfigurationDoneRequest = true;
 
 		response.body.supportsConditionalBreakpoints = true;
-		
+
 		response.body.supportsHitConditionalBreakpoints = true;
 
 		// make VS Code to use 'evaluate' when hovering over source
@@ -585,6 +585,17 @@ class LuaDebugSession extends DebugSession {
 		}
 
 	}
+	protected stringify(value: any):string {
+		if (value == null) {
+			return "nil";
+		}
+		else if (value == undefined) {
+			return "undefined";
+		}
+		else {
+			return JSON.stringify(value);
+		}
+	}
 
 	private variablesRequestResponce(response: DebugProtocol.VariablesResponse, variablesData: any, id: VariableReference): void {
 
@@ -598,7 +609,7 @@ class LuaDebugSession extends DebugSession {
 			variables.push({
 				name: k,
 				type: typename,
-				value: String(variablesData[k]),
+				value: this.stringify(variablesData[k]),
 				variablesReference: varRef
 			});
 
@@ -646,7 +657,7 @@ class LuaDebugSession extends DebugSession {
 				for (let r of res.result) {
 					if (ret.length > 0)
 						ret += '	';
-					ret += JSON.stringify(r)
+					ret += this.stringify(r)
 				}
 				let varRef = 0;
 				if (res.result.length == 1) {
