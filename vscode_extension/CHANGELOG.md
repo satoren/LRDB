@@ -4,6 +4,10 @@
 ## [Unreleased]
 
 
+## [0.1.5] - 2017-01-27
+### Changed
+- ``null`` to ``nil`` at watch and variable view
+
 ## [0.1.4] - 2017-01-26
 ### Changed
 - Remove ${command.CurrentSource}. It is same to ${file}
