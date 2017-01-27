@@ -43,15 +43,10 @@ export interface DebugServerEvent {
 	id: any;
 }
 
+
 class VariableReference {
-	frameId: number;
-	datapath: string[];
-
-	public constructor(frameId: number, datapath: string[]) {
-		this.frameId = frameId;
-		this.datapath = datapath;
+	public constructor(public msg_name: string, public msg_param: any, public datapath: string[]) {
 	}
-
 }
 
 
@@ -518,9 +513,9 @@ class LuaDebugSession extends DebugSession {
 	protected scopesRequest(response: DebugProtocol.ScopesResponse, args: DebugProtocol.ScopesArguments): void {
 
 		const scopes = new Array<Scope>();
-		scopes.push(new Scope("Local", this._variableHandles.create(new VariableReference(args.frameId, ["local"])), false));
-		scopes.push(new Scope("Upvalues", this._variableHandles.create(new VariableReference(args.frameId, ["upvalue"])), false));
-		scopes.push(new Scope("Global", this._variableHandles.create(new VariableReference(args.frameId, ["Global"])), true));
+		scopes.push(new Scope("Local", this._variableHandles.create(new VariableReference("get_local_variable", { "stack_no": args.frameId, "global": false, "local": true, "upvalue": false }, [])), false));
+		scopes.push(new Scope("Upvalues", this._variableHandles.create(new VariableReference("get_upvalues", { "stack_no": args.frameId, "global": false, "local": false, "upvalue": true }, [])), false));
+		scopes.push(new Scope("Global", this._variableHandles.create(new VariableReference("get_global", { "stack_no": args.frameId, "global": true, "local": false, "upvalue": false  }, [])), true));
 
 		response.body = {
 			scopes: scopes
@@ -537,53 +532,22 @@ class LuaDebugSession extends DebugSession {
 		const id = this._variableHandles.get(args.variablesReference);
 
 		if (id != null) {
-			if (id.datapath[0] == "local") {
-				if (id.datapath.length == 1) {
-					this._debug_client.send("get_local_variable", { "stack_no": id.frameId }, (res: any) => {
-						this.variablesRequestResponce(response, res.result, id);
-					});
-				}
-				else {
-					let chunk = "return " + this.createVariableObjectPath(id.datapath.slice(1));
-					this._debug_client.send("eval", { "stack_no": id.frameId, "chunk": chunk, "global": false, "local": true, "upvalue": false }, (res: any) => {
-						this.variablesRequestResponce(response, res.result[0], id);
-					});
-				}
-			}
-			else if (id.datapath[0] == "upvalue") {
-				if (id.datapath.length == 1) {
-					this._debug_client.send("get_upvalues", { "stack_no": id.frameId }, (res: any) => {
-						this.variablesRequestResponce(response, res.result, id);
-					});
-				}
-				else {
-					let chunk = "return " + this.createVariableObjectPath(id.datapath.slice(1));
-					this._debug_client.send("eval", { "stack_no": id.frameId, "chunk": chunk, "global": false, "local": false, "upvalue": true }, (res: any) => {
-						this.variablesRequestResponce(response, res.result[0], id);
-					});
-				}
-			}
-			else if (id.datapath[0] == "Global") {
-				let chunk = '';
-				if (id.datapath.length == 1) {
-					chunk = 'return _G';
-				}
-				else {
-					chunk = "return " + this.createVariableObjectPath(id.datapath.slice(1));
-				}
-				this._debug_client.send("eval", { "stack_no": id.frameId, "chunk": chunk, "global": true, "local": false, "upvalue": false }, (res: any) => {
-					this.variablesRequestResponce(response, res.result[0], id);
+			if (id.datapath.length == 0) {
+				this._debug_client.send(id.msg_name, Object.assign({}, id.msg_param), (res: any) => {
+					this.variablesRequestResponce(response, res.result, id);
 				});
 			}
 			else {
 				let chunk = "return " + this.createVariableObjectPath(id.datapath);
-				this._debug_client.send("eval", { "stack_no": id.frameId, "chunk": chunk }, (res: any) => {
+				this._debug_client.send(id.msg_name, Object.assign({ "chunk": chunk }, id.msg_param), (res: any) => {
 					this.variablesRequestResponce(response, res.result[0], id);
 				});
-
 			}
 		}
-
+		else {
+			response.success = false;
+			this.sendResponse(response);
+		}
 	}
 	protected stringify(value: any):string {
 		if (value == null) {
@@ -604,7 +568,7 @@ class LuaDebugSession extends DebugSession {
 			const typename = typeof variablesData[k];
 			let varRef = 0;
 			if (typename == "object") {
-				varRef = this._variableHandles.create(new VariableReference(id.frameId, id.datapath.concat([k])));
+				varRef = this._variableHandles.create(new VariableReference("eval", id.msg_param, id.datapath.concat([k])));
 			}
 			variables.push({
 				name: k,
@@ -663,8 +627,8 @@ class LuaDebugSession extends DebugSession {
 				if (res.result.length == 1) {
 					let refobj = res.result[0];
 					const typename = typeof refobj;
-					if (typename == "object") {
-						varRef = this._variableHandles.create(new VariableReference(args.frameId, [args.expression]));
+					if (refobj && typename == "object") {
+						varRef = this._variableHandles.create(new VariableReference("eval", { "stack_no": args.frameId }, [args.expression]));
 					}
 				}
 				response.body = {

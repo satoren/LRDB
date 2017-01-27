@@ -2,5 +2,6 @@
 {
     "C_Cpp.clang_format_style": "Google",
     "C_Cpp.clang_format_fallbackStyle": "Google",
-    "C_Cpp.clang_format_formatOnSave": true
+    "C_Cpp.clang_format_formatOnSave": true,
+    "files.associations": {}
 }

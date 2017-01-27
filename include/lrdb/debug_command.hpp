@@ -128,12 +128,14 @@ inline json::value exec_get_local_variable(debugger& debugger,
     return json::value();
   }
   bool has_stackno = param.get("stack_no").is<double>();
+  int depth = param.get("depth").is<double>()
+                  ? static_cast<int>(param.get("depth").get<double>())
+                  : 0;
   if (has_stackno) {
-    int stack_no = static_cast<int>(
-        param.get<json::object>().at("stack_no").get<double>());
+    int stack_no = static_cast<int>(param.get("stack_no").get<double>());
     auto callstack = debugger.get_call_stack();
     if (int(callstack.size()) > stack_no) {
-      auto localvar = callstack[stack_no].get_local_vars();
+      auto localvar = callstack[stack_no].get_local_vars(depth);
       json::object obj;
       for (auto& var : localvar) {
         obj[var.first] = var.second;
@@ -149,12 +151,15 @@ inline json::value exec_get_upvalues(debugger& debugger,
     return json::value();
   }
   bool has_stackno = param.get("stack_no").is<double>();
+  int depth = param.get("depth").is<double>()
+                  ? static_cast<int>(param.get("depth").get<double>())
+                  : 0;
   if (has_stackno) {
     int stack_no = static_cast<int>(
         param.get<json::object>().at("stack_no").get<double>());
     auto callstack = debugger.get_call_stack();
     if (int(callstack.size()) > stack_no) {
-      auto localvar = callstack[stack_no].get_upvalues();
+      auto localvar = callstack[stack_no].get_upvalues(depth);
       json::object obj;
       for (auto& var : localvar) {
         obj[var.first] = var.second;
@@ -175,6 +180,10 @@ inline json::value exec_eval(debugger& debugger, const json::value& param) {
   bool use_local =
       !param.get("local").is<bool>() || param.get("local").get<bool>();
 
+  int depth = param.get("depth").is<double>()
+                  ? static_cast<int>(param.get("depth").get<double>())
+                  : 1;
+
   if (has_chunk && has_stackno) {
     std::string chunk =
         param.get<json::object>().at("chunk").get<std::string>();
@@ -182,8 +191,8 @@ inline json::value exec_eval(debugger& debugger, const json::value& param) {
         param.get<json::object>().at("stack_no").get<double>());
     auto callstack = debugger.get_call_stack();
     if (int(callstack.size()) > stack_no) {
-      return json::value(callstack[stack_no].eval(chunk.c_str(), use_global,
-                                                  use_upvalue, use_local));
+      return json::value(callstack[stack_no].eval(
+          chunk.c_str(), use_global, use_upvalue, use_local, depth));
     }
   }
   return json::value();
