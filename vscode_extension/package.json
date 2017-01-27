@@ -39,8 +39,7 @@
 				"program": "./out/src/lrdbDebug.js",
 				"runtime": "node",
 				"variables": {
-					"CurrentSource": "extension.lrdb.getProgramName",
-					"DefaultLuaInterpreter": "extension.lrdb.getDefaultDebugServerName"
+					"CurrentSource": "extension.lrdb.getProgramName"
 				},
 				"configurationSnippets": [
 					{
