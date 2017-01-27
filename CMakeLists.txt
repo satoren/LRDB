@@ -90,7 +90,12 @@ target_link_libraries(lua_debugger_test ${LUA_LIBRARIES})
 if(NOT EMSCRIPTEN)
 add_executable(lrdb_server_test test/lrdb_server_test.cpp test/lrdb_server_test1.cpp ${HEADER_FILE} ${GTEST_SOURCE})
 target_link_libraries(lrdb_server_test ${LUA_LIBRARIES})
+if(UNIX)
 target_link_libraries(lrdb_server_test -lpthread)
+endif
+if(MINGW)
+target_link_libraries(lrdb_server_test -lws2_32)
+endif(MINGW)
 add_test(
   NAME lrdb_server_test
   COMMAND $<TARGET_FILE:lrdb_server_test>

@@ -13,6 +13,8 @@ SET(CMAKE_SYSTEM_NAME Windows)
 set(COMPILER_PREFIX "i686-w64-mingw32")
 #set(COMPILER_PREFIX "x86_64-w64-mingw32"
 
+set(MINGW TRUE)
+
 # which compilers to use for C and C++
 #find_program(CMAKE_RC_COMPILER NAMES ${COMPILER_PREFIX}-windres)
 SET(CMAKE_RC_COMPILER ${COMPILER_PREFIX}-windres)
