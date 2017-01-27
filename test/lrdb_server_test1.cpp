@@ -34,18 +34,18 @@ class DebugServerTest : public ::testing::Test {
   lrdb::server server;
   asio::ip::tcp::iostream client_stream;
 
-  std::function<void(const picojson::value&)> notify_handler;
+  std::function<void(const lrdb::json::value&)> notify_handler;
 
   bool pause_;
 
-  picojson::value sync_request(
+  lrdb::json::value sync_request(
       int rid, const std::string& method,
-      const picojson::value& param = picojson::value()) {
+      const lrdb::json::value& param = lrdb::json::value()) {
     client_stream << lrdb::message::request::serialize(rid, method, param)
                   << std::endl;
 
     if (client_stream.bad()) {
-      picojson::value error_res;
+      lrdb::json::value error_res;
       return error_res;
     }
 
@@ -53,27 +53,27 @@ class DebugServerTest : public ::testing::Test {
       std::string line;
       std::getline(client_stream, line, '\n');
       if (client_stream.bad()) {
-        picojson::value error_res;
+        lrdb::json::value error_res;
         return error_res;
       }
-      picojson::value v;
-      std::string err = picojson::parse(v, line);
+      lrdb::json::value v;
+      std::string err = lrdb::json::parse(v, line);
       if (!err.empty()) {
-        picojson::value error_res;
+        lrdb::json::value error_res;
         return error_res;
       }
-      const picojson::value& resid = lrdb::message::get_id(v);
+      const lrdb::json::value& resid = lrdb::message::get_id(v);
       if (resid.is<double>() && resid.get<double>() == rid) {
         return v;
       } else {
         notify(v);
       }
     }
-    picojson::value error_res;
+    lrdb::json::value error_res;
     return error_res;
   }
 
-  void notify(const picojson::value& v) {
+  void notify(const lrdb::json::value& v) {
     if (notify_handler) {
       notify_handler(v);
     }
@@ -92,8 +92,8 @@ class DebugServerTest : public ::testing::Test {
       if (client_stream.bad()) {
         return;
       }
-      picojson::value v;
-      std::string err = picojson::parse(v, line);
+      lrdb::json::value v;
+      std::string err = lrdb::json::parse(v, line);
       if (!err.empty()) {
         return;
       }

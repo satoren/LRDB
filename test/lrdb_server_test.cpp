@@ -2,7 +2,6 @@
 #include <iostream>
 #include <thread>
 
-
 #include "lrdb/client.hpp"
 #include "lrdb/message.hpp"
 #include "lrdb/server.hpp"
@@ -37,20 +36,20 @@ class DebugServerTest : public ::testing::Test {
   lrdb::server server;
   asio::ip::tcp::iostream client_stream;
 
-  std::function<void(const picojson::value&)> notify_handler;
+  std::function<void(const lrdb::json::value&)> notify_handler;
 
   bool pause_;
   int rid_;
 
-  picojson::value sync_request(
+  lrdb::json::value sync_request(
       const std::string& method,
-      const picojson::value& param = picojson::value()) {
+      const lrdb::json::value& param = lrdb::json::value()) {
     int rid = rid_++;
     client_stream << lrdb::message::request::serialize(rid, method, param)
                   << std::endl;
 
     if (client_stream.bad()) {
-      picojson::value error_res;
+      lrdb::json::value error_res;
       return error_res;
     }
 
@@ -58,27 +57,27 @@ class DebugServerTest : public ::testing::Test {
       std::string line;
       std::getline(client_stream, line, '\n');
       if (client_stream.bad()) {
-        picojson::value error_res;
+        lrdb::json::value error_res;
         return error_res;
       }
-      picojson::value v;
-      std::string err = picojson::parse(v, line);
+      lrdb::json::value v;
+      std::string err = lrdb::json::parse(v, line);
       if (!err.empty()) {
-        picojson::value error_res;
+        lrdb::json::value error_res;
         return error_res;
       }
-      const picojson::value& resid = lrdb::message::get_id(v);
+      const lrdb::json::value& resid = lrdb::message::get_id(v);
       if (resid.is<double>() && resid.get<double>() == rid) {
         return v;
       } else {
         notify(v);
       }
     }
-    picojson::value error_res;
+    lrdb::json::value error_res;
     return error_res;
   }
 
-  void notify(const picojson::value& v) {
+  void notify(const lrdb::json::value& v) {
     if (notify_handler) {
       notify_handler(v);
     }
@@ -97,8 +96,8 @@ class DebugServerTest : public ::testing::Test {
       if (client_stream.bad()) {
         return;
       }
-      picojson::value v;
-      std::string err = picojson::parse(v, line);
+      lrdb::json::value v;
+      std::string err = lrdb::json::parse(v, line);
       if (!err.empty()) {
         return;
       }
@@ -122,12 +121,12 @@ TEST_F(DebugServerTest, ConnectTest1) {
 
   std::thread client([&] {
 
-    picojson::object break_point;
-    break_point["file"] = picojson::value(TEST_LUA_SCRIPT);
-    break_point["line"] = picojson::value(5.);
+    lrdb::json::object break_point;
+    break_point["file"] = lrdb::json::value(TEST_LUA_SCRIPT);
+    break_point["line"] = lrdb::json::value(5.);
 
-    picojson::value res =
-        sync_request("add_breakpoint", picojson::value(break_point));
+    lrdb::json::value res =
+        sync_request("add_breakpoint", lrdb::json::value(break_point));
     ASSERT_TRUE(res.evaluate_as_boolean());
     res = sync_request("get_breakpoints");
     ASSERT_TRUE(res.evaluate_as_boolean());
@@ -152,12 +151,12 @@ TEST_F(DebugServerTest, ConnectTest2) {
 
   std::thread client([&] {
 
-    picojson::object break_point;
-    break_point["file"] = picojson::value(TEST_LUA_SCRIPT);
-    break_point["line"] = picojson::value(5.);
+    lrdb::json::object break_point;
+    break_point["file"] = lrdb::json::value(TEST_LUA_SCRIPT);
+    break_point["line"] = lrdb::json::value(5.);
 
-    picojson::value res =
-        sync_request("add_breakpoint", picojson::value(break_point));
+    lrdb::json::value res =
+        sync_request("add_breakpoint", lrdb::json::value(break_point));
     ASSERT_TRUE(res.evaluate_as_boolean());
     res = sync_request("get_breakpoints");
     ASSERT_TRUE(res.evaluate_as_boolean());
@@ -173,10 +172,10 @@ TEST_F(DebugServerTest, ConnectTest2) {
     res = sync_request("get_upvalues");
     ASSERT_TRUE(res.evaluate_as_boolean());
     //		std::cout << res.serialize() << std::endl;
-    picojson::object stack_var_req_param_obj;
-    stack_var_req_param_obj["stack_no"] = picojson::value(0.);
-    picojson::value stack_var_req_param =
-        picojson::value(stack_var_req_param_obj);
+    lrdb::json::object stack_var_req_param_obj;
+    stack_var_req_param_obj["stack_no"] = lrdb::json::value(0.);
+    lrdb::json::value stack_var_req_param =
+        lrdb::json::value(stack_var_req_param_obj);
     res = sync_request("get_local_variable", stack_var_req_param);
     ASSERT_TRUE(res.evaluate_as_boolean());
     //		std::cout << res.serialize() << std::endl;
@@ -198,12 +197,12 @@ TEST_F(DebugServerTest, ConnectTest4) {
 
   std::thread client([&] {
 
-    picojson::object break_point;
-    break_point["file"] = picojson::value(TEST_LUA_SCRIPT);
-    break_point["line"] = picojson::value(5.);
+    lrdb::json::object break_point;
+    break_point["file"] = lrdb::json::value(TEST_LUA_SCRIPT);
+    break_point["line"] = lrdb::json::value(5.);
 
-    picojson::value res =
-        sync_request("add_breakpoint", picojson::value(break_point));
+    lrdb::json::value res =
+        sync_request("add_breakpoint", lrdb::json::value(break_point));
     ASSERT_TRUE(res.evaluate_as_boolean());
     res = sync_request("get_breakpoints");
     ASSERT_TRUE(res.evaluate_as_boolean());
@@ -229,12 +228,12 @@ TEST_F(DebugServerTest, ConnectTest5) {
 
   std::thread client([&] {
 
-    picojson::object break_point;
-    break_point["file"] = picojson::value(TEST_LUA_SCRIPT);
-    break_point["line"] = picojson::value(2.);
+    lrdb::json::object break_point;
+    break_point["file"] = lrdb::json::value(TEST_LUA_SCRIPT);
+    break_point["line"] = lrdb::json::value(2.);
 
-    picojson::value res =
-        sync_request("add_breakpoint", picojson::value(break_point));
+    lrdb::json::value res =
+        sync_request("add_breakpoint", lrdb::json::value(break_point));
     ASSERT_TRUE(res.evaluate_as_boolean());
     res = sync_request("get_breakpoints");
     ASSERT_TRUE(res.evaluate_as_boolean());
@@ -250,10 +249,10 @@ TEST_F(DebugServerTest, ConnectTest5) {
     res = sync_request("get_upvalues");
     ASSERT_TRUE(res.evaluate_as_boolean());
     //		std::cout << res.serialize() << std::endl;
-    picojson::object stack_var_req_param_obj;
-    stack_var_req_param_obj["stack_no"] = picojson::value(0.);
-    picojson::value stack_var_req_param =
-        picojson::value(stack_var_req_param_obj);
+    lrdb::json::object stack_var_req_param_obj;
+    stack_var_req_param_obj["stack_no"] = lrdb::json::value(0.);
+    lrdb::json::value stack_var_req_param =
+        lrdb::json::value(stack_var_req_param_obj);
     res = sync_request("get_local_variable", stack_var_req_param);
     ASSERT_TRUE(res.evaluate_as_boolean());
     //		std::cout << res.serialize() << std::endl;

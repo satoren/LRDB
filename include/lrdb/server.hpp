@@ -1,8 +1,8 @@
 #pragma once
 
 #include <memory>
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include "debug_command.hpp"
 #include "debugger.hpp"
@@ -18,18 +18,39 @@ namespace lrdb {
 
 #define LRDB_SERVER_VERSION "0.0.1"
 
+/// @brief Debug Server Class
+/// template type is messaging communication customization point
+/// require members
+///  void close();			/// connection close
+///  bool is_open() const; /// connection is opened
+///  void poll();          /// polling event data. Require non blocking
+///  void run_one();		/// run event data. Blocking until run one
+///  message.
+///  void wait_for_connection(); //Blocking until connection.
+///  bool send_message(const std::string& message); /// send message to
+///  communication opponent
+///  //callback functions. Must that call inside poll or run_one
+///  std::function<void(const std::string& data)> on_data;///callback for
+///  receiving data.
+///  std::function<void()> on_connection;
+///  std::function<void()> on_close;
+///  std::function<void(const std::string&)> on_error;
 template <typename StreamType>
 class basic_server {
  public:
-
- template<typename... StreamArgs>
+  /// @brief constructor
+  /// @param arg Forward to StreamType constructor
+  template <typename... StreamArgs>
   basic_server(StreamArgs&&... arg)
-      : wait_for_connect_(true), command_stream_(std::forward<StreamArgs>(arg)...) {
+      : wait_for_connect_(true),
+        command_stream_(std::forward<StreamArgs>(arg)...) {
     init();
   }
 
   ~basic_server() { exit(); }
 
+  /// @brief attach (or detach) for debug target
+  /// @param lua_State*  debug target
   void reset(lua_State* L = 0) {
     debugger_.reset(L);
     if (!L) {
@@ -37,6 +58,7 @@ class basic_server {
     }
   }
 
+  /// @brief Exit debug server
   void exit() {
     send_message(message::notify::serialize("exit"));
     command_stream_.close();
@@ -66,10 +88,9 @@ class basic_server {
     command_stream_.on_close = [=]() { debugger_.unpause(); };
   }
   void send_pause_status() {
-    picojson::object pauseparam;
-    pauseparam["reason"] = picojson::value(debugger_.pause_reason());
-    send_message(
-        message::notify::serialize("paused", picojson::value(pauseparam)));
+    json::object pauseparam;
+    pauseparam["reason"] = json::value(debugger_.pause_reason());
+    send_message(message::notify::serialize("paused", json::value(pauseparam)));
   }
   void connected_done() { wait_for_connect_ = false; }
 
@@ -77,19 +98,19 @@ class basic_server {
     command_stream_.send_message(message);
   }
   void execute_message(const std::string& message) {
-    picojson::value req;
-    std::string err = picojson::parse(req, message);
+    json::value req;
+    std::string err = json::parse(req, message);
     if (err.empty()) {
       execute_request(req);
     }
   }
 
-  void execute_request(picojson::value& req) {
+  void execute_request(json::value& req) {
     const std::string& method = message::get_method(req);
-    const picojson::value& param = message::get_param(req);
-    const picojson::value& reqid = message::get_id(req);
+    const json::value& param = message::get_param(req);
+    const json::value& reqid = message::get_id(req);
 
-    picojson::value result;
+    json::value result;
 
 #define DEBUG_COMMAND_TABLE(NAME)                    \
   if (method == #NAME) {                             \
@@ -116,7 +137,7 @@ class basic_server {
 
 #undef DEBUG_COMMAND_TABLE
 
-    if (!reqid.is<picojson::null>()) {
+    if (!reqid.is<json::null>()) {
       send_message(message::responce::serialize(reqid, result));
     }
   }
