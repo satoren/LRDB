@@ -57,7 +57,7 @@ set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR})
 
 
 if(MINGW)
-target_link_libraries(lua_with_lrdb_server -lws2_32)
+target_link_libraries(lua_with_lrdb_server -lws2_32 -lwsock32)
 endif(MINGW)
 
 if(WIN32)
