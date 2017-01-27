@@ -55,6 +55,11 @@ target_link_libraries(lua_with_lrdb_server ${LUA_LIBRARIES})
 
 set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR})
 
+
+if(MINGW)
+target_link_libraries(lua_with_lrdb_server -lws2_32 -lwsock32)
+endif(MINGW)
+
 if(WIN32)
 install(TARGETS lua_with_lrdb_server
         RUNTIME DESTINATION vscode_extension/out/bin/windows)
@@ -90,7 +95,12 @@ target_link_libraries(lua_debugger_test ${LUA_LIBRARIES})
 if(NOT EMSCRIPTEN)
 add_executable(lrdb_server_test test/lrdb_server_test.cpp test/lrdb_server_test1.cpp ${HEADER_FILE} ${GTEST_SOURCE})
 target_link_libraries(lrdb_server_test ${LUA_LIBRARIES})
+if(UNIX)
 target_link_libraries(lrdb_server_test -lpthread)
+endif(UNIX)
+if(MINGW)
+target_link_libraries(lrdb_server_test -lws2_32)
+endif(MINGW)
 add_test(
   NAME lrdb_server_test
   COMMAND $<TARGET_FILE:lrdb_server_test>
