@@ -92,7 +92,7 @@ add_executable(lrdb_server_test test/lrdb_server_test.cpp test/lrdb_server_test1
 target_link_libraries(lrdb_server_test ${LUA_LIBRARIES})
 if(UNIX)
 target_link_libraries(lrdb_server_test -lpthread)
-endif
+endif(UNIX)
 if(MINGW)
 target_link_libraries(lrdb_server_test -lws2_32)
 endif(MINGW)
