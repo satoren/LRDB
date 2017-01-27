@@ -55,6 +55,11 @@ target_link_libraries(lua_with_lrdb_server ${LUA_LIBRARIES})
 
 set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR})
 
+
+if(MINGW)
+target_link_libraries(lua_with_lrdb_server -lws2_32)
+endif(MINGW)
+
 if(WIN32)
 install(TARGETS lua_with_lrdb_server
         RUNTIME DESTINATION vscode_extension/out/bin/windows)
