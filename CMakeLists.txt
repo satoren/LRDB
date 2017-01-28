@@ -56,8 +56,13 @@ target_link_libraries(lua_with_lrdb_server ${LUA_LIBRARIES})
 set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR})
 
 
+
+add_library(lrdb_server SHARED src/debug_server_module.cpp ${HEADER_FILE})
+target_link_libraries(lrdb_server ${LUA_LIBRARIES})
+
 if(MINGW)
 target_link_libraries(lua_with_lrdb_server -lws2_32 -lwsock32)
+target_link_libraries(lrdb_server -lws2_32 -lwsock32)
 endif(MINGW)
 
 if(WIN32)
