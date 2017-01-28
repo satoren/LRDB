@@ -16,7 +16,7 @@ extern "C" {
 namespace lrdb {
 namespace json {
 using namespace ::picojson;
-};
+}
 #if LUA_VERSION_NUM < 502
 inline int lua_absindex(lua_State* L, int idx) {
   return (idx > 0 || (idx <= LUA_REGISTRYINDEX)) ? idx

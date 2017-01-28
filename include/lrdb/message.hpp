@@ -5,7 +5,7 @@
 namespace lrdb {
 namespace json {
 using namespace ::picojson;
-};
+}
 
 namespace message {
 inline const std::string& get_method(const json::value& msg) {
