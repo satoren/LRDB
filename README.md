@@ -1,5 +1,10 @@
 # Lua Remote DeBugger
 
+Licensed under [Boost Software License](http://www.boost.org/LICENSE_1_0.txt)
+
+[![Build Status](https://travis-ci.org/satoren/LRDB.svg?branch=master)](https://travis-ci.org/satoren/LRDB)
+[![Coverage Status](https://coveralls.io/repos/github/satoren/LRDB/badge.svg?branch=master)](https://coveralls.io/github/satoren/LRDB?branch=master)
+
 ## Introduction
 
 LRDB is Debugger for Lua programing language.
