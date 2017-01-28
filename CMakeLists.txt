@@ -11,8 +11,10 @@ if(EMSCRIPTEN)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --memory-init-file 0 -s TOTAL_MEMORY=8777216 -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1 -s EXPORTED_FUNCTIONS=\"['_main', '_lrdb_server_socket_on_connect', '_lrdb_server_socket_on_close', '_lrdb_server_socket_on_error', '_lrdb_server_socket_on_data']\"")
 endif(EMSCRIPTEN)
 
-if(NOT LOCAL_LUA_DIRECTORY AND NOT LUA_SEARCH_LIB_NAME)
+if(LUA)
    set(LUA_SEARCH_LIB_NAME ${LUA})
+endif()
+if(NOT LOCAL_LUA_DIRECTORY AND NOT LUA_SEARCH_LIB_NAME)
    set(LOCAL_LUA_DIRECTORY "third_party/lua-5.3.3")
 endif()
 include(cmake/FindLua.cmake)
@@ -58,13 +60,14 @@ set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR})
 
 
 
+if(NOT LOCAL_LUA_DIRECTORY)
 add_library(lrdb_server SHARED src/debug_server_module.cpp ${HEADER_FILE})
 target_link_libraries(lrdb_server ${LUA_LIBRARIES})
 SET_TARGET_PROPERTIES(lrdb_server PROPERTIES OUTPUT_NAME lrdb_server)
+endif()
 
 if(MINGW)
 target_link_libraries(lua_with_lrdb_server -lws2_32 -lwsock32)
-target_link_libraries(lrdb_server -lws2_32 -lwsock32)
 endif(MINGW)
 
 if(WIN32)
