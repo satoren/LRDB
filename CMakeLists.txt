@@ -12,6 +12,7 @@ if(EMSCRIPTEN)
 endif(EMSCRIPTEN)
 
 if(NOT LOCAL_LUA_DIRECTORY AND NOT LUA_SEARCH_LIB_NAME)
+   set(LUA_SEARCH_LIB_NAME ${LUA})
    set(LOCAL_LUA_DIRECTORY "third_party/lua-5.3.3")
 endif()
 include(cmake/FindLua.cmake)
@@ -56,8 +57,14 @@ target_link_libraries(lua_with_lrdb_server ${LUA_LIBRARIES})
 set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR})
 
 
+
+add_library(lrdb_server SHARED src/debug_server_module.cpp ${HEADER_FILE})
+target_link_libraries(lrdb_server ${LUA_LIBRARIES})
+SET_TARGET_PROPERTIES(lrdb_server PROPERTIES OUTPUT_NAME lrdb_server)
+
 if(MINGW)
 target_link_libraries(lua_with_lrdb_server -lws2_32 -lwsock32)
+target_link_libraries(lrdb_server -lws2_32 -lwsock32)
 endif(MINGW)
 
 if(WIN32)

@@ -47,6 +47,25 @@ Command line interface debugger is not implemented.
   lua_close(L);
 ```
 
+## Lua module
+### Build Lua module
+```
+mkdir build
+cd build
+cmake ../ -DLUA=lua-5.3
+cmake --build --target lrdb_server
+```
+Generated lrdb_server.so or lrdb_server.dll
+### Use Lua module
+```lua
+lrdb = require("lrdb_server")
+lrdb.activate(21110) --21110 is using port number. waiting for connection by debug client.
+
+--debuggee lua code
+dofile("luascript.lua");
+
+lrdb.deactivate() --deactivate debug server if you want.
+```
 
 ## Visual Studio Code Extension setting
 search ``lrdb`` and install at Visual Studio Code
