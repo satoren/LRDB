@@ -12,6 +12,7 @@ if(EMSCRIPTEN)
 endif(EMSCRIPTEN)
 
 if(NOT LOCAL_LUA_DIRECTORY AND NOT LUA_SEARCH_LIB_NAME)
+   set(LUA_SEARCH_LIB_NAME ${LUA})
    set(LOCAL_LUA_DIRECTORY "third_party/lua-5.3.3")
 endif()
 include(cmake/FindLua.cmake)
