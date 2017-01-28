@@ -19,7 +19,7 @@ export interface LaunchRequestArguments extends DebugProtocol.LaunchRequestArgum
 	args: string[];
 	cwd: string;
 
-
+	useEmbeddedLua?: boolean;
 	port: number;
 	sourceRoot?: string;
 	stopOnEntry?: boolean;
@@ -340,7 +340,6 @@ class LuaDebugSession extends DebugSession {
 		}
 	}
 
-
 	protected launchRequest(response: DebugProtocol.LaunchResponse, args: LaunchRequestArguments): void {
 		this._stopOnEntry = args.stopOnEntry;
 		const cwd = args.cwd ? args.cwd : process.cwd();
@@ -351,11 +350,16 @@ class LuaDebugSession extends DebugSession {
 
 		const port = args.port ? args.port : 21110;
 
-		this._debug_server_process = spawn(this.launchBinary(), ['--port',
-			port.toString(), program], {
-				cwd: cwd
-			}
-		);
+		const useEmbeddedLua = args.useEmbeddedLua != null ? args.useEmbeddedLua : args.program.endsWith(".lua");
+
+		if (useEmbeddedLua) {
+			this._debug_server_process = spawn(this.launchBinary(),
+				['--port', port.toString(), program].concat(args.args),
+				{ cwd: cwd });
+		}
+		else {
+			this._debug_server_process = spawn(args.program, args.args, { cwd: cwd });
+		}
 		this._debug_server_process.stdout.on('data', (data: any) => {
 			this.sendEvent(new OutputEvent(data.toString(), 'stdout'));
 		});
@@ -515,7 +519,7 @@ class LuaDebugSession extends DebugSession {
 		const scopes = new Array<Scope>();
 		scopes.push(new Scope("Local", this._variableHandles.create(new VariableReference("get_local_variable", { "stack_no": args.frameId, "global": false, "local": true, "upvalue": false }, [])), false));
 		scopes.push(new Scope("Upvalues", this._variableHandles.create(new VariableReference("get_upvalues", { "stack_no": args.frameId, "global": false, "local": false, "upvalue": true }, [])), false));
-		scopes.push(new Scope("Global", this._variableHandles.create(new VariableReference("get_global", { "stack_no": args.frameId, "global": true, "local": false, "upvalue": false  }, [])), true));
+		scopes.push(new Scope("Global", this._variableHandles.create(new VariableReference("get_global", { "stack_no": args.frameId, "global": true, "local": false, "upvalue": false }, [])), true));
 
 		response.body = {
 			scopes: scopes
@@ -549,7 +553,7 @@ class LuaDebugSession extends DebugSession {
 			this.sendResponse(response);
 		}
 	}
-	protected stringify(value: any):string {
+	protected stringify(value: any): string {
 		if (value == null) {
 			return "nil";
 		}
