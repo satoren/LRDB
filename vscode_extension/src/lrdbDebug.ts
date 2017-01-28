@@ -346,19 +346,21 @@ class LuaDebugSession extends DebugSession {
 		const sourceRoot = args.sourceRoot ? args.sourceRoot : cwd;
 		this.setupSourceEnv(sourceRoot);
 		const program = this.convertClientPathToDebugger(args.program);
+		const programArg = args.args?args.args:[];
 
 
 		const port = args.port ? args.port : 21110;
 
 		const useEmbeddedLua = args.useEmbeddedLua != null ? args.useEmbeddedLua : args.program.endsWith(".lua");
 
+
 		if (useEmbeddedLua) {
 			this._debug_server_process = spawn(this.launchBinary(),
-				['--port', port.toString(), program].concat(args.args),
+				['--port', port.toString(), program].concat(programArg),
 				{ cwd: cwd });
 		}
 		else {
-			this._debug_server_process = spawn(args.program, args.args, { cwd: cwd });
+			this._debug_server_process = spawn(args.program, programArg, { cwd: cwd });
 		}
 		this._debug_server_process.stdout.on('data', (data: any) => {
 			this.sendEvent(new OutputEvent(data.toString(), 'stdout'));

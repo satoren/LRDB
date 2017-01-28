@@ -54,7 +54,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('extension.lrdb.provideInitialConfigurations', () => {
 		return [
-			'// TODO.',
 			JSON.stringify(initialConfigurations, null, '\t')
 		].join('\n');
 	}));

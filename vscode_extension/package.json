@@ -49,7 +49,8 @@
 							"type": "lua",
 							"request": "launch",
 							"name": "${2:Launch Program}",
-							"program": "^\"\\${workspaceRoot}/${1:Program}\""
+							"program": "Lua program file or Lua host executable.",
+							"args": []
 						}
 					},
 					{
@@ -58,8 +59,8 @@
 						"body": {
 							"type": "lua",
 							"request": "attach",
-							"name": "${2:Launch Program}",
-							"program": "^\"\\${workspaceRoot}/${1:Program}\""
+							"host": "localhost",
+							"port": 21110
 						}
 					}
 				],
@@ -71,17 +72,27 @@
 						"properties": {
 							"program": {
 								"type": "string",
-								"description": "Lua program name.",
-								"default": "localhost"
+								"description": "Lua program file or executable and LRDB embedded  Lua host.",
+								"default": "${file}"
 							},
 							"cwd": {
 								"type": "string",
 								"description": "working directory.",
 								"default": "${workspaceRoot}"
 							},
+							"args": {
+								"type": "array",
+								"description": "Command line arguments.",
+								"default": []
+							},
+							"useEmbeddedLua": {
+								"type":  ["boolean", "null"],
+								"description": "If true use embedded(in this Extension) Lua interpreter.",
+								"default": null
+							},
 							"sourceRoot": {
 								"type": "string",
-								"description": "script source root directory.",
+								"description": "script source root directory. to be used in souce file matching at breakpoints.",
 								"default": "${workspaceRoot}"
 							},
 							"stopOnEntry": {

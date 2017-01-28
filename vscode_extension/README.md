@@ -45,6 +45,10 @@ launch.json example:
 
 ## Release Notes
 
+
+### 0.1.7
+- Bug fix
+
 ### 0.1.6
 - ``null`` to ``nil`` at watch and variable view
 
@@ -54,7 +58,7 @@ launch.json example:
 
 
 ### 0.1.3
-Bug fixed
+- Bug fixes.
 
 ### 0.1.0
-Initial release.
+- Initial release.

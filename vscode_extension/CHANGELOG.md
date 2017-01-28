@@ -2,7 +2,9 @@
 
 
 ## [Unreleased]
-
+### Fixed
+- program arg is not available at Lua
+- Improve launch.json snipped
 
 ## [0.1.6] - 2017-01-27
 ### Changed
