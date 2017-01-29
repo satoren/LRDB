@@ -6,4 +6,6 @@ foreach(flag_var CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE C
    string(REGEX REPLACE "/MD" "/MT" ${flag_var}_INIT "${${flag_var}_INIT}")
    string(REGEX REPLACE "/MDd" "/MTd" ${flag_var}_INIT "${${flag_var}_INIT}")
 endforeach(flag_var)
+elseif(CMAKE_COMPILER_IS_GNUCXX)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++")
 endif(MSVC)
