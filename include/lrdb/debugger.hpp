@@ -1,4 +1,8 @@
 #pragma once
+
+
+#if __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1800)
+
 #include <cstdio>
 #include <functional>
 #include <string>
@@ -12,6 +16,7 @@ extern "C" {
 #include <lua.h>
 #include <lualib.h>
 }
+
 
 namespace lrdb {
 namespace json {
@@ -905,3 +910,7 @@ class debugger {
   tick_handler_type tick_handler_;
 };
 }
+
+#else
+#error Needs at least a C++11 compiler
+#endif
