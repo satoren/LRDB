@@ -1,0 +1,33 @@
+
+
+include_directories(SYSTEM ${LUA_INCLUDE_DIRS})
+link_directories(${LUA_LIBRARY_DIRS})
+
+
+if(LRDB_USE_BOOST_ASIO)
+  add_definitions(-DLRDB_USE_BOOST_ASIO)
+else(LRDB_USE_BOOST_ASIO)
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/third_party/asio/asio/include")
+endif(LRDB_USE_BOOST_ASIO)
+
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/third_party/picojson")
+
+
+if(ADDITIONAL_INCLUDE_PATH)
+  include_directories(SYSTEM ${ADDITIONAL_INCLUDE_PATH})
+endif()
+
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
+
+if(NOT MSVC)#-Wall nonsense on MSVC
+  add_definitions("-std=c++11")
+endif(NOT MSVC)
+
+add_library(lrdb_server SHARED src/debug_server_module.cpp ${HEADER_FILE})
+target_link_libraries(lrdb_server ${LUA_LIBRARIES})
+set_target_properties(lrdb_server PROPERTIES OUTPUT_NAME lrdb_server)
+set_target_properties(lrdb_server PROPERTIES PREFIX "")
+
+   
+set(CMAKE_INSTALL_PREFIX "")
+install(TARGETS lrdb_server LIBRARY DESTINATION ${INSTALL_LIBDIR}) 
