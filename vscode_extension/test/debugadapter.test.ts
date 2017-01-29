@@ -91,4 +91,16 @@ suite("Lua Debug Adapter", () => {
 		});
 	});
 	
+	suite('breakpoint', () => {
+		test('should stop on breakpoint', () => {
+			const PROGRAM = path.join(DATA_ROOT, 'loop_test.lua');
+			const BREAK_LINE = 5;
+			return Promise.all([
+				dc.hitBreakpoint({ program: PROGRAM},{path:PROGRAM,line:BREAK_LINE}),
+				dc.configurationSequence(),
+				dc.waitForEvent('stopped'),
+				dc.assertStoppedLocation('breakpoint', { line: BREAK_LINE } ),
+			]);
+		});
+	});
 });
