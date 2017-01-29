@@ -88,6 +88,7 @@ else(WIN32)
 message(FATAL_ERROR "Unsupported operation system")
 endif(WIN32)
 
+if(NOT BUILD_NO_TESTS)
 enable_testing()
 
 if(COVERAGE)
@@ -132,3 +133,5 @@ add_test(
   NAME lua_debugger_test
   COMMAND $<TARGET_FILE:lua_debugger_test>
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/test)
+
+endif(NOT BUILD_NO_TESTS)
