@@ -53,7 +53,7 @@ Command line interface debugger is not implemented.
 ```
 
 ## Lua module
-### Build Lua module
+### Build module
 ```
 mkdir build
 cd build
@@ -61,7 +61,13 @@ cmake ../ -DLUA=lua-5.3
 cmake --build --target lrdb_server
 ```
 Generated lrdb_server.so or lrdb_server.dll
-### Use Lua module
+
+### Build and Install with [LuaRocks](https://luarocks.org/)
+```
+luarocks install lrdb
+```
+
+### Use module
 ```lua
 lrdb = require("lrdb_server")
 lrdb.activate(21110) --21110 is using port number. waiting for connection by debug client.
