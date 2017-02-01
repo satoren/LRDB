@@ -46,8 +46,9 @@ launch.json example:
 ## Release Notes
 
 
-### 0.1.7
-- Bug fix
+### 0.1.8
+- Bug fixes.
+- Update Lua 5.3.3 to 5.3.4
 
 ### 0.1.6
 - ``null`` to ``nil`` at watch and variable view

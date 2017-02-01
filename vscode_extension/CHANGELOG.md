@@ -2,6 +2,8 @@
 
 
 ## [Unreleased]
+
+## [0.1.8] - 2017-02-01
 ### Changed
 - update Lua 5.3.3 to 5.3.4
 ### Fixed
