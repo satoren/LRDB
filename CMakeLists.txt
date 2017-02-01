@@ -15,7 +15,7 @@ if(LUA)
    set(LUA_SEARCH_LIB_NAME ${LUA})
 endif()
 if(NOT LOCAL_LUA_DIRECTORY AND NOT LUA_SEARCH_LIB_NAME)
-   set(LOCAL_LUA_DIRECTORY "third_party/lua-5.3.3")
+   set(LOCAL_LUA_DIRECTORY "third_party/lua-5.3.4")
 endif()
 include(cmake/FindLua.cmake)
 
