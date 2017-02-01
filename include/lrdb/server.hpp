@@ -116,10 +116,11 @@ class basic_server {
 #define DEBUG_COMMAND_TABLE(NAME)                    \
   if (method == #NAME) {                             \
     result = command::exec_##NAME(debugger_, param); \
-  } else
+ } else
 
     DEBUG_COMMAND_TABLE(step)
     DEBUG_COMMAND_TABLE(step_in)
+    DEBUG_COMMAND_TABLE(step_out)
     DEBUG_COMMAND_TABLE(continue)
     DEBUG_COMMAND_TABLE(pause)
     DEBUG_COMMAND_TABLE(add_breakpoint)

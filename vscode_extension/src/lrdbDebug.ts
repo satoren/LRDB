@@ -592,19 +592,33 @@ class LuaDebugSession extends DebugSession {
 
 	protected continueRequest(response: DebugProtocol.ContinueResponse, args: DebugProtocol.ContinueArguments): void {
 		this._debug_client.send("continue");
+		this.sendResponse(response);
 	}
 
 	protected nextRequest(response: DebugProtocol.NextResponse, args: DebugProtocol.NextArguments): void {
 		this._debug_client.send("step");
+		this.sendResponse(response);
 	}
 
-	protected stepInRequest(response: DebugProtocol.NextResponse, args: DebugProtocol.NextArguments): void {
+	protected stepInRequest(response: DebugProtocol.StepInResponse, args: DebugProtocol.StepInArguments): void {
 		this._debug_client.send("step_in");
+		this.sendResponse(response);
 	}
 
-	protected stepOutRequest(response: DebugProtocol.NextResponse, args: DebugProtocol.NextArguments): void {
+	protected stepOutRequest(response: DebugProtocol.StepOutResponse, args: DebugProtocol.StepOutArguments): void {
 		this._debug_client.send("step_out");
+		this.sendResponse(response);
 	}
+	protected pauseRequest(response: DebugProtocol.PauseResponse, args: DebugProtocol.PauseArguments): void {
+		this._debug_client.send("pause");
+		this.sendResponse(response);
+	}
+
+    protected sourceRequest(response: DebugProtocol.SourceResponse, args: DebugProtocol.SourceArguments): void
+	{
+		this.sendResponse(response);
+	}
+
 
 	protected disconnectRequest(response: DebugProtocol.DisconnectResponse, args: DebugProtocol.DisconnectArguments): void {
 		if (this._debug_server_process) {
@@ -620,7 +634,20 @@ class LuaDebugSession extends DebugSession {
 
 	protected evaluateRequest(response: DebugProtocol.EvaluateResponse, args: DebugProtocol.EvaluateArguments): void {
 		//		if (args.context == "watch" || args.context == "hover" || args.context == "repl") {
-		let chunk = "return " + args.expression
+			
+		let chunk = "";
+		if(args.context == "repl")
+		{
+			chunk = args.expression
+		}
+		else
+		{
+			chunk = args.expression.trim();
+			if(!chunk.startsWith("return"))
+			{
+				chunk = "return " + args.expression
+			}
+		}
 		this._debug_client.send("eval", { "stack_no": args.frameId, "chunk": chunk }, (res: any) => {
 			if (res.result) {
 				let ret = ""
