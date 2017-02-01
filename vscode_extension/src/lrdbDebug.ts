@@ -56,7 +56,7 @@ interface LRDBClient {
 	on_event: (event: DebugServerEvent) => void;
 	on_close: () => void;
 	on_open: () => void;
-	on_error: () => void;
+	on_error: (e:any) => void;
 	on_data: (data: string) => void;
 }
 
@@ -106,7 +106,7 @@ class LRDBTCPClient {
 
 			console.error(e.message);
 			if (this.on_error) {
-				this.on_error();
+				this.on_error(e);
 			}
 		});
 
@@ -163,7 +163,7 @@ class LRDBTCPClient {
 	on_data: (data: string) => void;
 	on_close: () => void;
 	on_open: () => void;
-	on_error: () => void;
+	on_error: (e:any) => void;
 }
 
 
@@ -244,7 +244,7 @@ class LRDBStdInOutClient {
 	on_data: (data: string) => void;
 	on_close: () => void;
 	on_open: () => void;
-	on_error: () => void;
+	on_error: (e:any) => void;
 }
 
 
@@ -380,10 +380,8 @@ class LuaDebugSession extends DebugSession {
 		this._debug_client = new LRDBTCPClient(port, 'localhost');
 		this._debug_client.on_event = (event: DebugServerEvent) => { this.handleServerEvents(event) };
 		this._debug_client.on_close = () => {
-			this.sendEvent(new TerminatedEvent());
 		};
-		this._debug_client.on_error = () => {
-			this.sendEvent(new TerminatedEvent());
+		this._debug_client.on_error = (e:any) => {
 		};
 
 		this._debug_client.on_open = () => {
@@ -401,8 +399,7 @@ class LuaDebugSession extends DebugSession {
 		this._debug_client.on_close = () => {
 			this.sendEvent(new TerminatedEvent());
 		};
-		this._debug_client.on_error = () => {
-			this.sendEvent(new TerminatedEvent());
+		this._debug_client.on_error = (e:any) => {
 		};
 
 		this._debug_client.on_open = () => {
@@ -622,7 +619,7 @@ class LuaDebugSession extends DebugSession {
 
 	protected disconnectRequest(response: DebugProtocol.DisconnectResponse, args: DebugProtocol.DisconnectArguments): void {
 		if (this._debug_server_process) {
-			this._debug_server_process.kill();
+			this._debug_server_process.disconnect();
 			delete this._debug_server_process;
 		}
 		if (this._debug_client) {
@@ -698,7 +695,6 @@ class LuaDebugSession extends DebugSession {
 			this.sendEvent(new ContinuedEvent(LuaDebugSession.THREAD_ID));
 		}
 		else if (event.method == "exit") {
-			this.sendEvent(new TerminatedEvent());
 		}
 	}
 }
