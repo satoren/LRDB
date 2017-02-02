@@ -56,7 +56,7 @@ interface LRDBClient {
 	on_event: (event: DebugServerEvent) => void;
 	on_close: () => void;
 	on_open: () => void;
-	on_error: (e:any) => void;
+	on_error: (e: any) => void;
 	on_data: (data: string) => void;
 }
 
@@ -139,7 +139,9 @@ class LRDBTCPClient {
 				this._callback_map[id] = callback
 			}
 			else {
-				callback({ result: null, id: id });
+				setTimeout(function () {
+					callback({ result: null, id: id });
+				}, 0);
 			}
 		}
 	}
@@ -163,7 +165,7 @@ class LRDBTCPClient {
 	on_data: (data: string) => void;
 	on_close: () => void;
 	on_open: () => void;
-	on_error: (e:any) => void;
+	on_error: (e: any) => void;
 }
 
 
@@ -218,7 +220,9 @@ class LRDBStdInOutClient {
 				this._callback_map[id] = callback
 			}
 			else {
-				callback({ result: null, id: id });
+				setTimeout(function () {
+					callback({ result: null, id: id });
+				}, 0);
 			}
 		}
 	}
@@ -244,7 +248,7 @@ class LRDBStdInOutClient {
 	on_data: (data: string) => void;
 	on_close: () => void;
 	on_open: () => void;
-	on_error: (e:any) => void;
+	on_error: (e: any) => void;
 }
 
 
@@ -266,6 +270,9 @@ class LuaDebugSession extends DebugSession {
 	private _variableHandles = new Handles<VariableReference>();
 
 	private _stopOnEntry: boolean;
+
+
+	private _startUpSequence: boolean;
 
 	/**
 	 * Creates a new debug adapter that is used for one debug session.
@@ -346,7 +353,7 @@ class LuaDebugSession extends DebugSession {
 		const sourceRoot = args.sourceRoot ? args.sourceRoot : cwd;
 		this.setupSourceEnv(sourceRoot);
 		const program = this.convertClientPathToDebugger(args.program);
-		const programArg = args.args?args.args:[];
+		const programArg = args.args ? args.args : [];
 
 
 		const port = args.port ? args.port : 21110;
@@ -381,13 +388,14 @@ class LuaDebugSession extends DebugSession {
 		this._debug_client.on_event = (event: DebugServerEvent) => { this.handleServerEvents(event) };
 		this._debug_client.on_close = () => {
 		};
-		this._debug_client.on_error = (e:any) => {
+		this._debug_client.on_error = (e: any) => {
 		};
 
 		this._debug_client.on_open = () => {
 			this.sendResponse(response);
 			this.sendEvent(new InitializedEvent());
 		};
+		this._startUpSequence = true;
 	}
 
 	protected attachRequest(response: DebugProtocol.AttachResponse, args: AttachRequestArguments): void {
@@ -399,14 +407,14 @@ class LuaDebugSession extends DebugSession {
 		this._debug_client.on_close = () => {
 			this.sendEvent(new TerminatedEvent());
 		};
-		this._debug_client.on_error = (e:any) => {
+		this._debug_client.on_error = (e: any) => {
 		};
 
 		this._debug_client.on_open = () => {
 			this.sendResponse(response);
 			this.sendEvent(new InitializedEvent());
 		};
-
+		this._startUpSequence = true;
 	}
 
 
@@ -417,6 +425,7 @@ class LuaDebugSession extends DebugSession {
 		} else {
 			this._debug_client.send("continue");
 		}
+		this._startUpSequence = false;
 		this.sendResponse(response);
 	}
 
@@ -611,8 +620,7 @@ class LuaDebugSession extends DebugSession {
 		this.sendResponse(response);
 	}
 
-    protected sourceRequest(response: DebugProtocol.SourceResponse, args: DebugProtocol.SourceArguments): void
-	{
+	protected sourceRequest(response: DebugProtocol.SourceResponse, args: DebugProtocol.SourceArguments): void {
 		this.sendResponse(response);
 	}
 
@@ -631,17 +639,14 @@ class LuaDebugSession extends DebugSession {
 
 	protected evaluateRequest(response: DebugProtocol.EvaluateResponse, args: DebugProtocol.EvaluateArguments): void {
 		//		if (args.context == "watch" || args.context == "hover" || args.context == "repl") {
-			
+
 		let chunk = "";
-		if(args.context == "repl")
-		{
+		if (args.context == "repl") {
 			chunk = args.expression
 		}
-		else
-		{
+		else {
 			chunk = args.expression.trim();
-			if(!chunk.startsWith("return"))
-			{
+			if (!chunk.startsWith("return")) {
 				chunk = "return " + args.expression
 			}
 		}
@@ -688,6 +693,9 @@ class LuaDebugSession extends DebugSession {
 	}
 
 	private handleServerEvents(event: DebugServerEvent) {
+		if (this._startUpSequence) {
+			return;
+		}
 		if (event.method == "paused") {
 			this.sendEvent(new StoppedEvent(event.param.reason, LuaDebugSession.THREAD_ID));
 		}
