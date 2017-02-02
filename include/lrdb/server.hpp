@@ -5,14 +5,14 @@
 #include <utility>
 #include <vector>
 
-#include "debug_command.hpp"
 #include "debugger.hpp"
 #include "message.hpp"
+#include "server/debug_command.hpp"
 
 #ifdef EMSCRIPTEN
-#include "command_stream_socket_emscripten.hpp"
+#include "server/command_stream_socket_emscripten.hpp"
 #else
-#include "command_stream_socket.hpp"
+#include "server/command_stream_socket.hpp"
 #endif
 
 namespace lrdb {
@@ -111,7 +111,8 @@ class basic_server {
     const json::value& param = message::get_param(req);
     const json::value& reqid = message::get_id(req);
 
-    typedef json::value (*exec_cmd_fn)(debugger & debugger, const json::value& param, bool& error);
+    typedef json::value (*exec_cmd_fn)(debugger & debugger,
+                                       const json::value& param, bool& error);
     static const std::map<std::string, exec_cmd_fn> cmd_map = {
 #define LRDB_DEBUG_COMMAND_TABLE(NAME) \
   { #NAME, &command::exec_##NAME }

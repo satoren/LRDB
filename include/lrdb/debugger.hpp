@@ -1,6 +1,5 @@
 #pragma once
 
-
 #if __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1800)
 
 #include <cstdio>
@@ -16,7 +15,6 @@ extern "C" {
 #include <lua.h>
 #include <lualib.h>
 }
-
 
 namespace lrdb {
 namespace json {
@@ -671,7 +669,7 @@ class debugger {
     }
   }
   /// @brief pause
-  void pause() { pause_ = true; }
+  void pause() { step_type_ = STEP_PAUSE; }
   /// @brief unpause(continue)
   void unpause() {
     pause_ = false;
@@ -693,6 +691,8 @@ class debugger {
       return "step_in";
     } else if (step_type_ == STEP_OUT) {
       return "step_out";
+    } else if (step_type_ == STEP_PAUSE) {
+      return "pause";
     }
     return "exception";
   }
@@ -852,6 +852,10 @@ class debugger {
         if (step_callstack_size_ > callstack.size()) {
           pause_ = true;
         }
+        break;
+      case STEP_PAUSE:
+        pause_ = true;
+        break;
       case STEP_NONE:
         break;
     }
@@ -896,6 +900,7 @@ class debugger {
     STEP_OVER,
     STEP_IN,
     STEP_OUT,
+    STEP_PAUSE,
   };
 
   lua_State* state_;

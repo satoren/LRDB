@@ -22,7 +22,9 @@ include(cmake/FindLua.cmake)
 include_directories(SYSTEM ${LUA_INCLUDE_DIRS})
 link_directories(${LUA_LIBRARY_DIRS})
 
-file(GLOB HEADER_FILE RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}  include/lrdb/*.hpp)
+file(GLOB HEADER_FILE RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} include/lrdb/*.hpp)
+file(GLOB HEADER_FILE_SERVER RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} include/lrdb/server/*.hpp)
+set(HEADER_FILE ${HEADER_FILE} ${HEADER_FILE_SERVER})
 
 if(LRDB_USE_BOOST_ASIO)
   add_definitions(-DLRDB_USE_BOOST_ASIO)

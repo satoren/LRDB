@@ -17,10 +17,6 @@
 #include <asio.hpp>
 #endif
 
-#include "debug_command.hpp"
-#include "debugger.hpp"
-#include "message.hpp"
-
 namespace lrdb {
 #ifdef LRDB_USE_BOOST_ASIO
 namespace asio {
@@ -37,16 +33,7 @@ class command_stream_socket {
       : endpoint_(asio::ip::tcp::v4(), port),
         acceptor_(io_service_, endpoint_),
         socket_(io_service_) {
-    acceptor_.async_accept(socket_, [&](const asio::error_code& ec) {
-      if (!ec) {
-        connected_done();
-      } else {
-        if (on_error) {
-          on_error(ec.message());
-        }
-        close();
-      }
-    });
+	  async_accept();
   }
 
   ~command_stream_socket() {
@@ -59,6 +46,10 @@ class command_stream_socket {
     if (on_close) {
       on_close();
     }
+  }
+  void reconnect() {
+	  close();
+	  async_accept();
   }
 
   std::function<void(const std::string& data)> on_data;
@@ -84,13 +75,28 @@ class command_stream_socket {
       if (on_error) {
         on_error(ec.message());
       }
-      close();
-      return true;
+	  reconnect();
+      return false;
     }
-    return false;
+    return true;
   }
 
  private:
+
+	 void async_accept()
+	 {
+		 acceptor_.async_accept(socket_, [&](const asio::error_code& ec) {
+			 if (!ec) {
+				 connected_done();
+			 }
+			 else {
+				 if (on_error) {
+					 on_error(ec.message());
+				 }
+				 reconnect();
+			 }
+		 });
+	 }
   void connected_done() {
     if (on_connection) {
       on_connection();
@@ -112,7 +118,7 @@ class command_stream_socket {
                                if (on_error) {
                                  on_error(ec.message());
                                }
-                               close();
+							   reconnect();
                              }
                            });
   }

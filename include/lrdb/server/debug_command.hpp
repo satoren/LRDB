@@ -1,7 +1,7 @@
 #pragma once
 
-#include "debugger.hpp"
-#include "message.hpp"
+#include "lrdb/debugger.hpp"
+#include "lrdb/message.hpp"
 
 namespace lrdb {
 

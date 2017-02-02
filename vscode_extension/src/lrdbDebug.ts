@@ -642,7 +642,7 @@ class LuaDebugSession extends DebugSession {
 
 	protected disconnectRequest(response: DebugProtocol.DisconnectResponse, args: DebugProtocol.DisconnectArguments): void {
 		if (this._debug_server_process) {
-			this._debug_server_process.disconnect();
+			this._debug_server_process.kill();
 			delete this._debug_server_process;
 		}
 		if (this._debug_client) {
