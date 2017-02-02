@@ -269,6 +269,9 @@ class LuaDebugSession extends DebugSession {
 
 	private _variableHandles = new Handles<VariableReference>();
 
+
+	private _sourceHandles = new Handles<string>();
+
 	private _stopOnEntry: boolean;
 
 
@@ -337,7 +340,8 @@ class LuaDebugSession extends DebugSession {
 			return path.relative(sourceRoot, clientPath);
 		}
 		this.convertDebuggerPathToClient = (debuggerPath: string): string => {
-			const filename: string = debuggerPath.startsWith("@") ? debuggerPath.substr(1) : debuggerPath;
+			if (!debuggerPath.startsWith("@")) { return ''; }
+			const filename: string = debuggerPath.substr(1);
 			if (path.isAbsolute(filename)) {
 				return filename;
 			}
@@ -503,8 +507,12 @@ class LuaDebugSession extends DebugSession {
 				const frames = new Array<StackFrame>();
 				for (let i = startFrame; i < endFrame; i++) {
 					const frame = res.result[i];	// use a word of the line as the stackframe name
-					frames.push(new StackFrame(i, frame.func, new Source(path.basename(frame.file),
-						this.convertDebuggerPathToClient(frame.file)),
+					let filename = this.convertDebuggerPathToClient(frame.file)
+					let source = new Source(frame.id, filename)
+					if (!frame.file.startsWith("@")) {
+						source.sourceReference = this._sourceHandles.create(frame.file)
+					}
+					frames.push(new StackFrame(i, frame.func, source,
 						this.convertDebuggerLineToClient(frame.line), 0));
 				}
 				response.body = {
@@ -621,6 +629,13 @@ class LuaDebugSession extends DebugSession {
 	}
 
 	protected sourceRequest(response: DebugProtocol.SourceResponse, args: DebugProtocol.SourceArguments): void {
+
+		const id = this._sourceHandles.get(args.sourceReference);
+		if (id) {
+			response.body = {
+				content: id
+			};
+		}
 		this.sendResponse(response);
 	}
 
