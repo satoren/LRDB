@@ -111,36 +111,38 @@ class basic_server {
     const json::value& param = message::get_param(req);
     const json::value& reqid = message::get_id(req);
 
-    json::value result;
+    typedef std::pair<json::value, json::value> exec_cmd_fn(
+        debugger & debugger, const json::value& param, bool& error);
+    static const std::map<std::string, exec_cmd_fn> cmd_map = {
+#define LRDB_DEBUG_COMMAND_TABLE(NAME) \
+  { #NAME, &command::exec_##NAME }
+        LRDB_DEBUG_COMMAND_TABLE(step),
+        LRDB_DEBUG_COMMAND_TABLE(step_in),
+        LRDB_DEBUG_COMMAND_TABLE(step_out),
+        LRDB_DEBUG_COMMAND_TABLE(continue),
+        LRDB_DEBUG_COMMAND_TABLE(pause),
+        LRDB_DEBUG_COMMAND_TABLE(add_breakpoint),
+        LRDB_DEBUG_COMMAND_TABLE(get_breakpoints),
+        LRDB_DEBUG_COMMAND_TABLE(clear_breakpoints),
+        LRDB_DEBUG_COMMAND_TABLE(get_stacktrace),
+        LRDB_DEBUG_COMMAND_TABLE(get_local_variable),
+        LRDB_DEBUG_COMMAND_TABLE(get_upvalues),
+        LRDB_DEBUG_COMMAND_TABLE(eval),
+        LRDB_DEBUG_COMMAND_TABLE(get_global),
+#undef LRDB_DEBUG_COMMAND_TABLE
+    };
 
-#define DEBUG_COMMAND_TABLE(NAME)                    \
-  if (method == #NAME) {                             \
-    result = command::exec_##NAME(debugger_, param); \
- } else
+    auto match = cmd_map.find(method);
+    if (match != cmd_map.end()) {
+      bool error = false;
+      json::value result = match->second(debugger_, param, error);
 
-    DEBUG_COMMAND_TABLE(step)
-    DEBUG_COMMAND_TABLE(step_in)
-    DEBUG_COMMAND_TABLE(step_out)
-    DEBUG_COMMAND_TABLE(continue)
-    DEBUG_COMMAND_TABLE(pause)
-    DEBUG_COMMAND_TABLE(add_breakpoint)
-    DEBUG_COMMAND_TABLE(get_breakpoints)
-    DEBUG_COMMAND_TABLE(clear_breakpoints)
-    DEBUG_COMMAND_TABLE(get_stacktrace)
-    DEBUG_COMMAND_TABLE(get_local_variable)
-    DEBUG_COMMAND_TABLE(get_upvalues)
-    DEBUG_COMMAND_TABLE(eval)
-    DEBUG_COMMAND_TABLE(get_global)
-    if (true) {
+      if (!reqid.is<json::null>() || error) {
+        send_message(message::responce::serialize(reqid, result, error));
+      }
+    } else {
       send_message(message::responce::serialize(
           reqid, method + " is not supported", true));
-      return;
-    }
-
-#undef DEBUG_COMMAND_TABLE
-
-    if (!reqid.is<json::null>()) {
-      send_message(message::responce::serialize(reqid, result));
     }
   }
 
@@ -150,7 +152,6 @@ class basic_server {
 };
 typedef basic_server<command_stream_socket> server;
 }
-
 
 #else
 #error Needs at least a C++11 compiler
