@@ -6,30 +6,26 @@
 namespace lrdb {
 
 namespace command {
-inline json::value exec_step(debugger& debugger,
-                                                     const json::value&,
-                                                     bool& error) {
+inline json::value exec_step(debugger& debugger, const json::value&, bool&) {
   debugger.step();
   return json::value();
 }
-inline json::value exec_step_in(debugger& debugger, const json::value&,
-                                bool& error) {
+inline json::value exec_step_in(debugger& debugger, const json::value&, bool&) {
   debugger.step_in();
   return json::value();
 }
 
 inline json::value exec_step_out(debugger& debugger, const json::value&,
-                                 bool& error) {
+                                 bool&) {
   debugger.step_out();
   return json::value();
 }
 inline json::value exec_continue(debugger& debugger, const json::value&,
-                                 bool& error) {
+                                 bool&) {
   debugger.unpause();
   return json::value();
 }
-inline json::value exec_pause(debugger& debugger, const json::value&,
-                              bool& error) {
+inline json::value exec_pause(debugger& debugger, const json::value&, bool&) {
   debugger.pause();
   return json::value();
 }
@@ -61,8 +57,7 @@ inline json::value exec_add_breakpoint(debugger& debugger,
   return json::value();
 }
 inline json::value exec_clear_breakpoints(debugger& debugger,
-                                          const json::value& param,
-                                          bool& error) {
+                                          const json::value& param, bool&) {
   bool has_source = param.get("file").is<std::string>();
   bool has_line = param.get("line").is<double>();
   if (!has_source) {
@@ -80,7 +75,7 @@ inline json::value exec_clear_breakpoints(debugger& debugger,
   return json::value(true);
 }
 inline json::value exec_get_breakpoints(debugger& debugger, const json::value&,
-                                        bool& error) {
+                                        bool&) {
   const debugger::line_breakpoint_type& breakpoints =
       debugger.line_breakpoints();
 
@@ -102,7 +97,7 @@ inline json::value exec_get_breakpoints(debugger& debugger, const json::value&,
   return json::value(res);
 }
 inline json::value exec_get_stacktrace(debugger& debugger, const json::value&,
-                                       bool& error) {
+                                       bool&) {
   auto callstack = debugger.get_call_stack();
   json::array res;
   for (auto& s : callstack) {
@@ -212,7 +207,7 @@ inline json::value exec_eval(debugger& debugger, const json::value& param,
   return json::value("invalid arguments");
 }
 inline json::value exec_get_global(debugger& debugger, const json::value&,
-                                   bool& error) {
+                                   bool&) {
   return debugger.get_global_table();
 }
 }
