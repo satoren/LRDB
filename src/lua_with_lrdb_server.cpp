@@ -26,11 +26,13 @@ int exec(const char* program, DebugServer& debug_server, int argc,
   if (ret != 0) {
     std::cerr << lua_tostring(L, -1);  // output error
   }
-
   debug_server.reset();
 
   lua_close(L);
   L = 0;
+#ifdef EMSCRIPTEN
+  emscripten_force_exit(ret ? 1 : 0);
+#endif
   return ret ? 1 : 0;
 }
 
@@ -61,6 +63,7 @@ int main(int argc, char* argv[]) {
   }
   std::cout << LUA_COPYRIGHT << std::endl;
 #ifdef EMSCRIPTEN
+  std::cout << "on JavaScript powered by Emscripten(Emterpreter)" << std::endl;
   EM_ASM_(
       {
         var path = require('path');
@@ -75,6 +78,10 @@ int main(int argc, char* argv[]) {
       program);
 #endif
 
+#ifdef LRDB_USE_NODE_CHILD_PROCESS
+  lrdb::server debug_server;
+  return exec(program, debug_server, argc - i, &argv[i]);
+#else
   if (port == 0)  // if no port use std::cin and std::cout
   {
 #ifdef LRDB_ENABLE_STDINOUT_STREAM
@@ -88,4 +95,5 @@ int main(int argc, char* argv[]) {
     lrdb::server debug_server(port);
     return exec(program, debug_server, argc - i, &argv[i]);
   }
+#endif
 }

@@ -10,7 +10,11 @@
 #include "server/debug_command.hpp"
 
 #ifdef EMSCRIPTEN
+#ifdef LRDB_USE_NODE_CHILD_PROCESS
+#include "server/command_stream_node_emscripten.hpp"
+#else
 #include "server/command_stream_socket_emscripten.hpp"
+#endif
 #else
 #include "server/command_stream_socket.hpp"
 #endif
@@ -81,7 +85,6 @@ class basic_server {
 
     debugger_.set_tick_handler([&](debugger&) { command_stream_.poll(); });
 
-    debugger_.step_in();
     command_stream_.on_connection = [=]() { connected_done(); };
     command_stream_.on_data = [=](const std::string& data) {
       execute_message(data);
