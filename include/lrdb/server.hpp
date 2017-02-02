@@ -111,7 +111,7 @@ class basic_server {
     const json::value& param = message::get_param(req);
     const json::value& reqid = message::get_id(req);
 
-    typedef std::pair<json::value, json::value> exec_cmd_fn(
+    typedef json::value exec_cmd_fn(
         debugger & debugger, const json::value& param, bool& error);
     static const std::map<std::string, exec_cmd_fn> cmd_map = {
 #define LRDB_DEBUG_COMMAND_TABLE(NAME) \

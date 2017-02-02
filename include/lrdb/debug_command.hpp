@@ -6,7 +6,7 @@
 namespace lrdb {
 
 namespace command {
-inline std::pair<json::value, json::value> exec_step(debugger& debugger,
+inline json::value exec_step(debugger& debugger,
                                                      const json::value&,
                                                      bool& error) {
   debugger.step();
