@@ -17,7 +17,7 @@
 
 namespace lrdb {
 
-#define LRDB_SERVER_VERSION "0.0.1"
+#define LRDB_SERVER_VERSION "0.1.9"
 
 /// @brief Debug Server Class
 /// template type is messaging communication customization point

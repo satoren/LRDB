@@ -25,7 +25,7 @@ If you want embedded debug server to your host program, Please see [this page](h
 launch.json example:
 ```
 {
-    "version": "0.1.0",
+    "version": "0.2.0",
     "configurations": [
         {
             "type": "lua",
@@ -39,13 +39,11 @@ launch.json example:
 }
 ```
 
-
-## Known Issues
-
-
 ## Release Notes
 
-
+### 0.1.9
+- Bug fixes.
+- Added support sourceRequest. It mean can step execute on string chunk.
 ### 0.1.8
 - Bug fixes.
 - Update Lua 5.3.3 to 5.3.4

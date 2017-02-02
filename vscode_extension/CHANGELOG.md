@@ -2,6 +2,8 @@
 
 
 ## [Unreleased]
+
+## [0.1.9] - 2017-02-03
 ### Changed
 - Added support sourceRequest. It mean can step execute on string chunk.
 
