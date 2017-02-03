@@ -69,17 +69,18 @@ class basic_server {
   void init() {
     debugger_.set_pause_handler([&](debugger& debugger) {
       send_pause_status();
-      if (wait_for_connect_) {
-        debugger.pause();
-        command_stream_.wait_for_connection();
-      }
       while (debugger.paused() && command_stream_.is_open()) {
         command_stream_.run_one();
       }
       send_message(message::notify::serialize("running"));
     });
 
-    debugger_.set_tick_handler([&](debugger&) { command_stream_.poll(); });
+    debugger_.set_tick_handler([&](debugger&) {
+      if (wait_for_connect_) {
+        command_stream_.wait_for_connection();
+      }
+      command_stream_.poll();
+    });
 
     debugger_.step_in();
     command_stream_.on_connection = [=]() { connected_done(); };
