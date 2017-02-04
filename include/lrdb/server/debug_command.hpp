@@ -206,9 +206,12 @@ inline json::value exec_eval(debugger& debugger, const json::value& param,
   error = true;
   return json::value("invalid arguments");
 }
-inline json::value exec_get_global(debugger& debugger, const json::value&,
+inline json::value exec_get_global(debugger& debugger, const json::value& param,
                                    bool&) {
-  return debugger.get_global_table();
+  int depth = param.get("depth").is<double>()
+                  ? static_cast<int>(param.get("depth").get<double>())
+                  : 0;
+  return debugger.get_global_table(depth);
 }
 }
 }
