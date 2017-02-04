@@ -769,6 +769,26 @@ class debugger {
   debugger(const debugger&);             //=delete;
   debugger& operator=(const debugger&);  //=delete;
 
+  static bool is_file_path_match(const char* path1, const char* path2) {
+    // TODO need more inteligent?
+    int i = 0;
+    while (true) {
+      char c1 = path1[i];
+      char c2 = path2[i];
+
+      if (c1 != c2) {
+        // allow different backslash and slash for windows
+        if (((c1 != '\\' || c2 != '/') && (c1 != '/' || c2 != '\\'))) {
+          return false;
+        }
+      }
+      if (c1 == '\0') {
+        return true;
+      }
+      i++;
+    }
+  }
+
   breakpoint_info* search_breakpoints(debug_info& debuginfo) {
     if (line_breakpoints_.empty()) {
       return 0;
@@ -785,7 +805,7 @@ class debugger {
         if (source[0] == '@') {
           source++;
         }
-        if (it->file == source) {
+        if (is_file_path_match(it->file.c_str(), source)) {
           return &(*it);
         }
       }
