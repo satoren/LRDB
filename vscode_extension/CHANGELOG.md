@@ -2,11 +2,10 @@
 
 
 ## [Unreleased]
-### Changed
-- Improve variables viewing
 
 ## [0.2.0] - 2017-02-04
 ### Changed
+- Improve variables viewing
 - Change LuaVM native code to javascript by Emscripten.
 ## [0.1.9] - 2017-02-03
 ### Changed
