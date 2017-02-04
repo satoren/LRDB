@@ -504,7 +504,12 @@ class LuaDebugSession extends DebugSession {
 	}
 
 	private createVariableObjectPath(datapath: string[]): string {
-		return "_ENV" + '["' + datapath.join('"]["') + '"]'
+		if (datapath.length == 1) {
+			return datapath[0];
+		}
+		else {
+			return datapath[0] + '["' + datapath.slice(1).join('"]["') + '"]';
+		}
 	}
 
 	protected variablesRequest(response: DebugProtocol.VariablesResponse, args: DebugProtocol.VariablesArguments): void {
@@ -619,10 +624,14 @@ class LuaDebugSession extends DebugSession {
 			return;
 		}
 		//		if (args.context == "watch" || args.context == "hover" || args.context == "repl") {
-
+		let expression_name = args.expression.trim()
 		let chunk = "";
 		if (args.context == "repl") {
 			chunk = args.expression
+			if(expression_name.startsWith("return"))
+			{
+				expression_name = expression_name.substr("return".length)
+			}
 		}
 		else {
 			chunk = args.expression.trim();
@@ -630,7 +639,7 @@ class LuaDebugSession extends DebugSession {
 				chunk = "return " + args.expression
 			}
 		}
-		this._debug_client.send("eval", { "stack_no": args.frameId, "chunk": chunk }, (res: any) => {
+		this._debug_client.send("eval", { "stack_no": args.frameId, "chunk": chunk,"depth":0 }, (res: any) => {
 			if (res.result) {
 				let ret = ""
 				for (let r of res.result) {
@@ -643,7 +652,7 @@ class LuaDebugSession extends DebugSession {
 					let refobj = res.result[0];
 					const typename = typeof refobj;
 					if (refobj && typename == "object") {
-						varRef = this._variableHandles.create(new VariableReference("eval", { "stack_no": args.frameId }, [args.expression]));
+						varRef = this._variableHandles.create(new VariableReference("eval", { "stack_no": args.frameId }, [expression_name]));
 					}
 				}
 				response.body = {

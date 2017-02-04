@@ -65,7 +65,6 @@ inline json::value to_json(lua_State* L, int index, int max_recursive = 1) {
     case LUA_TTABLE: {
       if (max_recursive <= 0) {
         char buffer[128] = {};
-        lua_pushvalue(L, index);  // backup
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4996)
@@ -74,9 +73,15 @@ inline json::value to_json(lua_State* L, int index, int max_recursive = 1) {
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-        lua_pop(L, 1);  // pop value
         json::object obj;
-        obj[lua_typename(L, type)] = json::value(buffer);
+
+        int tt = luaL_getmetafield(L, index, "__name");
+        const char* type =
+            (tt == LUA_TSTRING) ? lua_tostring(L, -1) : luaL_typename(L, index);
+        obj[type] = json::value(buffer);
+        if (tt != LUA_TNIL) {
+          lua_pop(L, 1); /* remove '__name' */
+        }
         return json::value(obj);
       }
       int array_size = lua_rawlen(L, index);
@@ -734,9 +739,9 @@ class debugger {
   /// @brief get global table
   /// @param object_depth depth of extract for return value
   /// @return global table value
-  json::value get_global_table(int object_depth = 0) {
+  json::value get_global_table(int object_depth = 1) {
     lua_pushglobaltable(state_);
-    json::value v = utility::to_json(state_, -1, 1 + object_depth);
+    json::value v = utility::to_json(state_, -1, object_depth);
     lua_pop(state_, 1);  // pop global table
     return v;
   }
