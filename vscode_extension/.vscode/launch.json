@@ -54,7 +54,7 @@
 	"compounds": [
 		{
 			"name": "Extension + Server",
-			"configurations": [ "Extension", "Server" ]
+			"configurations": [ "Launch Extension", "Server" ]
 		},
 		{
 			"name": "Debug adapter tests + Server",

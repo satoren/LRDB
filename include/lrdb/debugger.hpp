@@ -65,7 +65,6 @@ inline json::value to_json(lua_State* L, int index, int max_recursive = 1) {
     case LUA_TTABLE: {
       if (max_recursive <= 0) {
         char buffer[128] = {};
-        lua_pushvalue(L, index);  // backup
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4996)
@@ -74,9 +73,15 @@ inline json::value to_json(lua_State* L, int index, int max_recursive = 1) {
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-        lua_pop(L, 1);  // pop value
         json::object obj;
-        obj[lua_typename(L, type)] = json::value(buffer);
+
+        int tt = luaL_getmetafield(L, index, "__name");
+        const char* type =
+            (tt == LUA_TSTRING) ? lua_tostring(L, -1) : luaL_typename(L, index);
+        obj[type] = json::value(buffer);
+        if (tt != LUA_TNIL) {
+          lua_pop(L, 1); /* remove '__name' */
+        }
         return json::value(obj);
       }
       int array_size = lua_rawlen(L, index);
@@ -106,46 +111,35 @@ inline json::value to_json(lua_State* L, int index, int max_recursive = 1) {
       }
     }
     case LUA_TUSERDATA: {
-      const char* str = lua_tostring(L, index);
-      if (str) {
-        return json::value(str);
+      if (luaL_callmeta(L, index, "__tostring")) {
+        json::value v = to_json(L, -1, max_recursive);  // return value to json
+        lua_pop(L, 1);  // pop return value and metatable
+        return v;
       }
-      if (lua_getmetatable(L, index)) {
-        // in Lua code
-        // local meta = getmetatable(udata);
-        // if(meta.__totable)
-        //   local t = meta.__totable(udata)
-        //   if(t) return json.stringify(t) end
-        // end
-        //
-        lua_getfield(L, -1, "__totable");
-        int type = lua_type(L, -1);
-        if (type == LUA_TFUNCTION) {
-          lua_pushvalue(L, index);
-          if (lua_pcall(L, 1, 1, 0) == 0)  // invoke __totable with userdata
-          {
-            json::value v =
-                to_json(L, -1, max_recursive);  // return value to json
-            lua_pop(L, 1);  // pop return value and metatable
-            return v;
-          }
-          lua_pop(L, 1);  // pop error message
-        }
-        lua_pop(L, 2);  // pop metatable and getfield data
+      if (luaL_callmeta(L, index, "__totable")) {
+        json::value v = to_json(L, -1, max_recursive);  // return value to json
+        lua_pop(L, 1);  // pop return value and metatable
+        return v;
       }
     }
     case LUA_TLIGHTUSERDATA:
     case LUA_TTHREAD:
     case LUA_TFUNCTION: {
+      int tt = luaL_getmetafield(L, index, "__name");
+      const char* type =
+          (tt == LUA_TSTRING) ? lua_tostring(L, -1) : luaL_typename(L, index);
       char buffer[128] = {};
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4996)
 #endif
-      sprintf(buffer, "%s: %p", lua_typename(L, type), lua_topointer(L, index));
+      sprintf(buffer, "%s: %p", type, lua_topointer(L, index));
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
+      if (tt != LUA_TNIL) {
+        lua_pop(L, 1); /* remove '__name' */
+      }
       return json::value(buffer);
     }
   }
@@ -745,9 +739,9 @@ class debugger {
   /// @brief get global table
   /// @param object_depth depth of extract for return value
   /// @return global table value
-  json::value get_global_table(int object_depth = 0) {
+  json::value get_global_table(int object_depth = 1) {
     lua_pushglobaltable(state_);
-    json::value v = utility::to_json(state_, -1, 1 + object_depth);
+    json::value v = utility::to_json(state_, -1, object_depth);
     lua_pop(state_, 1);  // pop global table
     return v;
   }
