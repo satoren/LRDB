@@ -8,17 +8,17 @@ This extension is debug Lua programs with Visual Studio Code.
 
 ## Features
 
-Debug your Lua program.
 
-* Breakpoints
-* Step over, step in, step out
-* Display Local,Upvalue,Global values
-* Watches,Eval on Debug Console
-* Debug with embedded Lua interpreter(Lua 5.3.3)
-* Remote debugging over TCP network
+* Add/remove break points
+* Conditional break points
+* Continue,Pause,Step over, Step in, Step out
+* Local,Global,_ENV,Upvalue variables and arguments
+* Watch window
+* Evaluate Expressions
+* Debug with embedded Lua interpreter(Lua 5.3.3 on Javascript by Emscripten)
+* Debug with Your host program([require embed debug server](https://github.com/satoren/LRDB))
+* Remote debugging over TCP
 
-
-If you want embedded debug server to your host program, Please see [this page](https://github.com/satoren/LRDB)
 
 ## Extension Settings
 
@@ -41,6 +41,8 @@ launch.json example:
 
 ## Release Notes
 
+### 0.2.0
+- Change LuaVM native code to javascript by Emscripten
 ### 0.1.9
 - Bug fixes.
 - Added support sourceRequest. It mean can step execute on string chunk.

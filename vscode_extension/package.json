@@ -2,7 +2,7 @@
 	"name": "lrdb",
 	"displayName": "LRDB",
 	"description": "Lua Remote DeBugger",
-	"version": "0.1.9",
+	"version": "0.2.0",
 	"publisher": "satoren",
 	"engines": {
 		"vscode": "^1.8.0"
@@ -43,14 +43,15 @@
 				},
 				"configurationSnippets": [
 					{
-						"label": "Lua Debug: Launch",
+						"label": "Launch Program: Launch",
 						"description": "A new configuration for launching a lua program",
 						"body": {
 							"type": "lua",
 							"request": "launch",
-							"name": "${2:Launch Program}",
-							"program": "Lua program file or Lua host executable.",
-							"args": []
+							"name": "Lua Launch",
+							"program": "Lua program file or Lua host executable. default:${file}",
+							"args": [],
+							"cwd": "${workspaceRoot}"
 						}
 					},
 					{
@@ -60,7 +61,8 @@
 							"type": "lua",
 							"request": "attach",
 							"host": "localhost",
-							"port": 21110
+							"port": 21110,
+							"sourceRoot": "${workspaceRoot}"
 						}
 					}
 				],
@@ -72,7 +74,7 @@
 						"properties": {
 							"program": {
 								"type": "string",
-								"description": "Lua program file or executable and LRDB embedded  Lua host.",
+								"description": "Lua program file or Lua host program with embedded LRDB.",
 								"default": "${file}"
 							},
 							"cwd": {
@@ -85,9 +87,12 @@
 								"description": "Command line arguments.",
 								"default": []
 							},
-							"useEmbeddedLua": {
-								"type":  ["boolean", "null"],
-								"description": "If true use embedded(in this Extension) Lua interpreter.",
+							"useInternalLua": {
+								"type": [
+									"boolean",
+									"null"
+								],
+								"description": "If true use internal(in this Extension) Lua interpreter, false direct execute `program`",
 								"default": null
 							},
 							"sourceRoot": {
