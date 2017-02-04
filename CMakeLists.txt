@@ -5,10 +5,15 @@ project(LRDB)
 include(cmake/ReduceDependencies.cmake)
 
 
-
 if(EMSCRIPTEN)
-  set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS}  --memory-init-file 0 -s TOTAL_MEMORY=8777216 -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --memory-init-file 0 -s TOTAL_MEMORY=8777216 -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1 -s EXPORTED_FUNCTIONS=\"['_main', '_lrdb_server_socket_on_connect', '_lrdb_server_socket_on_close', '_lrdb_server_socket_on_error', '_lrdb_server_socket_on_data']\"")
+  set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS}  --memory-init-file 0 -s TOTAL_MEMORY=8777216")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --memory-init-file 0 -s TOTAL_MEMORY=8777216 -s EXPORTED_FUNCTIONS=\"['_main', '_lrdb_server_socket_on_connect', '_lrdb_server_socket_on_close', '_lrdb_server_socket_on_error', '_lrdb_server_socket_on_data']\"")
+ 
+  set(EMTERPRETER_OPT " -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1 -s NO_EXIT_RUNTIME=1 -s EMTERPRETIFY_BLACKLIST=\"['_lua_getinfo','_lua_rawgetp','_lua_touserdata','_lua_settop','_lua_getstack','_lua_next']\"")
+  set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} ${EMTERPRETER_OPT}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EMTERPRETER_OPT}")
+
+  add_definitions(-DLRDB_USE_NODE_CHILD_PROCESS)
 endif(EMSCRIPTEN)
 
 if(LUA)
@@ -72,23 +77,10 @@ if(MINGW)
 target_link_libraries(lua_with_lrdb_server -lws2_32 -lwsock32)
 endif(MINGW)
 
-if(WIN32)
-install(TARGETS lua_with_lrdb_server
-        RUNTIME DESTINATION vscode_extension/out/bin/windows)
-elseif(APPLE)
-install(TARGETS lua_with_lrdb_server
-        RUNTIME DESTINATION vscode_extension/out/bin/macos) 
-elseif(EMSCRIPTEN)
+if(EMSCRIPTEN)
 install(TARGETS lua_with_lrdb_server
         RUNTIME DESTINATION vscode_extension/out/bin/node)
-elseif(UNIX)
-target_link_libraries(lua_with_lrdb_server -lpthread)
-
-install(TARGETS lua_with_lrdb_server
-        RUNTIME DESTINATION vscode_extension/out/bin/linux)
-else(WIN32)
-message(FATAL_ERROR "Unsupported operation system")
-endif(WIN32)
+endif(EMSCRIPTEN)
 
 if(NOT BUILD_NO_TESTS)
 enable_testing()

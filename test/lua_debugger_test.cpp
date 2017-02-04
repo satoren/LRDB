@@ -20,6 +20,7 @@ class DebuggerTest : public ::testing::Test {
     L = luaL_newstate();
     luaL_openlibs(L);
     debugger.reset(L);
+	debugger.unpause();
   }
 
   virtual void TearDown() {
@@ -46,6 +47,7 @@ TEST_F(DebuggerTest, BreakPointTest1) {
 
   bool breaked = false;
   debugger.set_pause_handler([&](lrdb::debugger& debugger) {
+    ASSERT_STREQ("breakpoint", debugger.pause_reason());
     auto* breakpoint = debugger.current_breakpoint();
     ASSERT_TRUE(breakpoint);
     ASSERT_EQ(TEST_LUA_SCRIPT, breakpoint->file);

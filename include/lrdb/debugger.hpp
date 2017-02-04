@@ -31,6 +31,10 @@ inline size_t lua_rawlen(lua_State* L, int index) {
 inline void lua_pushglobaltable(lua_State* L) {
   lua_pushvalue(L, LUA_GLOBALSINDEX);
 }
+inline void lua_rawgetp(lua_State* L, int index, void* p) {
+  lua_pushlightuserdata(L, p);
+  lua_rawget(L, LUA_REGISTRYINDEX);
+}
 #endif
 namespace utility {
 
@@ -205,11 +209,13 @@ class debug_info {
     got_debug_ = other.got_debug_;
     return *this;
   }
-  void assign(lua_State* L, lua_Debug* debug, const char* got_type = "") {
+  void assign(lua_State* L, lua_Debug* debug, const char* got_type = 0) {
     state_ = L;
     debug_ = debug;
     got_debug_.clear();
-    got_debug_.append(got_type);
+    if (got_type) {
+      got_debug_.append(got_type);
+    }
   }
   bool is_available_info(const char* type) const {
     return got_debug_.find(type) != std::string::npos;
@@ -584,8 +590,8 @@ class debugger {
   typedef std::function<void(debugger& debugger)> pause_handler_type;
   typedef std::function<void(debugger& debugger)> tick_handler_type;
 
-  debugger() : state_(0), pause_(false), step_type_(STEP_NONE) {}
-  debugger(lua_State* L) : state_(0), pause_(false), step_type_(STEP_NONE) {
+  debugger() : state_(0), pause_(true), step_type_(STEP_ENTRY) {}
+  debugger(lua_State* L) : state_(0), pause_(true), step_type_(STEP_ENTRY) {
     reset(L);
   }
   ~debugger() { reset(); }
@@ -693,7 +699,10 @@ class debugger {
       return "step_out";
     } else if (step_type_ == STEP_PAUSE) {
       return "pause";
+    } else if (step_type_ == STEP_ENTRY) {
+      return "entry";
     }
+
     return "exception";
   }
 
@@ -764,6 +773,9 @@ class debugger {
   debugger& operator=(const debugger&);  //=delete;
 
   breakpoint_info* search_breakpoints(debug_info& debuginfo) {
+    if (line_breakpoints_.empty()) {
+      return 0;
+    }
     int currentline = debuginfo.currentline();
     for (line_breakpoint_type::iterator it = line_breakpoints_.begin();
          it != line_breakpoints_.end(); ++it) {
@@ -846,7 +858,6 @@ class debugger {
         break;
       case STEP_IN:
         pause_ = true;
-
         break;
       case STEP_OUT:
         if (step_callstack_size_ > callstack.size()) {
@@ -856,6 +867,7 @@ class debugger {
       case STEP_PAUSE:
         pause_ = true;
         break;
+      case STEP_ENTRY:
       case STEP_NONE:
         break;
     }
@@ -863,7 +875,6 @@ class debugger {
   void hook(lua_State* L, lua_Debug* ar) {
     current_debug_info_.assign(L, ar);
     current_breakpoint_ = 0;
-    pause_ = false;
     tick();
 
     if (!pause_ && ar->event == LUA_HOOKLINE) {
@@ -880,6 +891,9 @@ class debugger {
     if (pause_ && pause_handler_) {
       step_callstack_size_ = 0;
       pause_handler_(*this);
+      if (step_type_ == STEP_NONE) {
+        pause_ = false;
+      }
     }
   }
   static void* this_data_key() {
@@ -887,8 +901,7 @@ class debugger {
     return &key_data;
   }
   static void hook_function(lua_State* L, lua_Debug* ar) {
-    lua_pushlightuserdata(L, this_data_key());
-    lua_rawget(L, LUA_REGISTRYINDEX);
+    lua_rawgetp(L, LUA_REGISTRYINDEX, this_data_key());
 
     debugger* self = static_cast<debugger*>(lua_touserdata(L, -1));
     lua_pop(L, 1);
@@ -901,6 +914,7 @@ class debugger {
     STEP_IN,
     STEP_OUT,
     STEP_PAUSE,
+    STEP_ENTRY,
   };
 
   lua_State* state_;
