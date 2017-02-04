@@ -210,6 +210,9 @@ class debug_info {
     if (got_type) {
       got_debug_.append(got_type);
     }
+    if (debug->event == LUA_HOOKLINE) {
+      got_debug_.append("l");
+    }
   }
   bool is_available_info(const char* type) const {
     return got_debug_.find(type) != std::string::npos;
