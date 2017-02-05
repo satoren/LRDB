@@ -13,6 +13,17 @@ import * as vscode from 'vscode';
 import { DebugClient } from 'vscode-debugadapter-testsupport';
 import { DebugProtocol } from 'vscode-debugprotocol';
 
+function sequenceTasks(tasks) {
+	function recordValue(results, value) {
+		results.push(value);
+		return results;
+	}
+	var pushValue = recordValue.bind(null, []);
+	return tasks.reduce(function (promise, task) {
+		return promise.then(task).then(pushValue);
+	}, Promise.resolve());
+}
+
 // Defines a Mocha test suite to group tests of similar kind together
 suite("Lua Debug Adapter", () => {
 	const DEBUG_ADAPTER = './out/src/lrdbDebug.js';
@@ -86,21 +97,69 @@ suite("Lua Debug Adapter", () => {
 				dc.launch({ program: PROGRAM, stopOnEntry: true }),
 				dc.configurationSequence(),
 				dc.waitForEvent('stopped'),
-				dc.assertStoppedLocation('entry', { line: ENTRY_LINE } )
+				dc.assertStoppedLocation('entry', { line: ENTRY_LINE })
 			]);
 		});
 	});
-	
+
 	suite('breakpoint', () => {
 		test('should stop on breakpoint', () => {
 			const PROGRAM = path.join(DATA_ROOT, 'loop_test.lua');
 			const BREAK_LINE = 5;
 			return Promise.all([
-				dc.hitBreakpoint({ program: PROGRAM},{path:PROGRAM,line:BREAK_LINE}),
+				dc.hitBreakpoint({ program: PROGRAM }, { path: PROGRAM, line: BREAK_LINE }),
 				dc.configurationSequence(),
 				dc.waitForEvent('stopped'),
-				dc.assertStoppedLocation('breakpoint', { line: BREAK_LINE } ),
+				dc.assertStoppedLocation('breakpoint', { line: BREAK_LINE }),
 			]);
+		});
+	});
+	suite('evaluate', () => {
+		test('launch', () => {
+			const PROGRAM = path.join(DATA_ROOT, 'loop_test.lua');
+			const BREAK_LINE = 5;
+
+			return Promise.all([
+				dc.launch({ program: PROGRAM, stopOnEntry: true }),
+				dc.configurationSequence(),
+				dc.waitForEvent('stopped'),
+			]);
+			//			return sequenceTasks([
+			//				function (){ return dc.launch({ program: PROGRAM, stopOnEntry: true })},
+			//				function (){ return dc.configurationSequence()},
+			//			]);
+		});
+
+		test('check evaluate results', done => {
+			const PROGRAM = path.join(DATA_ROOT, 'loop_test.lua');
+
+			return Promise.all([
+				dc.launch({ program: PROGRAM, stopOnEntry: true }),
+				dc.configurationSequence(),
+				dc.waitForEvent('stopped'),
+			]).then(() => {
+				sequenceTasks([
+					function () {
+						return dc.evaluateRequest({ expression: "1", context: "watch", frameId: 0 }).then(response => {
+							assert.equal(response.body.result, "1");
+						});
+					},
+					function () {
+						return dc.evaluateRequest({ expression: "{{1}}", context: "watch", frameId: 0 }).then(response => {
+							return response.body.variablesReference
+						}).then(res => {
+							dc.variablesRequest({ variablesReference: res }).then(response => {
+								return response.body.variables[0].variablesReference
+							}).then(res => {
+								dc.variablesRequest({ variablesReference: res }).then(response => {
+									assert.equal(response.body.variables[0].value , "1");
+									done();
+								});
+							});
+						});
+					},
+				]);
+			});
 		});
 	});
 });

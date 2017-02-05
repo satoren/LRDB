@@ -48,7 +48,8 @@
 			],
 			"sourceMaps": true,
 			"outFiles": [ "${workspaceRoot}/out/test/**/*.js" ],
-			"internalConsoleOptions": "openOnSessionStart"
+			"internalConsoleOptions": "openOnSessionStart",
+            "preLaunchTask": "npm"
 		}
     ],
 	"compounds": [
