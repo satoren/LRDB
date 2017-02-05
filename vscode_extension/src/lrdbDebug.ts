@@ -508,7 +508,7 @@ class LuaDebugSession extends DebugSession {
 			return datapath[0];
 		}
 		else {
-			return datapath[0] + '["' + datapath.slice(1).join('"]["') + '"]';
+			return '(' + datapath[0] + ')[' + datapath.slice(1).join('][') + ']';
 		}
 	}
 
@@ -549,19 +549,41 @@ class LuaDebugSession extends DebugSession {
 	private variablesRequestResponce(response: DebugProtocol.VariablesResponse, variablesData: any, id: VariableReference): void {
 
 		const variables = [];
-		for (var k in variablesData) {
-			const typename = typeof variablesData[k];
-			let varRef = 0;
-			if (typename == "object") {
-				varRef = this._variableHandles.create(new VariableReference("eval", id.msg_param, id.datapath.concat([k])));
+		if (variablesData instanceof Array) {
+			for (let i = 0; i < variablesData.length; ++i) {
+				const typename = typeof variablesData[i];
+				let k = (i + 1).toString()
+				let varRef = 0;
+				if (typename == "object") {
+					varRef = this._variableHandles.create(new VariableReference("eval", id.msg_param, id.datapath.concat([k])));
+				}
+				variables.push({
+					name: k,
+					type: typename,
+					value: this.stringify(variablesData[i]),
+					variablesReference: varRef
+				});
 			}
-			variables.push({
-				name: k,
-				type: typename,
-				value: this.stringify(variablesData[k]),
-				variablesReference: varRef
-			});
 
+		}
+		else {
+			for (var k in variablesData) {
+				const typename = typeof variablesData[k];
+				let varRef = 0;
+				if (typename == "object") {
+					let datakey = k;
+					if (id.datapath.length) {
+						datakey = '"' + k + '"'
+					}
+					varRef = this._variableHandles.create(new VariableReference("eval", id.msg_param, id.datapath.concat([datakey])));
+				}
+				variables.push({
+					name: k,
+					type: typename,
+					value: this.stringify(variablesData[k]),
+					variablesReference: varRef
+				});
+			}
 		}
 		response.body = {
 			variables: variables
@@ -628,8 +650,7 @@ class LuaDebugSession extends DebugSession {
 		let chunk = "";
 		if (args.context == "repl") {
 			chunk = args.expression
-			if(expression_name.startsWith("return"))
-			{
+			if (expression_name.startsWith("return")) {
 				expression_name = expression_name.substr("return".length)
 			}
 		}
@@ -639,7 +660,7 @@ class LuaDebugSession extends DebugSession {
 				chunk = "return " + args.expression
 			}
 		}
-		this._debug_client.send("eval", { "stack_no": args.frameId, "chunk": chunk,"depth":0 }, (res: any) => {
+		this._debug_client.send("eval", { "stack_no": args.frameId, "chunk": chunk, "depth": 0 }, (res: any) => {
 			if (res.result) {
 				let ret = ""
 				for (let r of res.result) {

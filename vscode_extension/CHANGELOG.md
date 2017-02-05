@@ -2,6 +2,9 @@
 
 
 ## [Unreleased]
+### Fixed
+- Did not stop breakpoints on remote debugging with different system. (windows and **nix)
+- Array is 1 origin in Lua...
 
 ## [0.2.0] - 2017-02-04
 ### Changed
