@@ -84,6 +84,9 @@ endif(EMSCRIPTEN)
 if(NOT BUILD_NO_TESTS)
 enable_testing()
 
+find_program( MEMORYCHECK_COMMAND valgrind )
+set( MEMORYCHECK_COMMAND_OPTIONS "--trace-children=yes --leak-check=full" )
+
 if(COVERAGE)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -Wall -Woverloaded-virtual -Wwrite-strings -fprofile-arcs -ftest-coverage -coverage -fno-inline -fno-inline-small-functions -fno-default-inline")
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0 -Wall -fprofile-arcs -ftest-coverage -coverage -fno-inline -fno-inline-small-functions -fno-default-inline")

@@ -68,7 +68,7 @@ def build_and_exec_test(compiler, lua_version, build_type, dir_opt):
         return
     ret = os.system('make -j 2')
     if ret != 0: raise Exception("build error at" + buildpath)
-    ret = os.system('ctest --output-on-failure')
+    ret = os.system('ctest --output-on-failure -D ExperimentalSubmit')
     if ret != 0: raise Exception("test error at" + buildpath)
     os.chdir("../../")
 
@@ -96,7 +96,7 @@ def build_msvc_and_exec_test(msvcver, lua_version, build_type):
         return
     ret = os.system('cmake --build . --config ' + build_type)
     if ret != 0: raise Exception("build error at" + buildpath)
-    ret = os.system('ctest --output-on-failure -C ' + build_type)
+    ret = os.system('ctest --output-on-failure -D ExperimentalSubmit -C ' + build_type)
     if ret != 0: raise Exception("test error at" + buildpath)
     os.chdir("../../")
 
