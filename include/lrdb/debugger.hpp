@@ -560,6 +560,7 @@ class debug_info {
 class stack_info : private debug_info {
  public:
   stack_info(lua_State* L, int level) {
+    memset(&debug_var_, 0, sizeof(debug_var_));
     valid_ = lua_getstack(L, level, &debug_var_) != 0;
     if (valid_) {
       assign(L, &debug_var_);
