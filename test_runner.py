@@ -68,9 +68,15 @@ def build_and_exec_test(compiler, lua_version, build_type, dir_opt):
         os.chdir("../../")
         return
     ret = os.system('make -j 2')
-    if ret != 0: raise Exception("build error at" + buildpath)
-    ret = os.system('ctest --output-on-failure -D ExperimentalSubmit')
-    if ret != 0: raise Exception("test error at" + buildpath)
+    if ret != 0:
+        raise Exception("build error at" + buildpath)
+
+    testcommand = 'ctest --output-on-failure'
+    if platform.system() == 'Linux':
+        testcommand += ' -T memcheck'
+    ret = os.system(testcommand)
+    if ret != 0:
+        raise Exception("test error at" + buildpath)
     os.chdir("../../")
 
 
