@@ -48,11 +48,14 @@ launch.json example:
 
 ### 0.2.1
 - Bug fixes.
+
 ### 0.2.0
 - Change LuaVM native code to javascript by Emscripten
+
 ### 0.1.9
 - Bug fixes.
 - Added support sourceRequest. It mean can step execute on string chunk.
+
 ### 0.1.8
 - Bug fixes.
 - Update Lua 5.3.3 to 5.3.4
