@@ -445,6 +445,7 @@ class debug_info {
     while (const char* varname = lua_getupvalue(state_, -1, upvno++)) {
       localvars.push_back(std::pair<std::string, json::value>(
           varname, utility::to_json(state_, -1, object_depth)));
+	  lua_pop(state_, 1);
     }
     lua_pop(state_, 1);  // pop current running function
     return localvars;
