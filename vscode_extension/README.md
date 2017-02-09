@@ -42,6 +42,10 @@ launch.json example:
 
 ## Release Notes
 
+### 0.2.2
+- LRDB Server bug fix.
+- Improve evaluate on debug console
+
 ### 0.2.1
 - Bug fixes.
 ### 0.2.0
