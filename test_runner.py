@@ -3,6 +3,7 @@ import shlex, subprocess
 import os
 import tarfile
 import sys
+import platform
 
 if sys.version_info[0] < 3:
     import urllib
@@ -15,16 +16,16 @@ boost_dir = os.environ.get("BOOST_PATH")
 if not boost_dir:
     boost_dir = 'D:\\boost_1_60_0'
 
-lua_versions = ["lua-5.3.3", "lua-5.2.4", "lua-5.1.5", "luajit"]
-maijor_test_lua_versions = ["lua-5.3.3"]
+LUA_VERSIONS = ["lua-5.3.3", "lua-5.2.4", "lua-5.1.5", "luajit"]
+MAIJOR_TEST_LUA_VERSIONS = ["lua-5.3.3"]
 
-test_msvc_vers = [("msvc2015", "Visual Studio 14 2015", "", True),
+TEST_MSVC_VERS = [("msvc2015", "Visual Studio 14 2015", "", True),
                   ("msvc2015win64", "Visual Studio 14 2015 Win64", "", True),
                   ("msvc2013", "Visual Studio 12 2013", "", False),
                   ("msvc2013win64", "Visual Studio 12 2013 Win64", "", False),
                   ("msvc2015", "Visual Studio 14 2015", "", True)]
 
-test_compilers = [
+TEST_COMPILERS = [
     ('gcc-4.7', 'g++-4.7', '-DCMAKE_CXX_FLAGS=-std=c++11', False),
     ('gcc-4.8', 'g++-4.8', '-DCMAKE_CXX_FLAGS=-std=c++11', False),
     ('gcc-4.9', 'g++-4.9', '-DCMAKE_CXX_FLAGS=-std=c++11', False),
@@ -62,7 +63,7 @@ def build_and_exec_test(compiler, lua_version, build_type, dir_opt):
                     "_build/" + lua_version + ' -DCMAKE_BUILD_TYPE=' +
                     build_type)
     if ret != 0:  #pass through cmake failed. e.g. not found lua
-        if lua_version in maijor_test_lua_versions:
+        if lua_version in MAIJOR_TEST_LUA_VERSIONS:
             raise Exception("cmake error at" + buildpath)
         os.chdir("../../")
         return
@@ -74,8 +75,8 @@ def build_and_exec_test(compiler, lua_version, build_type, dir_opt):
 
 
 def build_with_target_compiler(lua_version):
-    for i, compiler in enumerate(test_compilers):
-        if not compiler[3] and lua_version not in maijor_test_lua_versions:
+    for i, compiler in enumerate(TEST_COMPILERS):
+        if not compiler[3] and lua_version not in MAIJOR_TEST_LUA_VERSIONS:
             continue
         build_and_exec_test(compiler, lua_version, "Debug", str(i))
         if compiler[3]:
@@ -90,37 +91,39 @@ def build_msvc_and_exec_test(msvcver, lua_version, build_type):
     ret = os.system('cmake ../../ -DLOCAL_LUA_DIRECTORY=' + "_build/" +
                     lua_version + ' -G "' + msvcver[1] + '" ' + msvcver[2])
     if ret != 0:  #pass through cmake failed. e.g. not found lua
-        if lua_version in maijor_test_lua_versions:
+        if lua_version in MAIJOR_TEST_LUA_VERSIONS:
             raise Exception("cmake error at" + buildpath)
         os.chdir("../../")
         return
     ret = os.system('cmake --build . --config ' + build_type)
-    if ret != 0: raise Exception("build error at" + buildpath)
-    ret = os.system('ctest --output-on-failure -D ExperimentalSubmit -C ' + build_type)
-    if ret != 0: raise Exception("test error at" + buildpath)
+    if ret != 0:
+        raise Exception("build error at" + buildpath)
+    ret = os.system('ctest --output-on-failure -C ' + build_type)
+    if ret != 0:
+        raise Exception("test error at" + buildpath)
     os.chdir("../../")
 
 
 def build_with_msvc_ver(lua_version):
-    for msvcver in test_msvc_vers:
-        if not msvcver[3] and lua_version not in maijor_test_lua_versions:
+    for msvcver in TEST_MSVC_VERS:
+        if not msvcver[3] and lua_version not in MAIJOR_TEST_LUA_VERSIONS:
             continue
         build_msvc_and_exec_test(msvcver, lua_version, 'Debug')
         if msvcver[3]:
             build_msvc_and_exec_test(msvcver, lua_version, 'Release')
 
+if __name__ == '__main__':
+    for i, luaversion in enumerate(LUA_VERSIONS):
+        if not os.path.exists("_build/"):
+            os.makedirs("_build/")
+        if not os.path.exists("_build/" + luaversion) and luaversion != 'luajit':
+            if not os.path.exists(luaversion + ".tar.gz"):
+                lua_url = "https://www.lua.org/ftp/" + luaversion + ".tar.gz"
+                urlretrieve(lua_url, "_build/" + luaversion + ".tar.gz")
+            tf = tarfile.open("_build/" + luaversion + ".tar.gz", 'r')
+            tf.extractall("_build/")
 
-for i, luaversion in enumerate(lua_versions):
-    if not os.path.exists("_build/"):
-        os.makedirs("_build/")
-    if not os.path.exists("_build/" + luaversion) and luaversion != 'luajit':
-        if not os.path.exists(luaversion + ".tar.gz"):
-            lua_url = "https://www.lua.org/ftp/" + luaversion + ".tar.gz"
-            urlretrieve(lua_url, "_build/" + luaversion + ".tar.gz")
-        tf = tarfile.open("_build/" + luaversion + ".tar.gz", 'r')
-        tf.extractall("_build/")
-
-    if os.name == 'nt':
-        build_with_msvc_ver(luaversion, )
-    else:
-        build_with_target_compiler(luaversion)
+        if os.name == 'nt':
+            build_with_msvc_ver(luaversion, )
+        else:
+            build_with_target_compiler(luaversion)
