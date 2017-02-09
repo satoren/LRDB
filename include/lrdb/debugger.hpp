@@ -340,8 +340,29 @@ class debug_info {
   std::vector<json::value> eval(const char* script, bool global = true,
                                 bool upvalue = true, bool local = true,
                                 int object_depth = 1) {
+    std::string error;
+    std::vector<json::value> ret =
+        eval(script, error, global, upvalue, local, object_depth);
+    if (!error.empty()) {
+      ret.push_back(json::value(error));
+    }
+    return ret;
+  }
+
+  std::vector<json::value> eval(const char* script, std::string& error,
+                                bool global = true, bool upvalue = true,
+                                bool local = true, int object_depth = 1) {
     int stack_start = lua_gettop(state_);
-    luaL_loadstring(state_, script);
+    int loadstat =
+        luaL_loadstring(state_, (std::string("return ") + script).c_str());
+    if (loadstat != 0) {
+      lua_pop(state_, 1);
+      loadstat = luaL_loadstring(state_, script);
+    }
+    if (!lua_isfunction(state_, -1)) {
+      error = lua_tostring(state_, -1);
+      return std::vector<json::value>();
+    }
 
     create_eval_env(global, upvalue, local);
 #if LUA_VERSION_NUM >= 502
@@ -349,7 +370,11 @@ class debug_info {
 #else
     lua_setfenv(state_, -2);
 #endif
-    lua_pcall(state_, 0, LUA_MULTRET, 0);
+    int call_stat = lua_pcall(state_, 0, LUA_MULTRET, 0);
+    if (call_stat != 0) {
+      error = lua_tostring(state_, -1);
+      return std::vector<json::value>();
+    }
     std::vector<json::value> ret;
     int ret_end = lua_gettop(state_);
     for (int retindex = stack_start + 1; retindex <= ret_end; ++retindex) {

@@ -199,8 +199,14 @@ inline json::value exec_eval(debugger& debugger, const json::value& param,
         param.get<json::object>().at("stack_no").get<double>());
     auto callstack = debugger.get_call_stack();
     if (int(callstack.size()) > stack_no) {
-      return json::value(callstack[stack_no].eval(
-          chunk.c_str(), use_global, use_upvalue, use_local, depth + 1));
+      std::string error;
+      json::value ret = json::value(callstack[stack_no].eval(
+          chunk.c_str(), error, use_global, use_upvalue, use_local, depth + 1));
+      if (!error.empty()) {
+        error = true;
+        ret = json::value(error);
+      }
+      return ret;
     }
   }
   error = true;
