@@ -23,12 +23,15 @@ Command line interface debugger is not implemented.
 * Watches,Eval on Debug Console
 * Remote debugging over TCP network
 
-## Embedded to your host program
 
-### Requirements
+## Requirements
   * Lua 5.1 to 5.3 (recommended: 5.3)
   * C++11 compiler
-  
+
+## Embedded to your host program
+
+LRDB is header only library
+
 ### include path
   - LRDB/include
   - LRDB/third_party/asio/asio/include or boost.asio with -DLRDB_USE_BOOST_ASIO
@@ -53,7 +56,14 @@ Command line interface debugger is not implemented.
 ```
 
 ## Lua module
-### Build module
+If you using standalone Lua. you can use lua c mocule.
+
+### Build and Install with [LuaRocks](https://luarocks.org/)
+```
+luarocks install lrdb
+```
+
+### Build module your self
 ```
 mkdir build
 cd build
@@ -62,10 +72,6 @@ cmake --build --target lrdb_server
 ```
 Generated lrdb_server.so or lrdb_server.dll
 
-### Build and Install with [LuaRocks](https://luarocks.org/)
-```
-luarocks install lrdb
-```
 
 ### Use module
 ```lua
