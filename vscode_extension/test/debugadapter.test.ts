@@ -13,15 +13,27 @@ import * as vscode from 'vscode';
 import { DebugClient } from 'vscode-debugadapter-testsupport';
 import { DebugProtocol } from 'vscode-debugprotocol';
 
-function sequenceTasks(tasks) {
-	function recordValue(results, value) {
-		results.push(value);
-		return results;
+function sequenceVariablesRequest(dc: DebugClient, varref: number, datapath: string[]) {
+	let req = dc.variablesRequest({ variablesReference: varref })
+	let last = datapath.pop();
+	for (let p of datapath) {
+		req = req.then(response => {
+			for (let va of response.body.variables) {
+				if (va.name == p && va.variablesReference != 0) {
+					return dc.variablesRequest({ variablesReference: va.variablesReference });
+				}
+			}
+			assert.ok(false, "not found:" + p + " in " + JSON.stringify(response.body.variables));
+		});
 	}
-	var pushValue = recordValue.bind(null, []);
-	return tasks.reduce(function (promise, task) {
-		return promise.then(task).then(pushValue);
-	}, Promise.resolve());
+	return req.then(response => {
+		for (let va of response.body.variables) {
+			if (va.name == last) {
+				return va;
+			}
+		}
+		assert.ok(false, "not found:" + last + " in " + JSON.stringify(response.body.variables));
+	})
 }
 
 // Defines a Mocha test suite to group tests of similar kind together
@@ -35,7 +47,6 @@ suite("Lua Debug Adapter", () => {
 
 	setup(() => {
 		dc = new DebugClient('node', DEBUG_ADAPTER, 'lua');
-
 		return dc.start();
 	});
 
@@ -90,7 +101,6 @@ suite("Lua Debug Adapter", () => {
 		});
 
 		test('should stop on entry', () => {
-
 			const PROGRAM = path.join(DATA_ROOT, 'loop_test.lua');
 			const ENTRY_LINE = 1;
 			return Promise.all([
@@ -106,60 +116,131 @@ suite("Lua Debug Adapter", () => {
 		test('should stop on breakpoint', () => {
 			const PROGRAM = path.join(DATA_ROOT, 'loop_test.lua');
 			const BREAK_LINE = 5;
-			return Promise.all([
-				dc.hitBreakpoint({ program: PROGRAM }, { path: PROGRAM, line: BREAK_LINE }),
-				dc.configurationSequence(),
-				dc.waitForEvent('stopped'),
-				dc.assertStoppedLocation('breakpoint', { line: BREAK_LINE }),
-			]);
+			return dc.hitBreakpoint({ program: PROGRAM }, { path: PROGRAM, line: BREAK_LINE });
 		});
 	});
 	suite('evaluate', () => {
-		test('launch', () => {
+		setup(() => {
 			const PROGRAM = path.join(DATA_ROOT, 'loop_test.lua');
-			const BREAK_LINE = 5;
-
 			return Promise.all([
-				dc.launch({ program: PROGRAM, stopOnEntry: true }),
-				dc.configurationSequence(),
-				dc.waitForEvent('stopped'),
-			]);
-			//			return sequenceTasks([
-			//				function (){ return dc.launch({ program: PROGRAM, stopOnEntry: true })},
-			//				function (){ return dc.configurationSequence()},
-			//			]);
-		});
-
-		test('check evaluate results', done => {
-			const PROGRAM = path.join(DATA_ROOT, 'loop_test.lua');
-
-			return Promise.all([
-				dc.launch({ program: PROGRAM, stopOnEntry: true }),
-				dc.configurationSequence(),
-				dc.waitForEvent('stopped'),
-			]).then(() => {
-				sequenceTasks([
-					function () {
-						return dc.evaluateRequest({ expression: "1", context: "watch", frameId: 0 }).then(response => {
-							assert.equal(response.body.result, "1");
-						});
-					},
-					function () {
-						return dc.evaluateRequest({ expression: "{{1}}", context: "watch", frameId: 0 }).then(response => {
-							return response.body.variablesReference
-						}).then(res => {
-							dc.variablesRequest({ variablesReference: res }).then(response => {
-								return response.body.variables[0].variablesReference
-							}).then(res => {
-								dc.variablesRequest({ variablesReference: res }).then(response => {
-									assert.equal(response.body.variables[0].value , "1");
-									done();
-								});
-							});
-						});
-					},
+					dc.launch({ program: PROGRAM, stopOnEntry: true }).then(() => dc.configurationSequence()),
+					dc.waitForEvent('stopped'),
 				]);
+		});
+		test('check evaluate results', () => {
+			let evaltests = []
+			evaltests.push(dc.evaluateRequest({ expression: "{{1}}", context: "watch", frameId: 0 }).then(response => {
+				return sequenceVariablesRequest(dc, response.body.variablesReference, ["1", "1"]).then(va => {
+					assert.equal(va.value, "1");
+				});
+			}));
+			evaltests.push(dc.evaluateRequest({ expression: "{{{5,4}}}", context: "watch", frameId: 0 }).then(response => {
+				return sequenceVariablesRequest(dc, response.body.variablesReference, ["1", "1", "2"]).then(va => {
+					assert.equal(va.value, "4");
+				});
+			}));
+			evaltests.push(dc.evaluateRequest({ expression: "{a={4,2}}", context: "watch", frameId: 0 }).then(response => {
+				return sequenceVariablesRequest(dc, response.body.variablesReference, ["a", "2"]).then(va => {
+					assert.equal(va.value, "2");
+				});
+			}));
+			return Promise.all(evaltests);
+		});
+	});
+
+
+	suite('upvalues', () => {
+		
+		setup(() => {
+			const PROGRAM = path.join(DATA_ROOT, 'get_upvalue_test.lua');
+			const BREAK_LINE = 6;
+			return dc.hitBreakpoint({ program: PROGRAM , stopOnEntry: false }, { path: PROGRAM, line: BREAK_LINE });
+		});
+		function getUpvalueScope(frameID: number) {
+			return dc.scopesRequest({ frameId: frameID }).then(response => {
+				for (let scope of response.body.scopes) {
+					if (scope.name == "Upvalues") {
+						return scope;
+					}
+				}
+				assert.ok(false, "upvalue not found");
 			});
+		}
+		test('check upvalue a', () => {
+			let evaltests = []
+
+			evaltests.push(getUpvalueScope(0).then(scope => {
+				return sequenceVariablesRequest(dc, scope.variablesReference, ["a"]).then(va => {
+					assert.equal(va.value, "1");
+				});
+			}));
+			return Promise.all(evaltests);
+		});
+		test('check upvalue table', () => {
+			let evaltests = []
+
+			//local t={{1,2,3,4},5,6}
+			evaltests.push(getUpvalueScope(0).then(scope => {
+				return sequenceVariablesRequest(dc, scope.variablesReference, ["t", "1", "1"]).then(va => {
+					assert.equal(va.value, "1");
+				});
+			}));
+
+			evaltests.push(getUpvalueScope(0).then(scope => {
+				return sequenceVariablesRequest(dc, scope.variablesReference, ["t", "1", "3"]).then(va => {
+					assert.equal(va.value, "3");
+				});
+			}));
+			evaltests.push(getUpvalueScope(0).then(scope => {
+				return sequenceVariablesRequest(dc, scope.variablesReference, ["t", "2"]).then(va => {
+					assert.equal(va.value, "5");
+				});
+			}));
+
+			return Promise.all(evaltests);
+		});
+	});
+	
+	suite('local', () => {		
+		setup(() => {
+			const PROGRAM = path.join(DATA_ROOT, 'get_local_variable_test.lua');
+			const BREAK_LINE = 7;
+			return dc.hitBreakpoint({ program: PROGRAM , stopOnEntry: false }, { path: PROGRAM, line: BREAK_LINE });
+		});
+		function getUpvalueScope(frameID: number) {
+			return dc.scopesRequest({ frameId: frameID }).then(response => {
+				for (let scope of response.body.scopes) {
+					if (scope.name == "Local") {
+						return scope;
+					}
+				}
+				assert.ok(false, "upvalue not found");
+			});
+		}
+		test('check upvalue a', () => {
+			let evaltests = []
+
+			evaltests.push(getUpvalueScope(0).then(scope => {
+				return sequenceVariablesRequest(dc, scope.variablesReference, ["local_value1"]).then(va => {
+					assert.equal(va.value, "1");
+				});
+			}));
+			evaltests.push(getUpvalueScope(0).then(scope => {
+				return sequenceVariablesRequest(dc, scope.variablesReference, ["local_value2"]).then(va => {
+					assert.equal(va.value, '"abc"');
+				});
+			}));
+			evaltests.push(getUpvalueScope(0).then(scope => {
+				return sequenceVariablesRequest(dc, scope.variablesReference, ["local_value3"]).then(va => {
+					assert.equal(va.value, "1");
+				});
+			}));
+			evaltests.push(getUpvalueScope(0).then(scope => {
+				return sequenceVariablesRequest(dc, scope.variablesReference, ["local_value4"]["1"]).then(va => {
+					assert.equal(va.value, "4234.3");
+				});
+			}));
+			return Promise.all(evaltests);
 		});
 	});
 });
