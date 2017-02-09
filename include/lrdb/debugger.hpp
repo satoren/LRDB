@@ -843,7 +843,7 @@ class debugger {
                        debug_info& debuginfo) {
     if (!breakpoint.condition.empty()) {
       json::array condret =
-          debuginfo.eval(("return " + breakpoint.condition).c_str());
+          debuginfo.eval(breakpoint.condition.c_str());
       return !condret.empty() && condret[0].evaluate_as_boolean();
     }
     return true;
@@ -862,7 +862,7 @@ class debugger {
                            debug_info& debuginfo) {
     if (!breakpoint.hit_condition.empty()) {
       json::array condret =
-          debuginfo.eval(("return " + std::to_string(breakpoint.hit_count) +
+          debuginfo.eval((std::to_string(breakpoint.hit_count) +
                           breakpoint.hit_condition)
                              .c_str());
 
