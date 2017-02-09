@@ -560,6 +560,7 @@ class debug_info {
 class stack_info : private debug_info {
  public:
   stack_info(lua_State* L, int level) {
+    memset(&debug_var_, 0, sizeof(debug_var_));
     valid_ = lua_getstack(L, level, &debug_var_) != 0;
     if (valid_) {
       assign(L, &debug_var_);
@@ -842,7 +843,7 @@ class debugger {
                        debug_info& debuginfo) {
     if (!breakpoint.condition.empty()) {
       json::array condret =
-          debuginfo.eval(("return " + breakpoint.condition).c_str());
+          debuginfo.eval(breakpoint.condition.c_str());
       return !condret.empty() && condret[0].evaluate_as_boolean();
     }
     return true;
@@ -861,7 +862,7 @@ class debugger {
                            debug_info& debuginfo) {
     if (!breakpoint.hit_condition.empty()) {
       json::array condret =
-          debuginfo.eval(("return " + std::to_string(breakpoint.hit_count) +
+          debuginfo.eval((std::to_string(breakpoint.hit_count) +
                           breakpoint.hit_condition)
                              .c_str());
 

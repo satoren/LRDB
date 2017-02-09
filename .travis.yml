@@ -20,13 +20,14 @@ addons:
     - gcc-4.8
     - g++-4.8
     - clang
+    - valgrind
 env:
   - BUILD_TYPE=Debug LUALIB=lua5.2 CXX_FLAGS=-std=c++11 COV=On
   - BUILD_TYPE=Release LUALIB=lua5.2 CXX_FLAGS=-std=c++11
   - BUILD_TYPE=Debug LUALIB=luajit CXX_FLAGS=-std=c++11 COV=On
   - BUILD_TYPE=Release LUALIB=luajit CXX_FLAGS=-std=c++11
 script:
-  - cmake . -DCOVERAGE=${COVERAGE} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DLUA_SEARCH_LIB_NAME=${LUALIB} -DCMAKE_CXX_FLAGS=${CXX_FLAGS} && make && CTEST_OUTPUT_ON_FAILURE=1 make test
+  - cmake . -DCOVERAGE=${COVERAGE} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DLUA_SEARCH_LIB_NAME=${LUALIB} -DCMAKE_CXX_FLAGS=${CXX_FLAGS} && make && ctest --output-on-failure -T memcheck
 
 after_success: |
 

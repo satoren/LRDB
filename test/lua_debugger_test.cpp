@@ -184,7 +184,7 @@ TEST_F(DebuggerTest, EvalTest1) {
 
   debugger.set_pause_handler([&](lrdb::debugger& debugger) {
     std::vector<picojson::value> ret = debugger.current_debug_info().eval(
-        "return arg,value,local_value,local_value3");
+        "arg,value,local_value,local_value3");
 
     ASSERT_EQ(4U, ret.size());
 
@@ -207,19 +207,19 @@ TEST_F(DebuggerTest, EvalTest2) {
 
   debugger.set_pause_handler([&](lrdb::debugger& debugger) {
     std::vector<picojson::value> ret =
-        debugger.current_debug_info().eval("return _G", true, false, false, 1);
+        debugger.current_debug_info().eval("_G", true, false, false, 1);
 
     ASSERT_EQ(1U, ret.size());
     ASSERT_TRUE(ret[0].is<object>());
     ASSERT_LT(0U, ret[0].get<object>().size());
 
     std::vector<picojson::value> ret2 = debugger.current_debug_info().eval(
-        "return _ENV._G", false, true, false, 1);
+        "_ENV._G", false, true, false, 1);
     ASSERT_EQ(ret, ret2);
     ASSERT_TRUE(ret[0].is<object>());
     ASSERT_LT(0U, ret[0].get<object>().size());
 
-    ret = debugger.current_debug_info().eval("return _ENV['envvar']", false,
+    ret = debugger.current_debug_info().eval("_ENV['envvar']", false,
                                              false, true, 1);
     ASSERT_EQ(1U, ret.size());
     ASSERT_TRUE(ret[0].is<double>());
@@ -253,13 +253,13 @@ TEST_F(DebuggerTest, GetLocalTest1) {
     ASSERT_EQ("ab", localvars[0].second.get<std::string>());
 
     std::vector<picojson::value> eret =
-        debugger.current_debug_info().eval("return local_value1");
+        debugger.current_debug_info().eval("local_value1");
 
     ASSERT_EQ(1U, eret.size());
     ASSERT_TRUE(eret[0].is<std::string>());
     ASSERT_EQ("ab", eret[0].get<std::string>());
 
-    eret = debugger.current_debug_info().eval("return _G");
+    eret = debugger.current_debug_info().eval("_G");
     ASSERT_EQ(1U, eret.size());
     ASSERT_TRUE(eret[0].is<picojson::object>());
 
@@ -555,7 +555,7 @@ TEST_F(DebuggerTest, GetEnvDataTest1) {
   const char* TEST_LUA_SCRIPT = "../test/lua/loop_test.lua";
 
   debugger.set_pause_handler([&](lrdb::debugger& debugger) {
-    auto env = debugger.current_debug_info().eval("return envvar");
+    auto env = debugger.current_debug_info().eval("envvar");
     ASSERT_EQ(1, env.size());
     ASSERT_TRUE(env[0].is<double>());
     ASSERT_EQ(2, env[0].get<double>());
