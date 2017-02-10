@@ -207,7 +207,7 @@ suite("Lua Debug Adapter", () => {
 			const BREAK_LINE = 7;
 			return dc.hitBreakpoint({ program: PROGRAM , stopOnEntry: false }, { path: PROGRAM, line: BREAK_LINE });
 		});
-		function getUpvalueScope(frameID: number) {
+		function getLocalScope(frameID: number) {
 			return dc.scopesRequest({ frameId: frameID }).then(response => {
 				for (let scope of response.body.scopes) {
 					if (scope.name == "Local") {
@@ -217,26 +217,26 @@ suite("Lua Debug Adapter", () => {
 				assert.ok(false, "upvalue not found");
 			});
 		}
-		test('check upvalue a', () => {
+		test('check local', () => {
 			let evaltests = []
 
-			evaltests.push(getUpvalueScope(0).then(scope => {
+			evaltests.push(getLocalScope(0).then(scope => {
 				return sequenceVariablesRequest(dc, scope.variablesReference, ["local_value1"]).then(va => {
 					assert.equal(va.value, "1");
 				});
 			}));
-			evaltests.push(getUpvalueScope(0).then(scope => {
+			evaltests.push(getLocalScope(0).then(scope => {
 				return sequenceVariablesRequest(dc, scope.variablesReference, ["local_value2"]).then(va => {
 					assert.equal(va.value, '"abc"');
 				});
 			}));
-			evaltests.push(getUpvalueScope(0).then(scope => {
+			evaltests.push(getLocalScope(0).then(scope => {
 				return sequenceVariablesRequest(dc, scope.variablesReference, ["local_value3"]).then(va => {
 					assert.equal(va.value, "1");
 				});
 			}));
-			evaltests.push(getUpvalueScope(0).then(scope => {
-				return sequenceVariablesRequest(dc, scope.variablesReference, ["local_value4"]["1"]).then(va => {
+			evaltests.push(getLocalScope(0).then(scope => {
+				return sequenceVariablesRequest(dc, scope.variablesReference, ["local_value4","1"]).then(va => {
 					assert.equal(va.value, "4234.3");
 				});
 			}));
