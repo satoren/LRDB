@@ -39,7 +39,9 @@ export interface AttachRequestArguments extends DebugProtocol.AttachRequestArgum
 
 export interface DebugServerEvent {
 	method: string;
-	param: any;
+	params: any;
+	param?: any;//
+	error?: any;
 	id: any;
 }
 
@@ -130,8 +132,8 @@ class LRDBTCPClient {
 
 	public send(method: string, param?: any, callback?: (response: any) => void) {
 		let id = this._request_id++;
-
-		var data = JSON.stringify({ "method": method, "param": param, "id": id }) + "\n";
+		//TODO need remove param
+		var data = JSON.stringify({ "jsonrpc": "2.0", "method": method, "params": param, "param": param, "id": id }) + "\n";
 		var ret = this._connection.write(data);
 
 		if (callback) {
@@ -189,7 +191,7 @@ class LRDBChildProcessClient {
 	public send(method: string, param?: any, callback?: (response: any) => void) {
 		let id = this._request_id++;
 
-		var ret = this._child.send({ "method": method, "param": param, "id": id });
+		var ret = this._child.send({ "jsonrpc": "2.0", "method": method, "params": param, "id": id });
 
 		if (callback) {
 			if (ret) {
@@ -203,6 +205,9 @@ class LRDBChildProcessClient {
 		}
 	}
 	public receive(event: DebugServerEvent) {
+		if (event.params == null) {
+			event.params = event.param;
+		}
 		if (this._callback_map[event.id]) {
 			this._callback_map[event.id](event);
 			delete this._callback_map[event.id];
@@ -519,13 +524,27 @@ class LuaDebugSession extends DebugSession {
 		if (id != null) {
 			if (id.datapath.length == 0) {
 				this._debug_client.send(id.msg_name, Object.assign({}, id.msg_param), (res: any) => {
-					this.variablesRequestResponce(response, res.result, id);
+					if (res.error) {
+						response.success = false;
+						response.message = res.error.message;
+						this.sendResponse(response);
+					}
+					else {
+						this.variablesRequestResponce(response, res.result, id);
+					}
 				});
 			}
 			else {
 				let chunk = this.createVariableObjectPath(id.datapath);
 				this._debug_client.send(id.msg_name, Object.assign({ "chunk": chunk }, id.msg_param), (res: any) => {
-					this.variablesRequestResponce(response, res.result[0], id);
+					if (res.error) {
+						response.success = false;
+						response.message = res.error.message;
+						this.sendResponse(response);
+					}
+					else {
+						this.variablesRequestResponce(response, res.result[0], id);
+					}
 				});
 			}
 		}
@@ -690,8 +709,8 @@ class LuaDebugSession extends DebugSession {
 	}
 
 	private handleServerEvents(event: DebugServerEvent) {
-		if (event.method == "paused" && event.param.reason != "entry") {
-			this.sendEvent(new StoppedEvent(event.param.reason, LuaDebugSession.THREAD_ID));
+		if (event.method == "paused" && event.params.reason != "entry") {
+			this.sendEvent(new StoppedEvent(event.params.reason, LuaDebugSession.THREAD_ID));
 		}
 		else if (event.method == "running") {
 			this._variableHandles.reset();
