@@ -42,6 +42,9 @@ launch.json example:
 
 ## Release Notes
 
+### 0.2.3
+- Change protocol of remote debug to jsonrpc
+
 ### 0.2.2
 - LRDB Server bug fix.
 - Improve evaluate on debug console

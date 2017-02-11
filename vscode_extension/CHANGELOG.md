@@ -2,6 +2,15 @@
 
 
 ## [Unreleased]
+
+
+## [0.2.3] - 2017-02-12
+### Changed
+- Change protocol of remote debug to jsonrpc
+### Fixed
+- Fix memory errror on valgrind
+
+## [0.2.2] - 2017-02-09
 ### Changed
 - Improve evaluate on debug console
 ### Fixed
@@ -54,9 +63,10 @@
 ## [0.1.0] - 2017-01-24
 - Initial release
 
-[Unreleased]: https://github.com/satoren/LRDB/compare/v0.2.2...HEAD
-[0.2.2]: https://github.com/satoren/LRDB/compare/v0.2.0...0.2.2
-[0.1.9]: https://github.com/satoren/LRDB/compare/v0.1.9...0.2.0
+[Unreleased]: https://github.com/satoren/LRDB/compare/v0.2.3...HEAD
+[0.2.3]: https://github.com/satoren/LRDB/compare/v0.2.2...v0.2.3
+[0.2.2]: https://github.com/satoren/LRDB/compare/v0.2.0...v0.2.2
+[0.1.9]: https://github.com/satoren/LRDB/compare/v0.1.9...v0.2.0
 [0.1.9]: https://github.com/satoren/LRDB/compare/0.1.7...v0.1.9
 [0.1.7]: https://github.com/satoren/LRDB/compare/0.1.6...0.1.7
 [0.1.6]: https://github.com/satoren/LRDB/compare/0.1.4...0.1.6
