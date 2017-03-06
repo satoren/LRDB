@@ -1,6 +1,3 @@
-if(NOT LOCAL_LUA_DIRECTORY)
-   set(LOCAL_LUA_DIRECTORY "third_party/${LUA_SEARCH_LIB_NAME}")
-endif()
 
 if(LOCAL_LUA_DIRECTORY)
   #search local directory

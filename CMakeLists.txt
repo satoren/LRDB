@@ -65,8 +65,7 @@ target_link_libraries(lua_with_lrdb_server ${LUA_LIBRARIES})
 set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR})
 
 
-
-if(NOT EMSCRIPTEN)
+if(NOT LOCAL_LUA_DIRECTORY)
 add_library(lrdb_server SHARED src/debug_server_module.cpp ${HEADER_FILE})
 target_link_libraries(lrdb_server ${LUA_LIBRARIES})
 SET_TARGET_PROPERTIES(lrdb_server PROPERTIES OUTPUT_NAME lrdb_server)
