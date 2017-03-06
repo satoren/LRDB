@@ -3,6 +3,9 @@
 include_directories(SYSTEM ${LUA_INCLUDE_DIRS})
 link_directories(${LUA_LIBRARY_DIRS})
 
+if(NOT LUA_LIBRARIES)
+set(LUA_LIBRARIES "lua")
+endif()
 
 if(LRDB_USE_BOOST_ASIO)
   add_definitions(-DLRDB_USE_BOOST_ASIO)
