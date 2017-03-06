@@ -2,7 +2,7 @@ package = "LRDB"
 version = "0.2.4-1"
 source = {
    url = "git+https://github.com/satoren/LRDB",
-   tag = "0.2.4"
+   tag = "v0.2.4"
 }
 description = {
     summary = "Remote Debugger for Lua",
