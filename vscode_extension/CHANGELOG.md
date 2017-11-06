@@ -2,7 +2,12 @@
 
 
 ## [Unreleased]
-
+## [0.3.0] - 2017-02-12
+### Changed
+- ${workspaceRoot} changed to ${workspaceFolder}. It is deprecated from vscode version 1.17
+-  Configurations type changed to "lrdb" from "lua". Please check launch.json and change it.
+### Fixed
+- Fix deprecated initialConfigurations
 
 ## [0.2.3] - 2017-02-12
 ### Changed

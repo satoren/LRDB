@@ -29,11 +29,11 @@ launch.json example:
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "lua",
+            "type": "lrdb",
             "request": "launch",
             "name": "Lua Launch",
             "program": "${file}",
-            "cwd": "${workspaceRoot}",
+            "cwd": "${workspaceFolder}",
             "stopOnEntry": true
         }
     ]
@@ -41,6 +41,10 @@ launch.json example:
 ```
 
 ## Release Notes
+### Unreleased
+- Configurations type changed to "lrdb" from "lua". Please check launch.json and change it.
+- Fix deprecated initialConfigurations
+- ${workspaceRoot} changed to ${workspaceFolder}. It is deprecated from vscode version 1.17
 
 ### 0.2.3
 - Change protocol of remote debug to jsonrpc

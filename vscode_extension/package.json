@@ -2,21 +2,24 @@
 	"name": "lrdb",
 	"displayName": "LRDB",
 	"description": "Lua Remote DeBugger",
-	"version": "0.2.3",
+	"version": "0.3.0",
 	"publisher": "satoren",
 	"engines": {
-		"vscode": "^1.8.0"
+		"vscode": "^1.17.0",
+		"node": "^7.4.0"
 	},
+	"extensionDependencies": [
+		"ms-vscode.node-debug2"
+	],
 	"categories": [
 		"Debuggers"
 	],
 	"dependencies": {
-		"vscode-debugprotocol": "^1.15.0",
-		"vscode-debugadapter": "^1.15.0"
+		"vscode-debugadapter": "1.24.0",
+		"vscode-nls": "2.0.2"
 	},
 	"activationEvents": [
-		"onCommand:extension.lrdb.getProgramName",
-		"onCommand:extension.lrdb.provideInitialConfigurations"
+		"onDebug"
 	],
 	"repository": {
 		"type": "git",
@@ -25,7 +28,26 @@
 	"bugs": {
 		"url": "https://github.com/satoren/LRDB/issues"
 	},
-	"main": "./out/src/extension",
+	"main": "./out/src/extension.js",
+	"scripts": {
+		"vscode:prepublish": "tsc -p ./",
+		"compile": "tsc -watch -p ./",
+		"postinstall": "node ./node_modules/vscode/bin/install",
+		"test": "node ./node_modules/mocha/bin/mocha -u tdd ./out/test/"
+	},
+	"devDependencies": {
+		"typescript": "2.5.2",
+		"vscode": "1.1.17",
+		"vscode-nls-dev": "2.1.5",
+		"vscode-debugadapter-testsupport": "^1.24.0",
+		"vscode-debugprotocol": "1.24.0",
+		"mocha": "3.5.0",
+		"@types/mocha": "2.2.42",
+		"@types/node": "6.0.52",
+		"vsce": "1.32.0"
+	},
+	"icon": "images/icon.png",
+	"license": "BSL-1.0",
 	"contributes": {
 		"breakpoints": [
 			{
@@ -34,35 +56,36 @@
 		],
 		"debuggers": [
 			{
-				"type": "lua",
+				"type": "lrdb",
 				"label": "Lua Debug",
 				"program": "./out/src/lrdbDebug.js",
 				"runtime": "node",
+				"languages": ["lua"],
 				"variables": {
-					"CurrentSource": "extension.lrdb.getProgramName"
 				},
 				"configurationSnippets": [
 					{
-						"label": "Launch Program: Launch",
+						"label": "Lua: (lrdb) Launch",
 						"description": "A new configuration for launching a lua program",
 						"body": {
-							"type": "lua",
+							"type": "lrdb",
 							"request": "launch",
-							"name": "Lua Launch",
-							"program": "Lua program file or Lua host executable. default:${file}",
+							"name": "${2:Launch Program}",
+							"program": "Lua program file or Lua host executable.",
 							"args": [],
-							"cwd": "${workspaceRoot}"
+							"cwd": "${workspaceFolder}"
 						}
 					},
 					{
-						"label": "Lua Debug: Attach",
+						"label":"Lua: (lrdb) Attach",
 						"description": "A new configuration for attaching a LRDB embeded program",
 						"body": {
-							"type": "lua",
+							"type": "lrdb",
 							"request": "attach",
+							"name": "${1:Attach}",
 							"host": "localhost",
 							"port": 21110,
-							"sourceRoot": "${workspaceRoot}"
+							"sourceRoot": "${workspaceFolder}"
 						}
 					}
 				],
@@ -80,7 +103,7 @@
 							"cwd": {
 								"type": "string",
 								"description": "working directory.",
-								"default": "${workspaceRoot}"
+								"default": "${workspaceFolder}"
 							},
 							"args": {
 								"type": "array",
@@ -98,7 +121,7 @@
 							"sourceRoot": {
 								"type": "string",
 								"description": "script source root directory. to be used in souce file matching at breakpoints.",
-								"default": "${workspaceRoot}"
+								"default": "${workspaceFolder}"
 							},
 							"stopOnEntry": {
 								"type": "boolean",
@@ -126,7 +149,7 @@
 							"sourceRoot": {
 								"type": "string",
 								"description": "script source root directory.",
-								"default": "${workspaceRoot}"
+								"default": "${workspaceFolder}"
 							},
 							"stopOnEntry": {
 								"type": "boolean",
@@ -135,25 +158,8 @@
 							}
 						}
 					}
-				},
-				"initialConfigurations": "extension.lrdb.provideInitialConfigurations"
+				}
 			}
 		]
-	},
-	"scripts": {
-		"vscode:prepublish": "tsc -p ./",
-		"compile": "tsc -watch -p ./",
-		"postinstall": "node ./node_modules/vscode/bin/install",
-		"test": "node ./node_modules/mocha/bin/mocha -u tdd ./out/test/"
-	},
-	"devDependencies": {
-		"typescript": "^2.0.3",
-		"vscode": "^1.0.0",
-		"vscode-debugadapter-testsupport": "^1.15.0",
-		"mocha": "^2.3.3",
-		"@types/node": "^6.0.40",
-		"@types/mocha": "^2.2.32"
-	},
-	"icon": "images/icon.png",
-	"license": "BSL-1.0"
+	}
 }
