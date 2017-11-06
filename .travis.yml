@@ -17,14 +17,13 @@ addons:
     - liblua5.2-dev
     - libluajit-5.1-dev
     - clang
-    - valgrind
 env:
   - BUILD_TYPE=Debug LUALIB=lua5.2 CXX_FLAGS=-std=c++11 COV=On
   - BUILD_TYPE=Release LUALIB=lua5.2 CXX_FLAGS=-std=c++11
   - BUILD_TYPE=Debug LUALIB=luajit CXX_FLAGS=-std=c++11 COV=On
   - BUILD_TYPE=Release LUALIB=luajit CXX_FLAGS=-std=c++11
 script:
-  - cmake . -DCOVERAGE=${COVERAGE} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DLUA_SEARCH_LIB_NAME=${LUALIB} -DCMAKE_CXX_FLAGS=${CXX_FLAGS} && make && ctest --output-on-failure -T memcheck
+  - cmake . -DCOVERAGE=${COVERAGE} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DLUA_SEARCH_LIB_NAME=${LUALIB} -DCMAKE_CXX_FLAGS=${CXX_FLAGS} && make && ctest --output-on-failure
 
 after_success: |
 
