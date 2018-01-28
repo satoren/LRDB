@@ -5,7 +5,7 @@ import * as path from 'path';
 import * as os from 'os';
 import * as child_process from 'child_process';
 
-import { log, localize } from './utilities';
+import { localize } from './utilities';
 
 
 export function activate(context: vscode.ExtensionContext) {

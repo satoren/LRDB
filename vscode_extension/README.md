@@ -41,7 +41,9 @@ launch.json example:
 ```
 
 ## Release Notes
-### Unreleased
+### 0.3.2
+- Remove deprecated command
+### 0.3.0
 - Configurations type changed to "lrdb" from "lua". Please check launch.json and change it.
 - Fix deprecated initialConfigurations
 - ${workspaceRoot} changed to ${workspaceFolder}. It is deprecated from vscode version 1.17

@@ -2,15 +2,12 @@
 	"name": "lrdb",
 	"displayName": "LRDB",
 	"description": "Lua Remote DeBugger",
-	"version": "0.3.0",
+	"version": "0.3.2",
 	"publisher": "satoren",
 	"engines": {
 		"vscode": "^1.17.0",
 		"node": "^7.4.0"
 	},
-	"extensionDependencies": [
-		"ms-vscode.node-debug2"
-	],
 	"categories": [
 		"Debuggers"
 	],
@@ -37,7 +34,7 @@
 	},
 	"devDependencies": {
 		"typescript": "2.5.2",
-		"vscode": "1.1.17",
+		"vscode": "1.1.10",
 		"vscode-nls-dev": "2.1.5",
 		"vscode-debugadapter-testsupport": "^1.24.0",
 		"vscode-debugprotocol": "1.24.0",
@@ -60,9 +57,10 @@
 				"label": "Lua Debug",
 				"program": "./out/src/lrdbDebug.js",
 				"runtime": "node",
-				"languages": ["lua"],
-				"variables": {
-				},
+				"languages": [
+					"lua"
+				],
+				"variables": {},
 				"configurationSnippets": [
 					{
 						"label": "Lua: (lrdb) Launch",
@@ -77,7 +75,7 @@
 						}
 					},
 					{
-						"label":"Lua: (lrdb) Attach",
+						"label": "Lua: (lrdb) Attach",
 						"description": "A new configuration for attaching a LRDB embeded program",
 						"body": {
 							"type": "lrdb",

@@ -77,7 +77,7 @@ endif(MINGW)
 
 if(EMSCRIPTEN)
 install(TARGETS lua_with_lrdb_server
-        RUNTIME DESTINATION vscode_extension/out/bin/node)
+        RUNTIME DESTINATION vscode_extension/prebuilt)
 endif(EMSCRIPTEN)
 
 if(NOT BUILD_NO_TESTS)
@@ -94,10 +94,11 @@ endif(COVERAGE)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest" "${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/include")
 set(GTEST_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/src/gtest-all.cc)
 
+if(NOT EMSCRIPTEN)
+
 add_executable(lua_debugger_test test/lua_debugger_test.cpp ${HEADER_FILE} ${GTEST_SOURCE})
 target_link_libraries(lua_debugger_test ${LUA_LIBRARIES})
 
-if(NOT EMSCRIPTEN)
 add_executable(lrdb_server_test test/lrdb_server_test.cpp test/lrdb_server_test1.cpp ${HEADER_FILE} ${GTEST_SOURCE})
 target_link_libraries(lrdb_server_test ${LUA_LIBRARIES})
 if(UNIX)
@@ -110,7 +111,6 @@ add_test(
   NAME lrdb_server_test
   COMMAND $<TARGET_FILE:lrdb_server_test>
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/test)
-endif(NOT EMSCRIPTEN)
 
 if(WIN32)
 
@@ -129,3 +129,6 @@ add_test(
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/test)
 
 endif(NOT BUILD_NO_TESTS)
+
+
+endif(NOT EMSCRIPTEN)
