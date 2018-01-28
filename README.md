@@ -84,57 +84,5 @@ dofile("luascript.lua");
 lrdb.deactivate() --deactivate debug server if you want.
 ```
 
-## Visual Studio Code Extension setting
-search ``lrdb`` and install at Visual Studio Code
-
-launch.json example:
-```json
-{
-    "version": "0.1.0",
-    "configurations": [
-        {
-            "type": "lua",
-            "request": "attach",
-            "name": "Lua Attach",
-            "host": "localhost",
-            "port": 21110,
-            "sourceRoot": "${workspaceRoot}",
-            "stopOnEntry": true
-        }
-    ]
-}
-```
-
-If you want Lua and C++ debug in VSCode 
-
-launch.json example:
-```json
-{
-    "version": "0.1.0",
-    "configurations": [
-        {
-            "type": "lua",
-            "request": "attach",
-            "name": "Lua Attach",
-            "host": "localhost",
-            "port": 21110,
-            "sourceRoot": "${workspaceRoot}"
-        },
-        {
-            "name": "C++ Launch",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "Your Lua host program",
-            "args": []
-            "cwd": "${workspaceRoot}"
-            .....
-        }
-    ],
-	"compounds": [
-		{
-			"name": "Lua + C++",
-			"configurations": ["C++ Launch" , "Lua Attach"]
-		}
-	]
-}
-```
+## Visual Studio Code Extension
+https://github.com/satoren/vscode-lrdb
