@@ -328,7 +328,7 @@ class LuaDebugSession extends DebugSession {
 		const useInternalLua = args.useInternalLua != null ? args.useInternalLua : args.program.endsWith(".lua");
 
 		if (useInternalLua) {
-			let vm = path.resolve(path.join(__dirname, '../bin/node/lua_with_lrdb_server.js'));
+			let vm = path.resolve(path.join(__dirname, '../../prebuilt/lua_with_lrdb_server.js'));
 			let program = this.convertClientPathToDebugger(args.program);
 			this._debug_server_process = fork(vm,
 				[program].concat(programArg),
