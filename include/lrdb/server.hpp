@@ -46,7 +46,7 @@ class basic_server {
   /// @param arg Forward to StreamType constructor
   template <typename... StreamArgs>
   basic_server(StreamArgs&&... arg)
-      : wait_for_connect_(true),
+      : wait_for_connect_(false),
         command_stream_(std::forward<StreamArgs>(arg)...) {
     init();
   }
