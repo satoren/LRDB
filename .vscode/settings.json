@@ -3,5 +3,16 @@
     "C_Cpp.clang_format_style": "Google",
     "C_Cpp.clang_format_fallbackStyle": "Google",
     "C_Cpp.clang_format_formatOnSave": true,
-    "files.associations": {}
+    "files.associations": {
+        "xstring": "cpp",
+        "algorithm": "cpp",
+        "deque": "cpp",
+        "list": "cpp",
+        "vector": "cpp",
+        "future": "cpp",
+        "system_error": "cpp",
+        "xlocale": "cpp"
+    },
+    "editor.formatOnPaste": true,
+    "C_Cpp.default.configurationProvider": "vector-of-bool.cmake-tools"
 }

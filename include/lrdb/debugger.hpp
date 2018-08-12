@@ -173,7 +173,7 @@ inline void push_json(lua_State* L, const json::value& v) {
     }
   }
 }
-}
+}  // namespace utility
 
 /// @brief line based break point type
 struct breakpoint_info {
@@ -445,7 +445,7 @@ class debug_info {
     while (const char* varname = lua_getupvalue(state_, -1, upvno++)) {
       localvars.push_back(std::pair<std::string, json::value>(
           varname, utility::to_json(state_, -1, object_depth)));
-	  lua_pop(state_, 1);
+      lua_pop(state_, 1);
     }
     lua_pop(state_, 1);  // pop current running function
     return localvars;
@@ -580,27 +580,27 @@ class stack_info : private debug_info {
   bool is_available() { return valid_ && debug_info::is_available(); }
   ~stack_info() { debug_ = 0; }
   using debug_info::assign;
-  using debug_info::is_available_info;
+  using debug_info::currentline;
   using debug_info::get_info;
+  using debug_info::is_available_info;
+  using debug_info::lastlinedefined;
+  using debug_info::linedefined;
   using debug_info::name;
   using debug_info::namewhat;
-  using debug_info::what;
-  using debug_info::source;
-  using debug_info::currentline;
-  using debug_info::linedefined;
-  using debug_info::lastlinedefined;
   using debug_info::number_of_upvalues;
+  using debug_info::source;
+  using debug_info::what;
 #if LUA_VERSION_NUM >= 502
-  using debug_info::number_of_parameters;
-  using debug_info::is_variadic_arg;
   using debug_info::is_tailcall;
+  using debug_info::is_variadic_arg;
+  using debug_info::number_of_parameters;
 #endif
-  using debug_info::short_src;
   using debug_info::eval;
   using debug_info::get_local_vars;
-  using debug_info::set_local_var;
   using debug_info::get_upvalues;
+  using debug_info::set_local_var;
   using debug_info::set_upvalue;
+  using debug_info::short_src;
 
  private:
   lua_Debug debug_var_;
@@ -796,23 +796,28 @@ class debugger {
   debugger(const debugger&);             //=delete;
   debugger& operator=(const debugger&);  //=delete;
 
+  static bool is_path_separator(char c) { return c == '\\' || c == '/'; }
   static bool is_file_path_match(const char* path1, const char* path2) {
-    // TODO need more inteligent?
-    int i = 0;
     while (true) {
-      char c1 = path1[i];
-      char c2 = path2[i];
-
-      if (c1 != c2) {
-        // allow different backslash and slash for windows
-        if (((c1 != '\\' || c2 != '/') && (c1 != '/' || c2 != '\\'))) {
-          return false;
-        }
+      // skip './'
+      if (*path1 == '.' && is_path_separator(*(path1 + 1))) {
+        path1 += 2;
+        continue;
       }
-      if (c1 == '\0') {
+      if (*path2 == '.' && is_path_separator(*(path2 + 1))) {
+        path2 += 2;
+        continue;
+      }
+
+      if ((*path1 != *path2) &&
+          (!is_path_separator(*path1) || !is_path_separator(*path2))) {
+        return false;
+      }
+      if (*path1 == '\0') {
         return true;
       }
-      i++;
+      path1++;
+      path2++;
     }
   }
 
@@ -842,8 +847,7 @@ class debugger {
   bool breakpoint_cond(const breakpoint_info& breakpoint,
                        debug_info& debuginfo) {
     if (!breakpoint.condition.empty()) {
-      json::array condret =
-          debuginfo.eval(breakpoint.condition.c_str());
+      json::array condret = debuginfo.eval(breakpoint.condition.c_str());
       return !condret.empty() && condret[0].evaluate_as_boolean();
     }
     return true;
@@ -861,10 +865,9 @@ class debugger {
   bool breakpoint_hit_cond(const breakpoint_info& breakpoint,
                            debug_info& debuginfo) {
     if (!breakpoint.hit_condition.empty()) {
-      json::array condret =
-          debuginfo.eval((std::to_string(breakpoint.hit_count) +
-                          breakpoint.hit_condition)
-                             .c_str());
+      json::array condret = debuginfo.eval(
+          (std::to_string(breakpoint.hit_count) + breakpoint.hit_condition)
+              .c_str());
 
       return condret.empty() || condret[0].evaluate_as_boolean();
     }
@@ -972,7 +975,7 @@ class debugger {
   pause_handler_type pause_handler_;
   tick_handler_type tick_handler_;
 };
-}
+}  // namespace lrdb
 
 #else
 #error Needs at least a C++11 compiler

@@ -126,7 +126,9 @@ endif(WIN32)
 add_test(
   NAME lua_debugger_test
   COMMAND $<TARGET_FILE:lua_debugger_test>
-  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/test)
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/test/lua)
+
+
 
 endif(NOT BUILD_NO_TESTS)
 
