@@ -798,10 +798,35 @@ class debugger {
 
   static bool is_file_path_match(const char* path1, const char* path2) {
     // TODO need more inteligent?
-    int i = 0;
+
+    int c1_i = 0;
+    int c2_i = 0;
+
+
+    // TODO probably normalize paths generically here (instead of just checking for explicit prefixes), if fast enough..
+    // check for "./" prefix
+    const char* path_with_prefix = (path1[0] == '.') ? path1 : ((path2[0] == '.') ? path2 : nullptr);
+
+    if (path1[0] == '.' && path2[0] != '.')
+    {
+      if (path1[1] == '/' || path1[1] == '\\')
+      {
+        // skip the first 2 characters of path1
+        c1_i += 2;
+      }
+    }
+    else if (path2[0] == '.' && path1[0] != '.')
+    {
+      if (path2[1] == '/' || path2[1] == '\\')
+      {
+        // skip the first 2 characters of path2
+        c2_i += 2;
+      }
+    }
+
     while (true) {
-      char c1 = path1[i];
-      char c2 = path2[i];
+      char c1 = path1[c1_i];
+      char c2 = path2[c2_i];
 
       if (c1 != c2) {
         // allow different backslash and slash for windows
@@ -812,7 +837,8 @@ class debugger {
       if (c1 == '\0') {
         return true;
       }
-      i++;
+      c1_i++;
+      c2_i++;
     }
   }
 
