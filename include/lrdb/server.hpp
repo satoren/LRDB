@@ -20,7 +20,7 @@
 
 namespace lrdb {
 
-#define LRDB_SERVER_PROTOCOL_VERSION "2"
+#define LRDB_SERVER_PROTOCOL_VERSION "3"
 
 /// @brief Debug Server Class
 /// template type is messaging communication customization point
@@ -70,6 +70,9 @@ class basic_server {
 
  private:
   void init() {
+    getcwd(working_dir, 4096); // probably will need to check for trailing slash
+    debugger_.set_working_dir(working_dir);
+    
     debugger_.set_pause_handler([&](debugger&) {
       send_pause_status();
       while (debugger_.paused() && command_stream_.is_open()) {
@@ -411,6 +414,7 @@ class basic_server {
     }
   }
 
+  char working_dir[4096];
   bool wait_for_connect_;
   debugger debugger_;
   StreamType command_stream_;
