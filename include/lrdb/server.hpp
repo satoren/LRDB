@@ -104,6 +104,10 @@ class basic_server {
     json::object param;
     param["protocol_version"] = json::value(LRDB_SERVER_PROTOCOL_VERSION);
 
+    char working_dir[4096];
+    getcwd(working_dir, 4096);
+    param["working_directory"] = json::value(working_dir);
+
     json::object lua;
     lua["version"] = json::value(LUA_VERSION);
     lua["release"] = json::value(LUA_RELEASE);
