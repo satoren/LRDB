@@ -240,8 +240,19 @@ class basic_server {
     json::array res;
     for (auto& s : callstack) {
       json::object data;
-      if (s.source()) {
-        data["file"] = json::value(s.source());
+      
+      char absolute_source[4096] = {0};
+      const char* source = s.source();
+
+      if (source && source[0] == '@') {
+        debugger_.path_to_absolute(absolute_source, s.source());
+        source = absolute_source;
+        puts("get_stacktrace_request");
+        puts(absolute_source);
+      }
+
+      if (source) {
+        data["file"] = json::value(source);
       }
       const char* name = s.name();
       if (!name || name[0] == '\0') {
@@ -254,7 +265,7 @@ class basic_server {
         name = s.what();
       }
       if (!name || name[0] == '\0') {
-        name = s.source();
+        name = source;
       }
       data["func"] = json::value(name);
       data["line"] = json::value(double(s.currentline()));
