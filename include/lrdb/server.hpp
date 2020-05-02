@@ -247,8 +247,6 @@ class basic_server {
       if (source && source[0] == '@') {
         debugger_.path_to_absolute(absolute_source, s.source());
         source = absolute_source;
-        puts("get_stacktrace_request");
-        puts(absolute_source);
       }
 
       if (source) {
