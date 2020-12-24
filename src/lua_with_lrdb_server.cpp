@@ -78,7 +78,7 @@ int main(int argc, char* argv[]) {
       program);
 #endif
 
-#ifdef LRDB_USE_NODE_CHILD_PROCESS
+#ifdef EMSCRIPTEN
   lrdb::server debug_server;
   return exec(program, debug_server, argc - i, &argv[i]);
 #else

@@ -11,8 +11,6 @@ if(EMSCRIPTEN)
   set(EMTERPRETER_OPT "--memory-init-file 0 -s TOTAL_MEMORY=67108864 -s ABORTING_MALLOC=0 -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1 -s NO_EXIT_RUNTIME=1 -s EMTERPRETIFY_BLACKLIST=\"['_lua_getinfo','_lua_rawgetp','_lua_touserdata','_lua_settop','_lua_getstack','_lua_next']\"")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EMTERPRETER_OPT}")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EMTERPRETER_OPT}")
-
-  add_definitions(-DLRDB_USE_NODE_CHILD_PROCESS)
 endif(EMSCRIPTEN)
 
 if(LUA)
