@@ -6,13 +6,7 @@
 #include <vector>
 
 #include "basic_server.hpp"
-
-#ifdef EMSCRIPTEN
-#include "command_stream/node_childprocess_emscripten.hpp"
-#else
 #include "command_stream/socket.hpp"
-#endif
-
 namespace lrdb {
 typedef basic_server<command_stream_socket> server;
 }

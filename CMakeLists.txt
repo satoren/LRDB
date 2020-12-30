@@ -6,9 +6,8 @@ include(cmake/ReduceDependencies.cmake)
 
 
 if(EMSCRIPTEN)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s EXPORTED_FUNCTIONS=\"['_main', '_lrdb_server_socket_on_connect', '_lrdb_server_socket_on_close', '_lrdb_server_socket_on_error', '_lrdb_server_socket_on_data']\"")
- 
-  set(EMTERPRETER_OPT "--memory-init-file 0 -s TOTAL_MEMORY=67108864 -s ABORTING_MALLOC=0 -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1 -s NO_EXIT_RUNTIME=1 -s EMTERPRETIFY_BLACKLIST=\"['_lua_getinfo','_lua_rawgetp','_lua_touserdata','_lua_settop','_lua_getstack','_lua_next']\"")
+
+  set(EMTERPRETER_OPT "--bind -s ASYNCIFY -s MODULARIZE -s NODERAWFS=1 -s ASYNCIFY_STACK_SIZE=65535 -s 'EXPORT_NAME=\"DebuggableLuaInit\"'")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EMTERPRETER_OPT}")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EMTERPRETER_OPT}")
 endif(EMSCRIPTEN)
@@ -57,6 +56,14 @@ if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
   add_definitions ("-fno-strict-overflow")
 endif()
 
+if(EMSCRIPTEN)
+
+add_executable(node_lua_with_lrdb src/node_lua_with_lrdb.cpp ${HEADER_FILE})
+target_link_libraries(node_lua_with_lrdb  nodefs.js ${LUA_LIBRARIES})
+
+INSTALL(FILES ${CMAKE_BINARY_DIR}/node_lua_with_lrdb.js ${CMAKE_BINARY_DIR}/node_lua_with_lrdb.wasm DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/node/bin )
+
+else(EMSCRIPTEN)
 add_executable(lua_with_lrdb_server src/lua_with_lrdb_server.cpp ${HEADER_FILE})
 target_link_libraries(lua_with_lrdb_server ${LUA_LIBRARIES})
 
@@ -73,10 +80,6 @@ if(MINGW)
 target_link_libraries(lua_with_lrdb_server -lws2_32 -lwsock32)
 endif(MINGW)
 
-if(EMSCRIPTEN)
-install(TARGETS lua_with_lrdb_server
-        RUNTIME DESTINATION vscode_extension/prebuilt)
-endif(EMSCRIPTEN)
 
 if(NOT BUILD_NO_TESTS)
 enable_testing()
@@ -92,7 +95,6 @@ endif(COVERAGE)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest" "${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/include")
 set(GTEST_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/src/gtest-all.cc)
 
-if(NOT EMSCRIPTEN)
 
 add_executable(lua_debugger_test test/lua_debugger_test.cpp ${HEADER_FILE} ${GTEST_SOURCE})
 target_link_libraries(lua_debugger_test ${LUA_LIBRARIES})
@@ -131,4 +133,4 @@ add_test(
 endif(NOT BUILD_NO_TESTS)
 
 
-endif(NOT EMSCRIPTEN)
+endif(EMSCRIPTEN)

@@ -58,6 +58,8 @@ class basic_server {
     command_stream_.close();
   }
 
+  StreamType& command_stream() { return command_stream_; };
+
  private:
   void init() {
     debugger_.set_pause_handler([&](debugger&) {
@@ -399,7 +401,6 @@ class basic_server {
       send_response(response);
     }
   }
-
   bool wait_for_connect_;
   debugger debugger_;
   StreamType command_stream_;
