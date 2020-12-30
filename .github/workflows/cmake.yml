@@ -1,6 +1,13 @@
 name: CMake
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
@@ -12,8 +19,25 @@ jobs:
     # well on Windows or Mac.  You can convert this to a matrix build if you need
     # cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
-    runs-on: ubuntu-latest
 
+    name: ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        - {
+            name: "Windows Latest - MSVC",
+            os: windows-latest,
+          }
+        - {
+            name: "Ubuntu Latest - GCC",
+            os: ubuntu-latest,
+          }
+        - {
+            name: "Mac Latest",
+            os: macos-latest,
+          }
     steps:
     - uses: actions/checkout@v2
 
