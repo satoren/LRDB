@@ -1,0 +1,12 @@
+{
+  "semi": false,
+  "overrides": [
+    {
+      "files": ["*.md", "*.html"],
+      "options": {
+        "tabWidth": 4
+      }
+    }
+  ],
+  "singleQuote": true
+}
