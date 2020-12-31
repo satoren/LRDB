@@ -634,6 +634,9 @@ class debugger {
                       const std::string& hit_condition = "") {
     breakpoint_info info;
     info.file = file;
+    if (!is_path_separator(file.at(0)) && working_dir) { // is relative path and working_dir is set
+      info.file = std::string(working_dir) + "/" + info.file;
+    }
     info.line = line;
     info.condition = condition;
     if (!hit_condition.empty()) {
@@ -776,6 +779,25 @@ class debugger {
     return v;
   }
 
+  /// @brief set wcurrent working directory for relative path resolution
+  void set_working_dir(char* arg_working_dir) {
+    working_dir = (char*) malloc(4096 * sizeof(char));
+    strcpy(working_dir, arg_working_dir);
+  }
+
+  void path_to_absolute(char* path_absolute, const char* path) {
+    if (path[0] == '@') {
+      path++;
+      path_absolute[0] = '@';
+      path_absolute[1] = '\0';
+    }
+    if (!is_path_separator(path[0]) && working_dir) {  // is a relative path and working_dir is set
+      strcat(path_absolute, working_dir);
+      strcat(path_absolute, "/");
+    }
+    strcat(path_absolute, path);
+  }
+
  private:
   void sethook() {
     lua_pushlightuserdata(state_, this_data_key());
@@ -837,7 +859,13 @@ class debugger {
         if (source[0] == '@') {
           source++;
         }
-        if (is_file_path_match(it->file.c_str(), source)) {
+        else { // @ is prepended to all filenames. When there is no @, the line is from eval, therefore can not have a breakpoint
+          return 0;
+        }
+        char source_absolute[4096] = {0};
+        path_to_absolute(source_absolute, source);
+
+        if (is_file_path_match(it->file.c_str(), source_absolute)) {
           return &(*it);
         }
       }
@@ -963,6 +991,8 @@ class debugger {
     STEP_PAUSE,
     STEP_ENTRY,
   };
+
+  char *working_dir = NULL;
 
   lua_State* state_;
   bool pause_;

@@ -20,7 +20,7 @@
 
 namespace lrdb {
 
-#define LRDB_SERVER_PROTOCOL_VERSION "2"
+#define LRDB_SERVER_PROTOCOL_VERSION "3"
 
 /// @brief Debug Server Class
 /// template type is messaging communication customization point
@@ -70,6 +70,9 @@ class basic_server {
 
  private:
   void init() {
+    getcwd(working_dir, 4096); // probably will need to check for trailing slash
+    debugger_.set_working_dir(working_dir);
+    
     debugger_.set_pause_handler([&](debugger&) {
       send_pause_status();
       while (debugger_.paused() && command_stream_.is_open()) {
@@ -100,6 +103,10 @@ class basic_server {
     wait_for_connect_ = false;
     json::object param;
     param["protocol_version"] = json::value(LRDB_SERVER_PROTOCOL_VERSION);
+
+    char working_dir[4096];
+    getcwd(working_dir, 4096);
+    param["working_directory"] = json::value(working_dir);
 
     json::object lua;
     lua["version"] = json::value(LUA_VERSION);
@@ -233,8 +240,17 @@ class basic_server {
     json::array res;
     for (auto& s : callstack) {
       json::object data;
-      if (s.source()) {
-        data["file"] = json::value(s.source());
+      
+      char absolute_source[4096] = {0};
+      const char* source = s.source();
+
+      if (source && source[0] == '@') {
+        debugger_.path_to_absolute(absolute_source, s.source());
+        source = absolute_source;
+      }
+
+      if (source) {
+        data["file"] = json::value(source);
       }
       const char* name = s.name();
       if (!name || name[0] == '\0') {
@@ -247,7 +263,7 @@ class basic_server {
         name = s.what();
       }
       if (!name || name[0] == '\0') {
-        name = s.source();
+        name = source;
       }
       data["func"] = json::value(name);
       data["line"] = json::value(double(s.currentline()));
@@ -411,6 +427,7 @@ class basic_server {
     }
   }
 
+  char working_dir[4096];
   bool wait_for_connect_;
   debugger debugger_;
   StreamType command_stream_;

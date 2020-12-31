@@ -5,6 +5,12 @@ Licensed under [Boost Software License](http://www.boost.org/LICENSE_1_0.txt)
 ![test](https://github.com/satoren/LRDB/workflows/test/badge.svg)
 [![Coverage Status](https://coveralls.io/repos/github/satoren/LRDB/badge.svg?branch=master)](https://coveralls.io/github/satoren/LRDB?branch=master)
 
+## Fork changes
+
+This fork is modified to use absolute paths instead of relative in communication with remote debugger.
+
+This fork works only with similarly modified vscode-lrdb extension - [kapecp/vscode-lrdb](https://github.com/kapecp/vscode-lrdb).
+
 ## Introduction
 
 LRDB is Debugger for Lua programing language.
