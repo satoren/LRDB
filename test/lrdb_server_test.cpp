@@ -139,6 +139,8 @@ TEST_F(DebugServerTest, ConnectTest1) {
     wait_for_paused();
     res = sync_request("continue");
     ASSERT_TRUE(res.evaluate_as_boolean());
+
+    client_stream.close();
   });
 
   luaDofile(L, TEST_LUA_SCRIPT);
@@ -184,6 +186,8 @@ TEST_F(DebugServerTest, ConnectTest2) {
     //		std::cout << res.serialize() << std::endl;
 
     sync_request("continue");
+
+    client_stream.close();
   });
 
   luaDofile(L, TEST_LUA_SCRIPT);
@@ -215,6 +219,8 @@ TEST_F(DebugServerTest, ConnectTest4) {
     wait_for_paused();
     res = sync_request("continue");
     ASSERT_TRUE(res.evaluate_as_boolean());
+
+    client_stream.close();
   });
 
   luaDofile(L, TEST_LUA_SCRIPT);
@@ -262,6 +268,8 @@ TEST_F(DebugServerTest, ConnectTest5) {
 
     res = sync_request("continue");
     ASSERT_TRUE(res.evaluate_as_boolean());
+
+    client_stream.close();
   });
 
   luaDofile(L, TEST_LUA_SCRIPT);
