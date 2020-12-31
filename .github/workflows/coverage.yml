@@ -1,0 +1,50 @@
+name: coverage
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+
+env:
+  BUILD_TYPE: Debug
+
+jobs:
+  build:
+    name: coverage
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install lcov
+      run: git clone https://github.com/linux-test-project/lcov.git && cd lcov && sudo make install
+
+    - name: Create Build Environment
+      run: cmake -E make_directory coverage
+
+    - name: Configure CMake
+      shell: bash
+      working-directory: coverage
+      run: cmake -DCOVERAGE=1 $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+
+    - name: Build
+      working-directory: coverage
+      shell: bash
+      run: cmake --build . --config $BUILD_TYPE
+
+    - name: Test
+      working-directory: coverage
+      shell: bash
+      run: ctest -C $BUILD_TYPE
+
+    - name: Coverage
+      working-directory: coverage
+      shell: bash
+      run: lcov -c  -d . --include **/include/lrdb/** -o ./lcov.info
+
+    - name: Coveralls
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}

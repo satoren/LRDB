@@ -86,9 +86,9 @@ enable_testing()
 include (CTest)
 
 if(COVERAGE)
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -Wall -Woverloaded-virtual -Wwrite-strings -fprofile-arcs -ftest-coverage -coverage -fno-inline -fno-inline-small-functions -fno-default-inline")
-SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0 -Wall -fprofile-arcs -ftest-coverage -coverage -fno-inline -fno-inline-small-functions -fno-default-inline")
-SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs -ftest-coverage -coverage -fno-inline -fno-inline-small-functions -fno-default-inline")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -Wall -Woverloaded-virtual -Wwrite-strings --coverage -fno-inline -fno-inline-small-functions -fno-default-inline")
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0 -Wall --coverage -fno-inline -fno-inline-small-functions -fno-default-inline")
+SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage -fno-inline -fno-inline-small-functions -fno-default-inline")
 endif(COVERAGE)
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest" "${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/include")

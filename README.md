@@ -2,7 +2,7 @@
 
 Licensed under [Boost Software License](http://www.boost.org/LICENSE_1_0.txt)
 
-[![Build Status](https://travis-ci.org/satoren/LRDB.svg?branch=master)](https://travis-ci.org/satoren/LRDB)
+![test](https://github.com/satoren/LRDB/workflows/test/badge.svg)
 [![Coverage Status](https://coveralls.io/repos/github/satoren/LRDB/badge.svg?branch=master)](https://coveralls.io/github/satoren/LRDB?branch=master)
 
 ## Introduction
