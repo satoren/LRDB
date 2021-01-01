@@ -68,3 +68,85 @@ jobs:
       # Execute tests defined by the CMake configuration.  
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest -C $BUILD_TYPE
+
+  coverage:
+    name: coverage
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install lcov
+      run: git clone https://github.com/linux-test-project/lcov.git && cd lcov && sudo make install
+
+    - name: Create Build Environment
+      run: cmake -E make_directory coverage
+
+    - name: Configure CMake
+      shell: bash
+      working-directory: coverage
+      run: cmake -DCOVERAGE=1 $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+
+    - name: Build
+      working-directory: coverage
+      shell: bash
+      run: cmake --build . --config $BUILD_TYPE
+
+    - name: Test
+      working-directory: coverage
+      shell: bash
+      run: ctest -C $BUILD_TYPE
+
+    - name: Coverage
+      working-directory: coverage
+      shell: bash
+      run: lcov -c  -d . --include **/include/lrdb/** -o ./lcov.info
+
+    - name: Coveralls
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  emscripten:
+    name: build for node.js
+    runs-on: ubuntu-latest
+    steps:
+      - uses: mymindstorm/setup-emsdk@v7
+      - uses: actions/checkout@v2
+      - run: cmake -E make_directory build
+      - run: emcmake cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=Release
+        working-directory: build
+      - run: cmake --build . && cmake --build . --target install
+        working-directory: build
+      - name: Archive build result for js
+        uses: actions/upload-artifact@v2
+        with:
+          name: node_lua_with_lrdb
+          path: node/bin/node_lua_with_lrdb.*
+
+  test_on_node:
+    needs: emscripten
+    name: test on node.js
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [10.x, 12.x, 14.x]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Download a node_lua_with_lrdb
+        uses: actions/download-artifact@v2
+        with:
+          name: node_lua_with_lrdb
+          path: node/bin/
+      - run: yarn
+        working-directory: node
+      - run: yarn build
+        working-directory: node
+      - run: yarn lint
+        working-directory: node
+      - run: yarn test
+        working-directory: node
+        env:
+          CI: true

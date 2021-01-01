@@ -1,6 +1,3 @@
-#ifdef EMSCRIPTEN
-#include <emscripten.h>
-#endif
 #include <iostream>
 
 #ifdef LRDB_ENABLE_STDINOUT_STREAM
@@ -30,9 +27,6 @@ int exec(const char* program, DebugServer& debug_server, int argc,
 
   lua_close(L);
   L = 0;
-#ifdef EMSCRIPTEN
-  emscripten_force_exit(ret ? 1 : 0);
-#endif
   return ret ? 1 : 0;
 }
 
@@ -62,26 +56,7 @@ int main(int argc, char* argv[]) {
     return 1;
   }
   std::cout << LUA_COPYRIGHT << std::endl;
-#ifdef EMSCRIPTEN
-  std::cout << "on JavaScript powered by Emscripten(Emterpreter)" << std::endl;
-  EM_ASM_(
-      {
-        var path = require('path');
-        var program_path = Pointer_stringify($0);
-        var program_full_path = path.resolve(program_path);
-        var token = path.parse(program_full_path);
-        var cwd = path.relative(token.root, process.cwd());
-        FS.mkdir('root');
-        FS.mount(NODEFS, {root : token.root}, 'root');
-        FS.chdir('root/' + cwd);
-      },
-      program);
-#endif
 
-#ifdef LRDB_USE_NODE_CHILD_PROCESS
-  lrdb::server debug_server;
-  return exec(program, debug_server, argc - i, &argv[i]);
-#else
   if (port == 0)  // if no port use std::cin and std::cout
   {
 #ifdef LRDB_ENABLE_STDINOUT_STREAM
@@ -95,5 +70,4 @@ int main(int argc, char* argv[]) {
     lrdb::server debug_server(port);
     return exec(program, debug_server, argc - i, &argv[i]);
   }
-#endif
 }
