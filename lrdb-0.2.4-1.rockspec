@@ -14,10 +14,20 @@ description = {
    license = "Boost"
 }
 dependencies = {
-    "lua >= 5.1, < 5.4"
+    "lua >= 5.1"
 }
+
 build = {
    type = "cmake",
    cmake = 'cmake_minimum_required(VERSION 2.8)\n include(luarocks_cmake.txt)',
-   variables ={LUA_LIBRARY_DIRS="$(LUA_LIBDIR)",LUA_INCLUDE_DIRS="$(LUA_INCDIR)",LUA_LIBRARIES="$(LUALIB)",INSTALL_LIBDIR="$(LIBDIR)"}
+   variables ={CFLAGS="$(CFLAGS)",
+   LIBFLAG="$(LIBFLAG)",
+   LUA="$(LUA)",
+   LUALIB="$(LUALIB)",
+   LUA_BINDIR="$(LUA_BINDIR)",
+   LUADIR="$(LUADIR)",
+   LUA_LIBDIR="$(LUA_LIBDIR)",
+   LIBDIR="$(LIBDIR)",
+   LUA_INCDIR="$(LUA_INCDIR)",
+   CMAKE_INSTALL_PREFIX="$(PREFIX)"}
 }
