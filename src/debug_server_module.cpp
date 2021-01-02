@@ -1,6 +1,3 @@
-#ifdef EMSCRIPTEN
-#include <emscripten.h>
-#endif
 #include <iostream>
 
 #include "lrdb/server.hpp"
