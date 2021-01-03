@@ -44,10 +44,13 @@ describe('basic', () => {
     ['vaarg_test1.lua'],
   ])('script %s', (script) => {
     test('exec', async () => {
-      const child = runScript(script)
-      const client = new Client(new ChildProcessAdapter(child))
+      const client = new Client(
+        new ChildProcessAdapter(script, [], {
+          cwd: testScriptDir,
+        })
+      )
       await wait(client, 'paused')
-      child.kill()
+      client.end()
     })
     test('step', async () => {
       const child = runScript(script)
