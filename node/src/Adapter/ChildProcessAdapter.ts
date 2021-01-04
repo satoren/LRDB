@@ -38,7 +38,7 @@ export class ChildProcessAdapter implements DebugClientAdapter {
     }
     this.initChildProcess()
   }
-  initChildProcess() {
+  initChildProcess(): void {
     setTimeout(() => {
       this.onOpen.emit()
     }, 0)
