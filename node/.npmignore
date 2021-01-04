@@ -1,0 +1,8 @@
+src
+__tests__
+coverage
+.github
+.vscode
+jest.config.js
+.prettier*
+.eslint*
