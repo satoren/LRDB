@@ -4,8 +4,24 @@ on:
     branches:
       - main
 jobs:
+  build_wasm:
+    name: build for node.js
+    runs-on: ubuntu-latest
+    steps:
+      - uses: mymindstorm/setup-emsdk@v7
+      - uses: actions/checkout@v2
+      - run: cmake -E make_directory build
+      - run: emcmake cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=Release
+        working-directory: build
+      - run: cmake --build . && cmake --build . --target install
+        working-directory: build
+      - name: Archive build result for js
+        uses: actions/upload-artifact@v2
+        with:
+          name: node_lua_with_lrdb
+          path: node/bin/node_lua_with_lrdb.*
   release:
-    needs: emscripten
+    needs: build_wasm
     name: Release
     runs-on: ubuntu-latest
     steps:
