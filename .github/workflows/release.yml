@@ -1,0 +1,35 @@
+name: Release
+on:
+  push:
+    branches:
+      - main
+jobs:
+  release:
+    needs: emscripten
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: Download a node_lua_with_lrdb
+        uses: actions/download-artifact@v2
+        with:
+          name: node_lua_with_lrdb
+          path: node/bin/
+      - run: yarn
+        working-directory: node
+      - run: yarn bundle
+        working-directory: node
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: yarn semantic-release
+        working-directory: node
