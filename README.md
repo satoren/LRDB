@@ -25,7 +25,7 @@ Command line interface debugger is not implemented.
 
 
 ## Requirements
-  * Lua 5.1 to 5.3 (recommended: 5.3)
+  * Lua 5.1 or later
   * C++11 compiler
 
 ## Embedded to your host program
