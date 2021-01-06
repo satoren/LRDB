@@ -1,5 +1,5 @@
-import path from 'path'
-import ChildProcess from 'child_process'
+import * as path from 'path'
+import * as ChildProcess from 'child_process'
 import { ChildProcessAdapter } from '../Adapter/ChildProcessAdapter'
 import { Client, DebuggerNotify, RunningStatus } from '../Client'
 
