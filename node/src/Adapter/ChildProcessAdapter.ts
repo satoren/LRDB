@@ -2,18 +2,8 @@ import * as path from 'path'
 import { isJsonRpcMessage, JsonRpcMessage } from '../JsonRpc'
 import { DebugRequest, DebugClientAdapter } from '../Client'
 import { TypedEventEmitter } from '../TypedEventEmitter'
-import { ChildProcess, ForkOptions, fork } from 'child_process'
-
-export const debuggableLuaModulePath = path.resolve(
-  __dirname,
-  '../../bin/ChildDebuggableLua.js'
-)
-
-export const runLuaAtWasm = (
-  file: string,
-  args: string[] = [],
-  options?: ForkOptions
-): ChildProcess => fork(debuggableLuaModulePath, [file, ...args], options)
+import { ChildProcess, ForkOptions } from 'child_process'
+import * as LuaWasm from '../LuaWasm'
 
 export class ChildProcessAdapter implements DebugClientAdapter {
   onMessage: TypedEventEmitter<JsonRpcMessage> = new TypedEventEmitter<JsonRpcMessage>()
@@ -28,7 +18,7 @@ export class ChildProcessAdapter implements DebugClientAdapter {
     options?: ForkOptions
   ) {
     if (typeof child === 'string') {
-      this.child = runLuaAtWasm(child, args, options)
+      this.child = LuaWasm.run(child, args, options)
     } else {
       this.child = child
     }

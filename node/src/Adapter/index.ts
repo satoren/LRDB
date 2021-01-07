@@ -1,6 +1,2 @@
 export { TcpAdapter } from './TcpAdapter'
-export {
-  ChildProcessAdapter,
-  runLuaAtWasm,
-  debuggableLuaModulePath,
-} from './ChildProcessAdapter'
+export { ChildProcessAdapter } from './ChildProcessAdapter'
