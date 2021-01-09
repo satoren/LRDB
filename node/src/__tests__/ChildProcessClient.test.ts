@@ -150,7 +150,7 @@ test('add breakpoint', async () => {
   const child = runScript('loop_test.lua', [])
   const client = new Client(new ChildProcessAdapter(child))
   await wait(client, 'paused')
-  await client.addBreadPoint({ file: 'loop_test.lua', line: 11 })
+  await client.addBreakPoint({ file: 'loop_test.lua', line: 11 })
   await client.continue()
   await wait(client, ['paused', 'exit'])
   const ret = []
@@ -169,7 +169,7 @@ test('get global', async () => {
   const child = runScript('test1.lua', [])
   const client = new Client(new ChildProcessAdapter(child))
   await wait(client, 'paused')
-  await client.addBreadPoint({ file: 'test1.lua', line: 3 })
+  await client.addBreakPoint({ file: 'test1.lua', line: 3 })
   await client.continue()
   await wait(client, ['paused', 'exit'])
 
@@ -184,7 +184,7 @@ test('get upvalues', async () => {
   const child = runScript('test1.lua', [])
   const client = new Client(new ChildProcessAdapter(child))
   await wait(client, 'paused')
-  await client.addBreadPoint({ file: 'test1.lua', line: 3 })
+  await client.addBreakPoint({ file: 'test1.lua', line: 3 })
   await client.continue()
   await wait(client, ['paused', 'exit'])
 
@@ -198,10 +198,10 @@ test('eval', async () => {
   const child = runScript('eval_test1.lua', ['arg1', 'arg2'])
   const client = new Client(new ChildProcessAdapter(child))
   await wait(client, 'paused')
-  await client.addBreadPoint({ file: 'eval_test1.lua', line: 4 })
+  await client.addBreakPoint({ file: 'eval_test1.lua', line: 4 })
   await client.continue()
   await wait(client, 'paused')
-  const evalResult = await client.evalRequest({
+  const evalResult = await client.eval({
     chunk: 'arg,value,local_value,local_value3',
     stack_no: 0,
   })
@@ -215,11 +215,11 @@ test('error response', async () => {
   const child = runScript('eval_test1.lua', ['arg1', 'arg2'])
   const client = new Client(new ChildProcessAdapter(child))
   await wait(client, 'paused')
-  await client.addBreadPoint({ file: 'eval_test1.lua', line: 4 })
+  await client.addBreakPoint({ file: 'eval_test1.lua', line: 4 })
   await client.continue()
   await wait(client, 'paused')
   await expect(
-    client.evalRequest({ chunk: 'arg', stack_no: 333 })
+    client.eval({ chunk: 'arg', stack_no: 333 })
   ).rejects.toThrowError()
 
   client.end()
@@ -230,8 +230,8 @@ test('get breakpoints', async () => {
   const child = runScript('test1.lua', [])
   const client = new Client(new ChildProcessAdapter(child))
   await wait(client, 'paused')
-  await client.addBreadPoint({ file: 'test1.lua', line: 3 })
-  await client.addBreadPoint({ file: 'test1.lua', line: 5 })
+  await client.addBreakPoint({ file: 'test1.lua', line: 3 })
+  await client.addBreakPoint({ file: 'test1.lua', line: 5 })
 
   expect(await (await client.getBreakPoints()).result).toMatchObject([
     { file: 'test1.lua', line: 3 },
@@ -245,8 +245,8 @@ test('get breakpoints', async () => {
   const child = runScript('test1.lua', [])
   const client = new Client(new ChildProcessAdapter(child))
   await wait(client, 'paused')
-  await client.addBreadPoint({ file: 'test1.lua', line: 3 })
-  await client.addBreadPoint({ file: 'test1.lua', line: 5 })
+  await client.addBreakPoint({ file: 'test1.lua', line: 3 })
+  await client.addBreakPoint({ file: 'test1.lua', line: 5 })
   await client.clearBreakPoints({ file: 'test1.lua' })
   await client.continue()
   await wait(client, ['exit'])
@@ -257,7 +257,7 @@ test('get step_out', async () => {
   const child = runScript('step_out_test1.lua', [])
   const client = new Client(new ChildProcessAdapter(child))
   await wait(client, 'paused')
-  await client.addBreadPoint({ file: 'step_out_test1.lua', line: 3 })
+  await client.addBreakPoint({ file: 'step_out_test1.lua', line: 3 })
   await client.continue()
   await wait(client, 'paused')
   await client.stepOut()
