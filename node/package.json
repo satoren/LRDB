@@ -1,6 +1,6 @@
 {
   "name": "lrdb-debuggable-lua",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "main": "dist/index",
   "license": "MIT",
   "scripts": {
