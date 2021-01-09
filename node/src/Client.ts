@@ -94,7 +94,7 @@ export class Client {
   pause = (): Promise<DebugResponseType<PauseRequest>> =>
     this.send({ method: 'pause', jsonrpc: '2.0', id: this.seqId++ })
 
-  addBreadPoint = (
+  addBreakPoint = (
     params: AddBreakPointRequest['params']
   ): Promise<DebugResponseType<AddBreakPointRequest>> =>
     this.send({
@@ -142,7 +142,7 @@ export class Client {
       id: this.seqId++,
       params,
     })
-  evalRequest = (
+  eval = (
     params: EvalRequest['params']
   ): Promise<DebugResponseType<EvalRequest>> =>
     this.send({
