@@ -137,6 +137,15 @@ test('pause in infinite loop', async () => {
   child.kill()
 })
 
+test('process exit at end', async () => {
+  const child = runScript('loop_test.lua', [])
+  const client = new Client(new ChildProcessAdapter(child))
+  await wait(client, 'paused')
+  await client.continue()
+  await new Promise<void>((resolve) => child.on('exit', resolve))
+  client.end()
+})
+
 test('add breakpoint', async () => {
   const child = runScript('loop_test.lua', [])
   const client = new Client(new ChildProcessAdapter(child))

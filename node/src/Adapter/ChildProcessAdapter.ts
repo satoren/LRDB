@@ -1,4 +1,3 @@
-import * as path from 'path'
 import { isJsonRpcMessage, JsonRpcMessage } from '../JsonRpc'
 import { DebugRequest, DebugClientAdapter } from '../Client'
 import { TypedEventEmitter } from '../TypedEventEmitter'
