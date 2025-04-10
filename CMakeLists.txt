@@ -1,5 +1,5 @@
 set(CMAKE_LEGACY_CYGWIN_WIN32 0)
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.16)
 project(LRDB)
 
 include(cmake/ReduceDependencies.cmake)
@@ -48,7 +48,7 @@ if(NOT MSVC)#-Wall nonsense on MSVC
   add_definitions(-Wno-variadic-macros)
   add_definitions ("-Wno-unused-local-typedefs")
   add_definitions ("-Wno-unknown-warning-option")
-  add_definitions("-std=c++11")
+  add_definitions("-std=c++17")
 endif(NOT MSVC)
 
 

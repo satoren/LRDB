@@ -27,8 +27,8 @@ test('exec', async () => {
     lua.do_file(
       path.resolve(testScriptDir, 'break_coroutine_test1.lua'),
       [],
-      resolve
-    )
+      resolve,
+    ),
   )
   expect(a).toBe(true)
 })

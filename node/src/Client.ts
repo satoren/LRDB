@@ -95,7 +95,7 @@ export class Client {
     this.send({ method: 'pause', jsonrpc: '2.0', id: this.seqId++ })
 
   addBreakPoint = (
-    params: AddBreakPointRequest['params']
+    params: AddBreakPointRequest['params'],
   ): Promise<DebugResponseType<AddBreakPointRequest>> =>
     this.send({
       method: 'add_breakpoint',
@@ -110,7 +110,7 @@ export class Client {
       id: this.seqId++,
     })
   clearBreakPoints = (
-    params: ClearBreakPointsRequest['params']
+    params: ClearBreakPointsRequest['params'],
   ): Promise<DebugResponseType<ClearBreakPointsRequest>> =>
     this.send({
       method: 'clear_breakpoints',
@@ -125,7 +125,7 @@ export class Client {
       id: this.seqId++,
     })
   getLocalVariable = (
-    params: GetLocalVariableRequest['params']
+    params: GetLocalVariableRequest['params'],
   ): Promise<DebugResponseType<GetLocalVariableRequest>> =>
     this.send({
       method: 'get_local_variable',
@@ -134,7 +134,7 @@ export class Client {
       params,
     })
   getUpvalues = (
-    params: GetUpvaluesRequest['params']
+    params: GetUpvaluesRequest['params'],
   ): Promise<DebugResponseType<GetUpvaluesRequest>> =>
     this.send({
       method: 'get_upvalues',
@@ -143,7 +143,7 @@ export class Client {
       params,
     })
   eval = (
-    params: EvalRequest['params']
+    params: EvalRequest['params'],
   ): Promise<DebugResponseType<EvalRequest>> =>
     this.send({
       method: 'eval',
@@ -152,7 +152,7 @@ export class Client {
       params,
     })
   getGlobal = (
-    params: GetGlobalRequest['params']
+    params: GetGlobalRequest['params'],
   ): Promise<DebugResponseType<GetGlobalRequest>> =>
     this.send({
       method: 'get_global',
@@ -165,7 +165,8 @@ export class Client {
     this.adapter.end()
   }
 
-  onNotify: TypedEventEmitter<DebuggerNotify> = new TypedEventEmitter<DebuggerNotify>()
+  onNotify: TypedEventEmitter<DebuggerNotify> =
+    new TypedEventEmitter<DebuggerNotify>()
   onClose: TypedEventTarget<void>
   onOpen: TypedEventTarget<void>
   onError: TypedEventTarget<Error>

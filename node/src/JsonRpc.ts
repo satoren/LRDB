@@ -8,7 +8,7 @@ export interface JsonRpcRequest {
 }
 
 export function isJsonRpcRequest(
-  message: JsonRpcMessage
+  message: JsonRpcMessage,
 ): message is JsonRpcRequest {
   return (
     (message as JsonRpcRequest).id != null &&
@@ -16,12 +16,12 @@ export function isJsonRpcRequest(
   )
 }
 export function isJsonRpcResponse(
-  message: JsonRpcMessage
+  message: JsonRpcMessage,
 ): message is JsonRpcResponse {
   return (message as JsonRpcResponse).id != null && !isJsonRpcRequest(message)
 }
 export function isJsonRpcNotify(
-  message: JsonRpcMessage
+  message: JsonRpcMessage,
 ): message is JsonRpcNotify {
   return (
     typeof (message as JsonRpcNotify).method === 'string' &&

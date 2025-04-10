@@ -8,15 +8,15 @@ jobs:
     name: build for node.js
     runs-on: ubuntu-latest
     steps:
-      - uses: mymindstorm/setup-emsdk@v7
-      - uses: actions/checkout@v2
+      - uses: mymindstorm/setup-emsdk@v13
+      - uses: actions/checkout@v4
       - run: cmake -E make_directory build
       - run: emcmake cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=Release
         working-directory: build
       - run: cmake --build . && cmake --build . --target install
         working-directory: build
       - name: Archive build result for js
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: node_lua_with_lrdb
           path: node/bin/node_lua_with_lrdb.*
@@ -26,26 +26,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           persist-credentials: false
       - name: Setup Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
-          node-version: 12
+          node-version: 20
       - name: Download a node_lua_with_lrdb
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: node_lua_with_lrdb
           path: node/bin/
-      - run: yarn
+      - run: npm ci
         working-directory: node
-      - run: yarn bundle
+      - run: npm run bundle
         working-directory: node
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: yarn semantic-release
+        run: npx semantic-release
         working-directory: node

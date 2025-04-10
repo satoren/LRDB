@@ -1,12 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`add breakpoint 1`] = `
-Array [
-  Object {
+[
+  {
     "id": 2,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -14,11 +14,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 4,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -26,11 +26,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 6,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -38,11 +38,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 8,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -50,11 +50,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 10,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -62,11 +62,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 12,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -74,11 +74,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 14,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -86,11 +86,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 16,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -98,11 +98,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 18,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -110,11 +110,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 20,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -126,12 +126,12 @@ Array [
 `;
 
 exports[`basic script break_coroutine_test1.lua step 1`] = `
-Array [
-  Object {
+[
+  {
     "id": 0,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@break_coroutine_test1.lua",
         "func": "main",
         "id": "break_coroutine_test1.lua",
@@ -139,11 +139,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 2,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@break_coroutine_test1.lua",
         "func": "main",
         "id": "break_coroutine_test1.lua",
@@ -151,11 +151,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 4,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@break_coroutine_test1.lua",
         "func": "main",
         "id": "break_coroutine_test1.lua",
@@ -163,11 +163,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 6,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@break_coroutine_test1.lua",
         "func": "main",
         "id": "break_coroutine_test1.lua",
@@ -175,11 +175,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 8,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@break_coroutine_test1.lua",
         "func": "main",
         "id": "break_coroutine_test1.lua",
@@ -187,11 +187,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 10,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@break_coroutine_test1.lua",
         "func": "main",
         "id": "break_coroutine_test1.lua",
@@ -199,11 +199,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 12,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@break_coroutine_test1.lua",
         "func": "Lua",
         "id": "break_coroutine_test1.lua",
@@ -211,11 +211,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 14,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@break_coroutine_test1.lua",
         "func": "Lua",
         "id": "break_coroutine_test1.lua",
@@ -223,11 +223,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 16,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@break_coroutine_test1.lua",
         "func": "Lua",
         "id": "break_coroutine_test1.lua",
@@ -235,11 +235,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 18,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@break_coroutine_test1.lua",
         "func": "Lua",
         "id": "break_coroutine_test1.lua",
@@ -247,11 +247,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 20,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@break_coroutine_test1.lua",
         "func": "Lua",
         "id": "break_coroutine_test1.lua",
@@ -263,12 +263,12 @@ Array [
 `;
 
 exports[`basic script break_coroutine_test1.lua stepIn 1`] = `
-Array [
-  Object {
+[
+  {
     "id": 0,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@break_coroutine_test1.lua",
         "func": "main",
         "id": "break_coroutine_test1.lua",
@@ -276,11 +276,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 2,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@break_coroutine_test1.lua",
         "func": "main",
         "id": "break_coroutine_test1.lua",
@@ -288,11 +288,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 4,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@break_coroutine_test1.lua",
         "func": "main",
         "id": "break_coroutine_test1.lua",
@@ -300,11 +300,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 6,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@break_coroutine_test1.lua",
         "func": "main",
         "id": "break_coroutine_test1.lua",
@@ -312,11 +312,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 8,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@break_coroutine_test1.lua",
         "func": "main",
         "id": "break_coroutine_test1.lua",
@@ -324,11 +324,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 10,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@break_coroutine_test1.lua",
         "func": "main",
         "id": "break_coroutine_test1.lua",
@@ -336,11 +336,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 12,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@break_coroutine_test1.lua",
         "func": "Lua",
         "id": "break_coroutine_test1.lua",
@@ -348,11 +348,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 14,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@break_coroutine_test1.lua",
         "func": "Lua",
         "id": "break_coroutine_test1.lua",
@@ -360,11 +360,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 16,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@break_coroutine_test1.lua",
         "func": "Lua",
         "id": "break_coroutine_test1.lua",
@@ -372,11 +372,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 18,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@break_coroutine_test1.lua",
         "func": "Lua",
         "id": "break_coroutine_test1.lua",
@@ -384,11 +384,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 20,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@break_coroutine_test1.lua",
         "func": "Lua",
         "id": "break_coroutine_test1.lua",
@@ -400,12 +400,12 @@ Array [
 `;
 
 exports[`basic script loop_test.lua step 1`] = `
-Array [
-  Object {
+[
+  {
     "id": 0,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -413,11 +413,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 2,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -425,11 +425,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 4,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -437,11 +437,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 6,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -449,11 +449,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 8,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -461,11 +461,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 10,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -473,11 +473,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 12,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -485,11 +485,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 14,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -497,11 +497,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 16,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -509,11 +509,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 18,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -521,11 +521,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 20,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -533,11 +533,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 22,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -545,11 +545,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 24,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -557,11 +557,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 26,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -569,11 +569,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 28,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -581,11 +581,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 30,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -593,11 +593,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 32,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -605,11 +605,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 34,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -617,11 +617,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 36,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -629,11 +629,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 38,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -641,11 +641,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 40,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -653,11 +653,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 42,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -665,11 +665,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 44,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -677,11 +677,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 46,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -689,11 +689,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 48,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -701,11 +701,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 50,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -717,12 +717,12 @@ Array [
 `;
 
 exports[`basic script loop_test.lua stepIn 1`] = `
-Array [
-  Object {
+[
+  {
     "id": 0,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -730,11 +730,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 2,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -742,11 +742,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 4,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -754,11 +754,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 6,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -766,11 +766,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 8,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -778,11 +778,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 10,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -790,17 +790,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 12,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 4,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -808,17 +808,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 14,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 5,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -826,17 +826,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 16,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 6,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -844,17 +844,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 18,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 7,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -862,17 +862,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 20,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 8,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -880,11 +880,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 22,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -892,11 +892,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 24,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -904,17 +904,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 26,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 4,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -922,17 +922,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 28,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 5,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -940,17 +940,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 30,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 6,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -958,17 +958,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 32,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 7,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -976,17 +976,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 34,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 8,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -994,11 +994,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 36,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1006,11 +1006,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 38,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1018,17 +1018,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 40,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 4,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1036,17 +1036,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 42,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 5,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1054,17 +1054,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 44,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 6,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1072,17 +1072,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 46,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 7,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1090,17 +1090,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 48,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 8,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1108,11 +1108,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 50,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1120,11 +1120,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 52,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1132,17 +1132,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 54,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 4,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1150,17 +1150,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 56,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 5,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1168,17 +1168,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 58,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 6,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1186,17 +1186,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 60,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 7,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1204,17 +1204,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 62,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 8,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1222,11 +1222,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 64,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1234,11 +1234,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 66,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1246,17 +1246,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 68,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 4,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1264,17 +1264,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 70,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 5,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1282,17 +1282,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 72,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 6,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1300,17 +1300,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 74,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 7,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1318,17 +1318,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 76,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 8,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1336,11 +1336,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 78,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1348,11 +1348,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 80,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1360,17 +1360,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 82,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 4,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1378,17 +1378,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 84,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 5,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1396,17 +1396,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 86,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 6,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1414,17 +1414,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 88,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 7,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1432,17 +1432,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 90,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 8,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1450,11 +1450,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 92,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1462,11 +1462,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 94,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1474,17 +1474,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 96,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 4,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1492,17 +1492,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 98,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 5,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1510,17 +1510,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 100,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 6,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1528,17 +1528,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 102,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 7,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1546,17 +1546,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 104,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 8,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1564,11 +1564,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 106,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1576,11 +1576,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 108,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1588,17 +1588,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 110,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 4,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1606,17 +1606,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 112,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 5,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1624,17 +1624,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 114,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 6,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1642,17 +1642,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 116,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 7,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1660,17 +1660,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 118,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 8,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1678,11 +1678,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 120,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1690,11 +1690,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 122,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1702,17 +1702,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 124,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 4,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1720,17 +1720,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 126,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 5,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1738,17 +1738,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 128,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 6,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1756,17 +1756,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 130,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 7,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1774,17 +1774,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 132,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 8,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1792,11 +1792,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 134,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1804,11 +1804,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 136,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1816,17 +1816,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 138,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 4,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1834,17 +1834,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 140,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 5,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1852,17 +1852,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 142,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 6,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1870,17 +1870,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 144,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 7,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1888,17 +1888,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 146,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "testfn",
         "id": "loop_test.lua",
         "line": 8,
       },
-      Object {
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1906,11 +1906,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 148,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1918,11 +1918,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 150,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@loop_test.lua",
         "func": "main",
         "id": "loop_test.lua",
@@ -1934,12 +1934,12 @@ Array [
 `;
 
 exports[`basic script require_module.lua step 1`] = `
-Array [
-  Object {
+[
+  {
     "id": 0,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@require_module.lua",
         "func": "main",
         "id": "require_module.lua",
@@ -1947,11 +1947,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 2,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@require_module.lua",
         "func": "main",
         "id": "require_module.lua",
@@ -1959,11 +1959,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 4,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@require_module.lua",
         "func": "main",
         "id": "require_module.lua",
@@ -1975,12 +1975,12 @@ Array [
 `;
 
 exports[`basic script require_module.lua stepIn 1`] = `
-Array [
-  Object {
+[
+  {
     "id": 0,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@require_module.lua",
         "func": "main",
         "id": "require_module.lua",
@@ -1988,11 +1988,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 2,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@require_module.lua",
         "func": "main",
         "id": "require_module.lua",
@@ -2000,23 +2000,23 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 4,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@./loadmodule.lua",
         "func": "main",
         "id": "./loadmodule.lua",
         "line": 1,
       },
-      Object {
+      {
         "file": "=[C]",
         "func": "require",
         "id": "[C]",
         "line": -1,
       },
-      Object {
+      {
         "file": "@require_module.lua",
         "func": "main",
         "id": "require_module.lua",
@@ -2024,23 +2024,23 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 6,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@./loadmodule.lua",
         "func": "main",
         "id": "./loadmodule.lua",
         "line": 2,
       },
-      Object {
+      {
         "file": "=[C]",
         "func": "require",
         "id": "[C]",
         "line": -1,
       },
-      Object {
+      {
         "file": "@require_module.lua",
         "func": "main",
         "id": "require_module.lua",
@@ -2048,23 +2048,23 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 8,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@./loadmodule.lua",
         "func": "main",
         "id": "./loadmodule.lua",
         "line": 3,
       },
-      Object {
+      {
         "file": "=[C]",
         "func": "require",
         "id": "[C]",
         "line": -1,
       },
-      Object {
+      {
         "file": "@require_module.lua",
         "func": "main",
         "id": "require_module.lua",
@@ -2072,11 +2072,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 10,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@require_module.lua",
         "func": "main",
         "id": "require_module.lua",
@@ -2088,12 +2088,12 @@ Array [
 `;
 
 exports[`basic script step_in_test1.lua step 1`] = `
-Array [
-  Object {
+[
+  {
     "id": 0,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@step_in_test1.lua",
         "func": "main",
         "id": "step_in_test1.lua",
@@ -2101,11 +2101,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 2,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@step_in_test1.lua",
         "func": "main",
         "id": "step_in_test1.lua",
@@ -2113,11 +2113,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 4,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@step_in_test1.lua",
         "func": "main",
         "id": "step_in_test1.lua",
@@ -2125,11 +2125,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 6,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@step_in_test1.lua",
         "func": "main",
         "id": "step_in_test1.lua",
@@ -2137,11 +2137,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 8,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@step_in_test1.lua",
         "func": "main",
         "id": "step_in_test1.lua",
@@ -2153,12 +2153,12 @@ Array [
 `;
 
 exports[`basic script step_in_test1.lua stepIn 1`] = `
-Array [
-  Object {
+[
+  {
     "id": 0,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@step_in_test1.lua",
         "func": "main",
         "id": "step_in_test1.lua",
@@ -2166,11 +2166,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 2,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@step_in_test1.lua",
         "func": "main",
         "id": "step_in_test1.lua",
@@ -2178,11 +2178,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 4,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@step_in_test1.lua",
         "func": "main",
         "id": "step_in_test1.lua",
@@ -2190,11 +2190,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 6,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@step_in_test1.lua",
         "func": "main",
         "id": "step_in_test1.lua",
@@ -2202,11 +2202,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 8,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@step_in_test1.lua",
         "func": "main",
         "id": "step_in_test1.lua",
@@ -2214,17 +2214,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 10,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@step_in_test1.lua",
         "func": "testfn",
         "id": "step_in_test1.lua",
         "line": 3,
       },
-      Object {
+      {
         "file": "@step_in_test1.lua",
         "func": "main",
         "id": "step_in_test1.lua",
@@ -2232,17 +2232,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 12,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@step_in_test1.lua",
         "func": "testfn",
         "id": "step_in_test1.lua",
         "line": 4,
       },
-      Object {
+      {
         "file": "@step_in_test1.lua",
         "func": "main",
         "id": "step_in_test1.lua",
@@ -2250,17 +2250,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 14,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@step_in_test1.lua",
         "func": "testfn",
         "id": "step_in_test1.lua",
         "line": 5,
       },
-      Object {
+      {
         "file": "@step_in_test1.lua",
         "func": "main",
         "id": "step_in_test1.lua",
@@ -2268,17 +2268,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 16,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@step_in_test1.lua",
         "func": "testfn",
         "id": "step_in_test1.lua",
         "line": 6,
       },
-      Object {
+      {
         "file": "@step_in_test1.lua",
         "func": "main",
         "id": "step_in_test1.lua",
@@ -2286,17 +2286,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 18,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@step_in_test1.lua",
         "func": "testfn",
         "id": "step_in_test1.lua",
         "line": 7,
       },
-      Object {
+      {
         "file": "@step_in_test1.lua",
         "func": "main",
         "id": "step_in_test1.lua",
@@ -2308,12 +2308,12 @@ Array [
 `;
 
 exports[`basic script table.lua step 1`] = `
-Array [
-  Object {
+[
+  {
     "id": 0,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@table.lua",
         "func": "main",
         "id": "table.lua",
@@ -2321,11 +2321,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 2,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@table.lua",
         "func": "main",
         "id": "table.lua",
@@ -2333,11 +2333,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 4,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@table.lua",
         "func": "main",
         "id": "table.lua",
@@ -2345,11 +2345,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 6,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@table.lua",
         "func": "main",
         "id": "table.lua",
@@ -2361,12 +2361,12 @@ Array [
 `;
 
 exports[`basic script table.lua stepIn 1`] = `
-Array [
-  Object {
+[
+  {
     "id": 0,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@table.lua",
         "func": "main",
         "id": "table.lua",
@@ -2374,11 +2374,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 2,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@table.lua",
         "func": "main",
         "id": "table.lua",
@@ -2386,11 +2386,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 4,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@table.lua",
         "func": "main",
         "id": "table.lua",
@@ -2398,11 +2398,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 6,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@table.lua",
         "func": "main",
         "id": "table.lua",
@@ -2414,12 +2414,12 @@ Array [
 `;
 
 exports[`basic script vaarg_test1.lua step 1`] = `
-Array [
-  Object {
+[
+  {
     "id": 0,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@vaarg_test1.lua",
         "func": "main",
         "id": "vaarg_test1.lua",
@@ -2427,11 +2427,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 2,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@vaarg_test1.lua",
         "func": "main",
         "id": "vaarg_test1.lua",
@@ -2439,11 +2439,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 4,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@vaarg_test1.lua",
         "func": "main",
         "id": "vaarg_test1.lua",
@@ -2451,11 +2451,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 6,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@vaarg_test1.lua",
         "func": "main",
         "id": "vaarg_test1.lua",
@@ -2463,11 +2463,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 8,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@vaarg_test1.lua",
         "func": "main",
         "id": "vaarg_test1.lua",
@@ -2479,12 +2479,12 @@ Array [
 `;
 
 exports[`basic script vaarg_test1.lua stepIn 1`] = `
-Array [
-  Object {
+[
+  {
     "id": 0,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@vaarg_test1.lua",
         "func": "main",
         "id": "vaarg_test1.lua",
@@ -2492,11 +2492,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 2,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@vaarg_test1.lua",
         "func": "main",
         "id": "vaarg_test1.lua",
@@ -2504,11 +2504,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 4,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@vaarg_test1.lua",
         "func": "main",
         "id": "vaarg_test1.lua",
@@ -2516,11 +2516,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 6,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@vaarg_test1.lua",
         "func": "main",
         "id": "vaarg_test1.lua",
@@ -2528,11 +2528,11 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 8,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@vaarg_test1.lua",
         "func": "main",
         "id": "vaarg_test1.lua",
@@ -2540,17 +2540,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 10,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@vaarg_test1.lua",
         "func": "testfn",
         "id": "vaarg_test1.lua",
         "line": 3,
       },
-      Object {
+      {
         "file": "@vaarg_test1.lua",
         "func": "main",
         "id": "vaarg_test1.lua",
@@ -2558,17 +2558,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 12,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@vaarg_test1.lua",
         "func": "testfn",
         "id": "vaarg_test1.lua",
         "line": 4,
       },
-      Object {
+      {
         "file": "@vaarg_test1.lua",
         "func": "main",
         "id": "vaarg_test1.lua",
@@ -2576,17 +2576,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 14,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@vaarg_test1.lua",
         "func": "testfn",
         "id": "vaarg_test1.lua",
         "line": 5,
       },
-      Object {
+      {
         "file": "@vaarg_test1.lua",
         "func": "main",
         "id": "vaarg_test1.lua",
@@ -2594,17 +2594,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 16,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@vaarg_test1.lua",
         "func": "testfn",
         "id": "vaarg_test1.lua",
         "line": 6,
       },
-      Object {
+      {
         "file": "@vaarg_test1.lua",
         "func": "main",
         "id": "vaarg_test1.lua",
@@ -2612,17 +2612,17 @@ Array [
       },
     ],
   },
-  Object {
+  {
     "id": 18,
     "jsonrpc": "2.0",
-    "result": Array [
-      Object {
+    "result": [
+      {
         "file": "@vaarg_test1.lua",
         "func": "testfn",
         "id": "vaarg_test1.lua",
         "line": 7,
       },
-      Object {
+      {
         "file": "@vaarg_test1.lua",
         "func": "main",
         "id": "vaarg_test1.lua",
@@ -2634,10 +2634,10 @@ Array [
 `;
 
 exports[`eval 1`] = `
-Object {
+{
   "id": 2,
   "jsonrpc": "2.0",
-  "result": Array [
+  "result": [
     4,
     1,
     2,
@@ -2649,11 +2649,11 @@ Object {
 exports[`get global 1`] = `"Lua 5.3"`;
 
 exports[`get step_out 1`] = `
-Object {
+{
   "id": 3,
   "jsonrpc": "2.0",
-  "result": Array [
-    Object {
+  "result": [
+    {
       "file": "@step_out_test1.lua",
       "func": "main",
       "id": "step_out_test1.lua",
@@ -2664,47 +2664,47 @@ Object {
 `;
 
 exports[`get upvalues 1`] = `
-Object {
+{
   "id": 2,
   "jsonrpc": "2.0",
-  "result": Object {
+  "result": {
     "value": 1,
   },
 }
 `;
 
 exports[`script step_in_test1.lua getLocalVariable 1`] = `
-Array [
-  Array [
-    Object {
+[
+  [
+    {
       "id": 1,
       "jsonrpc": "2.0",
-      "result": Object {
-        "(*vararg)": Array [
+      "result": {
+        "(*vararg)": [
           "arg1",
           "arg2",
         ],
       },
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "id": 4,
       "jsonrpc": "2.0",
-      "result": Object {
-        "(*vararg)": Array [
+      "result": {
+        "(*vararg)": [
           "arg1",
           "arg2",
         ],
       },
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "id": 7,
       "jsonrpc": "2.0",
-      "result": Object {
-        "(*vararg)": Array [
+      "result": {
+        "(*vararg)": [
           "arg1",
           "arg2",
         ],
@@ -2712,12 +2712,12 @@ Array [
       },
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "id": 10,
       "jsonrpc": "2.0",
-      "result": Object {
-        "(*vararg)": Array [
+      "result": {
+        "(*vararg)": [
           "arg1",
           "arg2",
         ],
@@ -2725,12 +2725,12 @@ Array [
       },
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "id": 13,
       "jsonrpc": "2.0",
-      "result": Object {
-        "(*vararg)": Array [
+      "result": {
+        "(*vararg)": [
           "arg1",
           "arg2",
         ],
@@ -2738,17 +2738,17 @@ Array [
       },
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "id": 16,
       "jsonrpc": "2.0",
-      "result": Object {},
+      "result": {},
     },
-    Object {
+    {
       "id": 17,
       "jsonrpc": "2.0",
-      "result": Object {
-        "(*vararg)": Array [
+      "result": {
+        "(*vararg)": [
           "arg1",
           "arg2",
         ],
@@ -2756,19 +2756,19 @@ Array [
       },
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "id": 20,
       "jsonrpc": "2.0",
-      "result": Object {
+      "result": {
         "local_value1": 1,
       },
     },
-    Object {
+    {
       "id": 21,
       "jsonrpc": "2.0",
-      "result": Object {
-        "(*vararg)": Array [
+      "result": {
+        "(*vararg)": [
           "arg1",
           "arg2",
         ],
@@ -2776,20 +2776,20 @@ Array [
       },
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "id": 24,
       "jsonrpc": "2.0",
-      "result": Object {
+      "result": {
         "local_value1": 1,
         "local_value2": "abc",
       },
     },
-    Object {
+    {
       "id": 25,
       "jsonrpc": "2.0",
-      "result": Object {
-        "(*vararg)": Array [
+      "result": {
+        "(*vararg)": [
           "arg1",
           "arg2",
         ],
@@ -2797,21 +2797,21 @@ Array [
       },
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "id": 28,
       "jsonrpc": "2.0",
-      "result": Object {
+      "result": {
         "local_value1": 1,
         "local_value2": "abc",
         "local_value3": 4234.33,
       },
     },
-    Object {
+    {
       "id": 29,
       "jsonrpc": "2.0",
-      "result": Object {
-        "(*vararg)": Array [
+      "result": {
+        "(*vararg)": [
           "arg1",
           "arg2",
         ],
@@ -2819,24 +2819,24 @@ Array [
       },
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "id": 32,
       "jsonrpc": "2.0",
-      "result": Object {
+      "result": {
         "local_value1": 1,
         "local_value2": "abc",
         "local_value3": 4234.33,
-        "local_value4": Array [
+        "local_value4": [
           4234.3,
         ],
       },
     },
-    Object {
+    {
       "id": 33,
       "jsonrpc": "2.0",
-      "result": Object {
-        "(*vararg)": Array [
+      "result": {
+        "(*vararg)": [
           "arg1",
           "arg2",
         ],
@@ -2848,37 +2848,37 @@ Array [
 `;
 
 exports[`script vaarg_test1.lua getLocalVariable 1`] = `
-Array [
-  Array [
-    Object {
+[
+  [
+    {
       "id": 1,
       "jsonrpc": "2.0",
-      "result": Object {
-        "(*vararg)": Array [
+      "result": {
+        "(*vararg)": [
           "arg1",
           "arg2",
         ],
       },
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "id": 4,
       "jsonrpc": "2.0",
-      "result": Object {
-        "(*vararg)": Array [
+      "result": {
+        "(*vararg)": [
           "arg1",
           "arg2",
         ],
       },
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "id": 7,
       "jsonrpc": "2.0",
-      "result": Object {
-        "(*vararg)": Array [
+      "result": {
+        "(*vararg)": [
           "arg1",
           "arg2",
         ],
@@ -2886,12 +2886,12 @@ Array [
       },
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "id": 10,
       "jsonrpc": "2.0",
-      "result": Object {
-        "(*vararg)": Array [
+      "result": {
+        "(*vararg)": [
           "arg1",
           "arg2",
         ],
@@ -2899,12 +2899,12 @@ Array [
       },
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "id": 13,
       "jsonrpc": "2.0",
-      "result": Object {
-        "(*vararg)": Array [
+      "result": {
+        "(*vararg)": [
           "arg1",
           "arg2",
         ],
@@ -2912,23 +2912,23 @@ Array [
       },
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "id": 16,
       "jsonrpc": "2.0",
-      "result": Object {
-        "(*vararg)": Array [
+      "result": {
+        "(*vararg)": [
           1,
           3,
         ],
         "v1": 2,
       },
     },
-    Object {
+    {
       "id": 17,
       "jsonrpc": "2.0",
-      "result": Object {
-        "(*vararg)": Array [
+      "result": {
+        "(*vararg)": [
           "arg1",
           "arg2",
         ],
@@ -2936,12 +2936,12 @@ Array [
       },
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "id": 20,
       "jsonrpc": "2.0",
-      "result": Object {
-        "(*vararg)": Array [
+      "result": {
+        "(*vararg)": [
           1,
           3,
         ],
@@ -2949,11 +2949,11 @@ Array [
         "v1": 2,
       },
     },
-    Object {
+    {
       "id": 21,
       "jsonrpc": "2.0",
-      "result": Object {
-        "(*vararg)": Array [
+      "result": {
+        "(*vararg)": [
           "arg1",
           "arg2",
         ],
@@ -2961,12 +2961,12 @@ Array [
       },
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "id": 24,
       "jsonrpc": "2.0",
-      "result": Object {
-        "(*vararg)": Array [
+      "result": {
+        "(*vararg)": [
           1,
           3,
         ],
@@ -2975,11 +2975,11 @@ Array [
         "v1": 2,
       },
     },
-    Object {
+    {
       "id": 25,
       "jsonrpc": "2.0",
-      "result": Object {
-        "(*vararg)": Array [
+      "result": {
+        "(*vararg)": [
           "arg1",
           "arg2",
         ],
@@ -2987,12 +2987,12 @@ Array [
       },
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "id": 28,
       "jsonrpc": "2.0",
-      "result": Object {
-        "(*vararg)": Array [
+      "result": {
+        "(*vararg)": [
           1,
           3,
         ],
@@ -3002,11 +3002,11 @@ Array [
         "v1": 2,
       },
     },
-    Object {
+    {
       "id": 29,
       "jsonrpc": "2.0",
-      "result": Object {
-        "(*vararg)": Array [
+      "result": {
+        "(*vararg)": [
           "arg1",
           "arg2",
         ],
@@ -3014,29 +3014,29 @@ Array [
       },
     },
   ],
-  Array [
-    Object {
+  [
+    {
       "id": 32,
       "jsonrpc": "2.0",
-      "result": Object {
-        "(*vararg)": Array [
+      "result": {
+        "(*vararg)": [
           1,
           3,
         ],
         "local_value1": 1,
         "local_value2": "abc",
         "local_value3": 4234.33,
-        "local_value4": Array [
+        "local_value4": [
           4234.3,
         ],
         "v1": 2,
       },
     },
-    Object {
+    {
       "id": 33,
       "jsonrpc": "2.0",
-      "result": Object {
-        "(*vararg)": Array [
+      "result": {
+        "(*vararg)": [
           "arg1",
           "arg2",
         ],
