@@ -6,7 +6,8 @@ import * as readline from 'readline'
 
 export class TcpAdapter implements DebugClientAdapter {
   private _connection: net.Socket
-  onMessage: TypedEventEmitter<JsonRpcMessage> = new TypedEventEmitter<JsonRpcMessage>()
+  onMessage: TypedEventEmitter<JsonRpcMessage> =
+    new TypedEventEmitter<JsonRpcMessage>()
   public constructor(port: number, host: string) {
     const connection = net.connect(port, host)
     this._connection = connection

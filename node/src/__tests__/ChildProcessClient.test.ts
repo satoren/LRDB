@@ -5,7 +5,7 @@ import { Client, DebuggerNotify, RunningStatus } from '../Client'
 
 async function wait(
   client: Client,
-  stat: RunningStatus[] | RunningStatus
+  stat: RunningStatus[] | RunningStatus,
 ): Promise<void> {
   return new Promise<void>((resolve, reject) => {
     const handleNotify = (notify: DebuggerNotify) => {
@@ -27,7 +27,7 @@ async function wait(
 
 const debuggableLuaModule = path.resolve(
   __dirname,
-  '../../bin/ChildDebuggableLua.js'
+  '../../bin/ChildDebuggableLua.js',
 )
 const testScriptDir = path.resolve(__dirname, '../../../test/lua/')
 const runScript = (file: string, args: string[] = []) =>
@@ -47,7 +47,7 @@ describe('basic', () => {
       const client = new Client(
         new ChildProcessAdapter(script, [], {
           cwd: testScriptDir,
-        })
+        }),
       )
       await wait(client, 'paused')
       client.end()
@@ -111,8 +111,8 @@ describe.each([['step_in_test1.lua'], ['vaarg_test1.lua']])(
       while (client.currentStatus !== 'exit') {
         const localVars = await Promise.all(
           (await client.getStackTrace()).result.map((stack, index) =>
-            client.getLocalVariable({ stack_no: index })
-          )
+            client.getLocalVariable({ stack_no: index }),
+          ),
         )
         ret.push(localVars)
         await client.stepIn()
@@ -123,7 +123,7 @@ describe.each([['step_in_test1.lua'], ['vaarg_test1.lua']])(
       client.end()
       child.kill()
     })
-  }
+  },
 )
 
 test('pause in infinite loop', async () => {
@@ -174,7 +174,7 @@ test('get global', async () => {
   await wait(client, ['paused', 'exit'])
 
   expect(
-    (await client.getGlobal({ depth: 1 })).result['_VERSION']
+    (await client.getGlobal({ depth: 1 })).result['_VERSION'],
   ).toMatchSnapshot()
 
   client.end()
@@ -219,7 +219,7 @@ test('error response', async () => {
   await client.continue()
   await wait(client, 'paused')
   await expect(
-    client.eval({ chunk: 'arg', stack_no: 333 })
+    client.eval({ chunk: 'arg', stack_no: 333 }),
   ).rejects.toThrowError()
 
   client.end()

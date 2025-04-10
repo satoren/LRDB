@@ -5,7 +5,8 @@ import { ChildProcess, ForkOptions } from 'child_process'
 import * as LuaWasm from '../LuaWasm'
 
 export class ChildProcessAdapter implements DebugClientAdapter {
-  onMessage: TypedEventEmitter<JsonRpcMessage> = new TypedEventEmitter<JsonRpcMessage>()
+  onMessage: TypedEventEmitter<JsonRpcMessage> =
+    new TypedEventEmitter<JsonRpcMessage>()
   public child: ChildProcess
 
   public constructor(child: ChildProcess)
@@ -14,7 +15,7 @@ export class ChildProcessAdapter implements DebugClientAdapter {
   public constructor(
     child: ChildProcess | string,
     args?: string[],
-    options?: ForkOptions
+    options?: ForkOptions,
   ) {
     if (typeof child === 'string') {
       this.child = LuaWasm.run(child, args, options)
