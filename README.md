@@ -26,7 +26,27 @@ Command line interface debugger is not implemented.
 
 ## Requirements
   * Lua 5.1 or later
-  * C++11 compiler
+  * C++17 compiler
+
+## Release Process
+
+To create a new release:
+
+1. Create and push a new tag with version number:
+   ```
+   git tag v1.2.3
+   git push origin v1.2.3
+   ```
+
+2. GitHub Actions will automatically:
+   - Build WASM files for Node.js
+   - Build Lua C module
+   - Create GitHub Release with built artifacts
+   - Publish NPM package
+
+3. The release artifacts will be available at:
+   - GitHub Releases: https://github.com/satoren/LRDB/releases
+   - NPM: https://www.npmjs.com/package/lrdb
 
 ## Embedded to your host program
 
